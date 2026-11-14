@@ -1,0 +1,185 @@
+{
+  "checkpoint": "E:\\visionops-ppe\\runs\\baseline_yolo26n_640\\weights\\best.pt",
+  "configuration": {
+    "amp": true,
+    "batch": 8,
+    "cache": false,
+    "data": "E:\\visionops-ppe\\data\\construction-ppe\\data.yaml",
+    "deterministic": true,
+    "device": 0,
+    "epochs": 100,
+    "imgsz": 640,
+    "model": "yolo26n.pt",
+    "name": "baseline_yolo26n_640",
+    "patience": 20,
+    "pretrained": true,
+    "project": "E:\\visionops-ppe\\runs",
+    "seed": 42,
+    "task": "detect",
+    "workers": 4
+  },
+  "created_at": "2026-11-13T22:10:27.182045+00:00",
+  "curated_plots": [
+    "results.png",
+    "confusion_matrix.png",
+    "confusion_matrix_normalized.png",
+    "BoxPR_curve.png",
+    "BoxF1_curve.png",
+    "BoxP_curve.png",
+    "BoxR_curve.png"
+  ],
+  "environment": {
+    "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.6",
+    "torch_cuda_runtime": "12.1",
+    "torch_version": "2.5.1+cu121",
+    "ultralytics_version": "8.4.212"
+  },
+  "overall": {
+    "map50": 0.7654089439510301,
+    "map50_95": 0.546142136043428,
+    "precision": 0.8667484493562814,
+    "recall": 0.7021269961400161
+  },
+  "per_class": [
+    {
+      "ap50": 0.8583893332,
+      "class_id": 0,
+      "class_name": "helmet",
+      "images": 146,
+      "instances": 294,
+      "map50_95": 0.6614492572,
+      "precision": 0.9151910367,
+      "recall": 0.7925170068
+    },
+    {
+      "ap50": 0.8081613446,
+      "class_id": 1,
+      "class_name": "gloves",
+      "images": 136,
+      "instances": 381,
+      "map50_95": 0.6227046737,
+      "precision": 0.8924637597,
+      "recall": 0.7406113742
+    },
+    {
+      "ap50": 0.9013801539,
+      "class_id": 2,
+      "class_name": "vest",
+      "images": 157,
+      "instances": 340,
+      "map50_95": 0.7117827256,
+      "precision": 0.9634498818,
+      "recall": 0.8528139918
+    },
+    {
+      "ap50": 0.7842344628,
+      "class_id": 3,
+      "class_name": "boots",
+      "images": 155,
+      "instances": 481,
+      "map50_95": 0.5801058083,
+      "precision": 0.8273896805,
+      "recall": 0.6964656965
+    },
+    {
+      "ap50": 0.9650554663,
+      "class_id": 4,
+      "class_name": "goggles",
+      "images": 102,
+      "instances": 139,
+      "map50_95": 0.6438718274,
+      "precision": 0.9197211641,
+      "recall": 0.964028777
+    },
+    {
+      "ap50": 0.9412102856,
+      "class_id": 5,
+      "class_name": "Person",
+      "images": 200,
+      "instances": 481,
+      "map50_95": 0.7841994339,
+      "precision": 0.9327648896,
+      "recall": 0.8877338877
+    },
+    {
+      "ap50": 0.6816260865,
+      "class_id": 6,
+      "class_name": "no_helmet",
+      "images": 91,
+      "instances": 179,
+      "map50_95": 0.4158317353,
+      "precision": 0.9110398921,
+      "recall": 0.5977653631
+    },
+    {
+      "ap50": 0.351606302,
+      "class_id": 7,
+      "class_name": "no_goggle",
+      "images": 56,
+      "instances": 82,
+      "map50_95": 0.0844611989,
+      "precision": 0.6113937173,
+      "recall": 0.2195121951
+    },
+    {
+      "ap50": 0.6525833217,
+      "class_id": 8,
+      "class_name": "no_gloves",
+      "images": 94,
+      "instances": 203,
+      "map50_95": 0.4008696585,
+      "precision": 0.8566396929,
+      "recall": 0.5887212865
+    },
+    {
+      "ap50": 0.731262993,
+      "class_id": 9,
+      "class_name": "no_boots",
+      "images": 71,
+      "instances": 178,
+      "map50_95": 0.5710435974,
+      "precision": 0.8535388391,
+      "recall": 0.6404494382
+    },
+    {
+      "ap50": 0.7998394295,
+      "class_id": 10,
+      "class_name": "forklift",
+      "images": 46,
+      "instances": 73,
+      "map50_95": 0.5855808805,
+      "precision": 0.7921967828,
+      "recall": 0.7833664751
+    },
+    {
+      "ap50": 0.7095581483,
+      "class_id": 11,
+      "class_name": "no_vest",
+      "images": 84,
+      "instances": 130,
+      "map50_95": 0.4918048358,
+      "precision": 0.9251920556,
+      "recall": 0.6615384615
+    }
+  ],
+  "training": {
+    "actual_batch": 8,
+    "best_epoch": 86,
+    "duration_seconds": 2690.5581833999604,
+    "early_stopping_occurred": false,
+    "final_epoch": 100,
+    "peak_gpu_memory_allocated_gib": 1.37969970703125,
+    "peak_gpu_memory_reserved_gib": 1.859375,
+    "requested_epochs": 100
+  },
+  "validation_duration_seconds": 14.678784700110555,
+  "validation_output_directory": "E:\\visionops-ppe\\runs\\baseline_yolo26n_640_best_val",
+  "validation_speed_ms_per_image": {
+    "inference": 6.405696999281645,
+    "loss": 0.000694995978847146,
+    "postprocess": 1.0478914948180318,
+    "preprocess": 0.7998124987352639
+  }
+}

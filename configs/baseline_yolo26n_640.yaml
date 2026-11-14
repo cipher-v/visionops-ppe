@@ -1,0 +1,19 @@
+# VisionOps PPE Checkpoint 2 baseline.
+# Unlisted training settings inherit Ultralytics 8.4.212 defaults.
+task: detect
+model: yolo26n.pt
+data: data/construction-ppe/data.yaml
+pretrained: true
+epochs: 100
+imgsz: 640
+batch: 8
+device: 0
+seed: 42
+deterministic: true
+patience: 20
+amp: true
+workers: 4
+cache: false
+project: runs
+name: baseline_yolo26n_640
+
