@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 5 — external generalization evaluation**
+**Checkpoint 6 — systematic domain-shift characterization**
 
-The repository now includes an integrity and leakage audit of RF100 Construction Safety
-v2 plus an independent comparison of the frozen YOLO26n and YOLO26s 960-pixel best
-checkpoints on its official test split. No training, fine-tuning, threshold tuning,
-tracking, inference API, export, event logic, dashboards, or monitoring components have
-been added.
+The repository now includes a frozen external-test policy and deterministic comparisons
+of image, annotation, confidence, localization, classification, miss, false-positive, and
+class-by-size distributions between Construction-PPE and RF100 development data. No
+training, fine-tuning, threshold tuning, tracking, inference API, export, event logic,
+dashboards, or monitoring components have been added.
 
