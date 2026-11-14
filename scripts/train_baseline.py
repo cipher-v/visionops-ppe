@@ -1,4 +1,4 @@
-"""Train the single deterministic VisionOps PPE YOLO26n baseline."""
+"""Train one exact, deterministic VisionOps PPE experiment configuration."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from ultralytics import YOLO
 from ultralytics import __version__ as ultralytics_version
 
 from visionops.baseline import (
-    load_baseline_config,
+    load_experiment_config,
     prepare_runtime_dataset_yaml,
     sha256_file,
 )
@@ -66,10 +66,10 @@ def main() -> None:
     """Validate the environment, train once, and record raw run metadata."""
     args = parse_args()
     config_path = args.config.resolve()
-    config = load_baseline_config(config_path)
+    config = load_experiment_config(config_path)
 
     if not torch.cuda.is_available():
-        raise RuntimeError("CUDA is required for the Checkpoint 2 baseline")
+        raise RuntimeError("CUDA is required for controlled training experiments")
     if torch.cuda.device_count() <= config.device:
         raise RuntimeError(
             f"Requested CUDA device {config.device}, but found "
@@ -79,7 +79,7 @@ def main() -> None:
     run_dir = config.project / config.name
     if run_dir.exists() and any(run_dir.iterdir()):
         raise FileExistsError(
-            f"Refusing to mix a new baseline with existing artifacts in {run_dir}"
+            f"Refusing to mix a new experiment with existing artifacts in {run_dir}"
         )
     run_dir.mkdir(parents=True, exist_ok=True)
     runtime_data = prepare_runtime_dataset_yaml(
@@ -126,7 +126,7 @@ def main() -> None:
         if trainer.batch_size < 4:
             raise RuntimeError(
                 "Batch 4 also exhausted CUDA memory; smaller batches are outside "
-                "the Checkpoint 2 specification"
+                "the controlled experiment specification"
             )
 
     model.add_callback("on_train_batch_start", enforce_allowed_batch)

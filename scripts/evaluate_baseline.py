@@ -1,4 +1,4 @@
-"""Evaluate the best baseline checkpoint and curate lightweight results."""
+"""Evaluate the best checkpoint from an exact controlled experiment."""
 
 from __future__ import annotations
 
@@ -16,7 +16,11 @@ import torch
 from ultralytics import YOLO
 from ultralytics import __version__ as ultralytics_version
 
-from visionops.baseline import load_baseline_config, prepare_runtime_dataset_yaml
+from visionops.baseline import (
+    EXPECTED_BASELINE_VALUES,
+    load_experiment_config,
+    prepare_runtime_dataset_yaml,
+)
 
 
 def json_safe(value: Any) -> Any:
@@ -211,11 +215,11 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Evaluate best.pt and write curated metrics, plots, and Markdown."""
+    """Evaluate best.pt and write curated metrics and plots."""
     args = parse_args()
-    config = load_baseline_config(args.config)
+    config = load_experiment_config(args.config)
     if not torch.cuda.is_available():
-        raise RuntimeError("CUDA is required for baseline validation")
+        raise RuntimeError("CUDA is required for experiment validation")
 
     training_dir = config.project / config.name
     metadata_path = training_dir / "training_metadata.json"
@@ -273,7 +277,9 @@ def main() -> None:
             }
         )
 
-    assets_dir = Path("docs/assets/baseline").resolve()
+    is_baseline = config.name == EXPECTED_BASELINE_VALUES["name"]
+    asset_name = "baseline" if is_baseline else "resolution_960"
+    assets_dir = Path("docs/assets", asset_name).resolve()
     curated_plots = copy_curated_plots(training_dir, validation_dir, assets_dir)
     metrics: dict[str, Any] = {
         "created_at": datetime.now(UTC).isoformat(),
@@ -321,12 +327,17 @@ def main() -> None:
         "curated_plots": curated_plots,
     }
 
-    output_dir = Path("docs/experiments/baseline").resolve()
+    output_name = "baseline" if is_baseline else "resolution_960"
+    output_dir = Path("docs/experiments", output_name).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    write_json(output_dir / "baseline_metrics.json", metrics)
-    (output_dir / "baseline.md").write_text(build_markdown(metrics), encoding="utf-8")
+    metrics_name = "baseline_metrics.json" if is_baseline else "metrics.json"
+    write_json(output_dir / metrics_name, metrics)
+    if is_baseline:
+        (output_dir / "baseline.md").write_text(
+            build_markdown(metrics), encoding="utf-8"
+        )
     print(json.dumps(json_safe(metrics), indent=2, sort_keys=True))
-    print(f"Curated baseline results: {output_dir}")
+    print(f"Curated experiment results: {output_dir}")
 
 
 if __name__ == "__main__":

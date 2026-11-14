@@ -1,0 +1,628 @@
+{
+  "checkpoint": "E:\\visionops-ppe\\runs\\experiment_yolo26n_960\\weights\\best.pt",
+  "comparison": {
+    "gpu_memory": {
+      "allocated_delta_gib": 1.665210247039795,
+      "baseline_allocated_gib": 1.37969970703125,
+      "baseline_reserved_gib": 1.859375,
+      "experiment_allocated_gib": 3.044909954071045,
+      "experiment_reserved_gib": 3.458984375,
+      "reserved_delta_gib": 1.599609375
+    },
+    "latency": {
+      "baseline_ms": 6.405696999281645,
+      "delta_ms": 4.558295498136431,
+      "experiment_ms": 10.963992497418076,
+      "ratio": 1.711600236265876
+    },
+    "overall": {
+      "map50": {
+        "baseline": 0.7654089439510301,
+        "delta": 0.0614461198582803,
+        "experiment": 0.8268550638093104
+      },
+      "map50_95": {
+        "baseline": 0.546142136043428,
+        "delta": 0.05508163434119406,
+        "experiment": 0.601223770384622
+      },
+      "precision": {
+        "baseline": 0.8667484493562814,
+        "delta": 0.014425615862397323,
+        "experiment": 0.8811740652186787
+      },
+      "recall": {
+        "baseline": 0.7021269961400161,
+        "delta": 0.0759986563727556,
+        "experiment": 0.7781256525127717
+      }
+    },
+    "per_class": [
+      {
+        "baseline_map50_95": 0.6614492572,
+        "baseline_recall": 0.7925170068,
+        "class_id": 0,
+        "class_name": "helmet",
+        "experiment_map50_95": 0.7325285824,
+        "experiment_recall": 0.8603831732,
+        "map50_95_delta": 0.07107932519999993,
+        "recall_delta": 0.06786616639999998
+      },
+      {
+        "baseline_map50_95": 0.6227046737,
+        "baseline_recall": 0.7406113742,
+        "class_id": 1,
+        "class_name": "gloves",
+        "experiment_map50_95": 0.7018619026,
+        "experiment_recall": 0.8057742782,
+        "map50_95_delta": 0.07915722889999999,
+        "recall_delta": 0.06516290400000002
+      },
+      {
+        "baseline_map50_95": 0.7117827256,
+        "baseline_recall": 0.8528139918,
+        "class_id": 2,
+        "class_name": "vest",
+        "experiment_map50_95": 0.7642797393,
+        "experiment_recall": 0.912613654,
+        "map50_95_delta": 0.05249701370000004,
+        "recall_delta": 0.0597996622000001
+      },
+      {
+        "baseline_map50_95": 0.5801058083,
+        "baseline_recall": 0.6964656965,
+        "class_id": 3,
+        "class_name": "boots",
+        "experiment_map50_95": 0.6527188661,
+        "experiment_recall": 0.7731096937,
+        "map50_95_delta": 0.07261305779999994,
+        "recall_delta": 0.07664399720000004
+      },
+      {
+        "baseline_map50_95": 0.6438718274,
+        "baseline_recall": 0.964028777,
+        "class_id": 4,
+        "class_name": "goggles",
+        "experiment_map50_95": 0.6810566653,
+        "experiment_recall": 0.9712230216,
+        "map50_95_delta": 0.037184837899999934,
+        "recall_delta": 0.007194244599999955
+      },
+      {
+        "baseline_map50_95": 0.7841994339,
+        "baseline_recall": 0.8877338877,
+        "class_id": 5,
+        "class_name": "Person",
+        "experiment_map50_95": 0.8219486912,
+        "experiment_recall": 0.9417879418,
+        "map50_95_delta": 0.037749257300000005,
+        "recall_delta": 0.05405405410000008
+      },
+      {
+        "baseline_map50_95": 0.4158317353,
+        "baseline_recall": 0.5977653631,
+        "class_id": 6,
+        "class_name": "no_helmet",
+        "experiment_map50_95": 0.4541169421,
+        "experiment_recall": 0.6815642458,
+        "map50_95_delta": 0.03828520679999997,
+        "recall_delta": 0.08379888270000002
+      },
+      {
+        "baseline_map50_95": 0.0844611989,
+        "baseline_recall": 0.2195121951,
+        "class_id": 7,
+        "class_name": "no_goggle",
+        "experiment_map50_95": 0.1638610112,
+        "experiment_recall": 0.4390243902,
+        "map50_95_delta": 0.07939981229999998,
+        "recall_delta": 0.2195121951
+      },
+      {
+        "baseline_map50_95": 0.4008696585,
+        "baseline_recall": 0.5887212865,
+        "class_id": 8,
+        "class_name": "no_gloves",
+        "experiment_map50_95": 0.4644083546,
+        "experiment_recall": 0.7097499109,
+        "map50_95_delta": 0.06353869610000001,
+        "recall_delta": 0.12102862439999995
+      },
+      {
+        "baseline_map50_95": 0.5710435974,
+        "baseline_recall": 0.6404494382,
+        "class_id": 9,
+        "class_name": "no_boots",
+        "experiment_map50_95": 0.6392556184,
+        "experiment_recall": 0.704975097,
+        "map50_95_delta": 0.06821202100000001,
+        "recall_delta": 0.06452565880000005
+      },
+      {
+        "baseline_map50_95": 0.5855808805,
+        "baseline_recall": 0.7833664751,
+        "class_id": 10,
+        "class_name": "forklift",
+        "experiment_map50_95": 0.6061308242,
+        "experiment_recall": 0.8219178082,
+        "map50_95_delta": 0.020549943699999962,
+        "recall_delta": 0.03855133310000003
+      },
+      {
+        "baseline_map50_95": 0.4918048358,
+        "baseline_recall": 0.6615384615,
+        "class_id": 11,
+        "class_name": "no_vest",
+        "experiment_map50_95": 0.5325180472,
+        "experiment_recall": 0.7153846154,
+        "map50_95_delta": 0.04071321139999995,
+        "recall_delta": 0.05384615390000003
+      }
+    ],
+    "size_recall": {
+      "goggles": {
+        "large": {
+          "baseline_matched_count": 10,
+          "baseline_recall": 0.9090909090909091,
+          "delta": 0.09090909090909094,
+          "experiment_matched_count": 11,
+          "experiment_recall": 1.0,
+          "ground_truth_count": 11
+        },
+        "small": {
+          "baseline_matched_count": 124,
+          "baseline_recall": 0.9841269841269841,
+          "delta": -0.007936507936507908,
+          "experiment_matched_count": 123,
+          "experiment_recall": 0.9761904761904762,
+          "ground_truth_count": 126
+        },
+        "tiny": {
+          "baseline_matched_count": 0,
+          "baseline_recall": 0.0,
+          "delta": 0.5,
+          "experiment_matched_count": 1,
+          "experiment_recall": 0.5,
+          "ground_truth_count": 2
+        }
+      },
+      "helmet": {
+        "large": {
+          "baseline_matched_count": 92,
+          "baseline_recall": 1.0,
+          "delta": 0.0,
+          "experiment_matched_count": 92,
+          "experiment_recall": 1.0,
+          "ground_truth_count": 92
+        },
+        "small": {
+          "baseline_matched_count": 75,
+          "baseline_recall": 0.9615384615384616,
+          "delta": 0.0,
+          "experiment_matched_count": 75,
+          "experiment_recall": 0.9615384615384616,
+          "ground_truth_count": 78
+        },
+        "tiny": {
+          "baseline_matched_count": 69,
+          "baseline_recall": 0.5564516129032258,
+          "delta": 0.17741935483870974,
+          "experiment_matched_count": 91,
+          "experiment_recall": 0.7338709677419355,
+          "ground_truth_count": 124
+        }
+      },
+      "no_goggle": {
+        "large": {
+          "baseline_matched_count": 0,
+          "baseline_recall": 0.0,
+          "delta": 0.0,
+          "experiment_matched_count": 0,
+          "experiment_recall": 0.0,
+          "ground_truth_count": 0
+        },
+        "small": {
+          "baseline_matched_count": 12,
+          "baseline_recall": 0.42857142857142855,
+          "delta": 0.39285714285714285,
+          "experiment_matched_count": 23,
+          "experiment_recall": 0.8214285714285714,
+          "ground_truth_count": 28
+        },
+        "tiny": {
+          "baseline_matched_count": 14,
+          "baseline_recall": 0.25925925925925924,
+          "delta": 0.05555555555555558,
+          "experiment_matched_count": 17,
+          "experiment_recall": 0.3148148148148148,
+          "ground_truth_count": 54
+        }
+      },
+      "no_helmet": {
+        "large": {
+          "baseline_matched_count": 49,
+          "baseline_recall": 1.0,
+          "delta": -0.020408163265306145,
+          "experiment_matched_count": 48,
+          "experiment_recall": 0.9795918367346939,
+          "ground_truth_count": 49
+        },
+        "small": {
+          "baseline_matched_count": 36,
+          "baseline_recall": 0.782608695652174,
+          "delta": 0.0,
+          "experiment_matched_count": 36,
+          "experiment_recall": 0.782608695652174,
+          "ground_truth_count": 46
+        },
+        "tiny": {
+          "baseline_matched_count": 24,
+          "baseline_recall": 0.2857142857142857,
+          "delta": 0.20238095238095238,
+          "experiment_matched_count": 41,
+          "experiment_recall": 0.4880952380952381,
+          "ground_truth_count": 84
+        }
+      },
+      "no_vest": {
+        "large": {
+          "baseline_matched_count": 69,
+          "baseline_recall": 0.971830985915493,
+          "delta": 0.014084507042253502,
+          "experiment_matched_count": 70,
+          "experiment_recall": 0.9859154929577465,
+          "ground_truth_count": 71
+        },
+        "small": {
+          "baseline_matched_count": 16,
+          "baseline_recall": 0.6153846153846154,
+          "delta": 0.11538461538461531,
+          "experiment_matched_count": 19,
+          "experiment_recall": 0.7307692307692307,
+          "ground_truth_count": 26
+        },
+        "tiny": {
+          "baseline_matched_count": 2,
+          "baseline_recall": 0.06060606060606061,
+          "delta": 0.06060606060606061,
+          "experiment_matched_count": 4,
+          "experiment_recall": 0.12121212121212122,
+          "ground_truth_count": 33
+        }
+      },
+      "overall": {
+        "large": {
+          "baseline_matched_count": 926,
+          "baseline_recall": 0.96760710553814,
+          "delta": 0.007314524555903867,
+          "experiment_matched_count": 933,
+          "experiment_recall": 0.9749216300940439,
+          "ground_truth_count": 957
+        },
+        "small": {
+          "baseline_matched_count": 1069,
+          "baseline_recall": 0.8886118038237739,
+          "delta": 0.03740648379052369,
+          "experiment_matched_count": 1114,
+          "experiment_recall": 0.9260182876142976,
+          "ground_truth_count": 1203
+        },
+        "tiny": {
+          "baseline_matched_count": 263,
+          "baseline_recall": 0.3283395755305868,
+          "delta": 0.14981273408239698,
+          "experiment_matched_count": 383,
+          "experiment_recall": 0.4781523096129838,
+          "ground_truth_count": 801
+        }
+      },
+      "vest": {
+        "large": {
+          "baseline_matched_count": 159,
+          "baseline_recall": 0.9814814814814815,
+          "delta": 0.006172839506172756,
+          "experiment_matched_count": 160,
+          "experiment_recall": 0.9876543209876543,
+          "ground_truth_count": 162
+        },
+        "small": {
+          "baseline_matched_count": 108,
+          "baseline_recall": 0.9473684210526315,
+          "delta": 0.026315789473684292,
+          "experiment_matched_count": 111,
+          "experiment_recall": 0.9736842105263158,
+          "ground_truth_count": 114
+        },
+        "tiny": {
+          "baseline_matched_count": 26,
+          "baseline_recall": 0.40625,
+          "delta": 0.234375,
+          "experiment_matched_count": 41,
+          "experiment_recall": 0.640625,
+          "ground_truth_count": 64
+        }
+      }
+    },
+    "validation_timing_ms_per_image": {
+      "inference": {
+        "baseline": 6.405696999281645,
+        "delta": 4.558295498136431,
+        "experiment": 10.963992497418076
+      },
+      "loss": {
+        "baseline": 0.000694995978847146,
+        "delta": 1.800130121409893e-05,
+        "experiment": 0.000712997280061245
+      },
+      "postprocess": {
+        "baseline": 1.0478914948180318,
+        "delta": -0.0627089908812195,
+        "experiment": 0.9851825039368123
+      },
+      "preprocess": {
+        "baseline": 0.7998124987352639,
+        "delta": 1.0070910095237195,
+        "experiment": 1.8069035082589835
+      }
+    }
+  },
+  "conclusion": {
+    "option": "A",
+    "rule": "A requires mAP50-95 delta >=0.02, tiny or small recall delta >=0.05, and inference-latency ratio <=2.0. B requires positive mAP50-95 and positive tiny or small recall but does not meet A. Otherwise C.",
+    "text": "Higher resolution materially improves the relevant performance enough to justify its latency cost."
+  },
+  "configuration": {
+    "amp": true,
+    "batch": 8,
+    "cache": false,
+    "data": "E:\\visionops-ppe\\data\\construction-ppe\\data.yaml",
+    "deterministic": true,
+    "device": 0,
+    "epochs": 100,
+    "imgsz": 960,
+    "model": "yolo26n.pt",
+    "name": "experiment_yolo26n_960",
+    "patience": 20,
+    "pretrained": true,
+    "project": "E:\\visionops-ppe\\runs",
+    "seed": 42,
+    "task": "detect",
+    "workers": 4
+  },
+  "created_at": "2026-11-14T12:59:03.270025+00:00",
+  "curated_plots": [
+    "results.png",
+    "confusion_matrix.png",
+    "confusion_matrix_normalized.png",
+    "BoxPR_curve.png",
+    "BoxF1_curve.png",
+    "BoxP_curve.png",
+    "BoxR_curve.png"
+  ],
+  "diagnostic_method": {
+    "confidence_threshold": 0.25,
+    "matching_algorithm": "Predictions sorted by descending confidence; greedy same-class match to highest-IoU unmatched ground truth; one-to-one at IoU >= 0.50.",
+    "matching_iou_threshold": 0.5,
+    "nms_iou_threshold": 0.7,
+    "size_bins": {
+      "large": "relative area >= 0.01",
+      "small": "0.001 <= relative area < 0.01",
+      "tiny": "relative area < 0.001"
+    }
+  },
+  "environment": {
+    "gpu_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.6",
+    "torch_cuda_runtime": "12.1",
+    "torch_version": "2.5.1+cu121",
+    "ultralytics_version": "8.4.212"
+  },
+  "failure_analysis_candidate_counts": {
+    "both_missed": 496,
+    "false_positive": 222,
+    "improved": 207
+  },
+  "failure_examples": [
+    {
+      "category": "improved",
+      "class_id": 7,
+      "class_name": "no_goggle",
+      "description": "640 missed; 960 detected",
+      "file": "example_improved_01.jpg",
+      "relative_area": 0.001070916000000001,
+      "source_image": "source-00f1fbfd9c8193a3c5a071512cf8c0a7.jpg"
+    },
+    {
+      "category": "improved",
+      "class_id": 2,
+      "class_name": "vest",
+      "description": "640 missed; 960 detected",
+      "file": "example_improved_02.jpg",
+      "relative_area": 0.0003283799999999982,
+      "source_image": "source-150feca69395fa769adccdc8e157e935.jpg"
+    },
+    {
+      "category": "both_missed",
+      "class_id": 2,
+      "class_name": "vest",
+      "description": "both models missed",
+      "file": "example_both_missed_01.jpg",
+      "relative_area": 0.00017413499999999952,
+      "source_image": "source-150feca69395fa769adccdc8e157e935.jpg"
+    },
+    {
+      "category": "both_missed",
+      "class_id": 7,
+      "class_name": "no_goggle",
+      "description": "both models missed",
+      "file": "example_both_missed_02.jpg",
+      "relative_area": 0.0005375043,
+      "source_image": "source-17e8cd16e406c9f394f05f7ec1b33947.jpg"
+    },
+    {
+      "category": "false_positive",
+      "class_id": 7,
+      "class_name": "no_goggle",
+      "description": "960 introduced false positive",
+      "file": "example_false_positive_01.jpg",
+      "relative_area": 0.0010531530915613985,
+      "source_image": "source-00f1fbfd9c8193a3c5a071512cf8c0a7.jpg"
+    },
+    {
+      "category": "false_positive",
+      "class_id": 6,
+      "class_name": "no_helmet",
+      "description": "960 introduced false positive",
+      "file": "example_false_positive_02.jpg",
+      "relative_area": 6.028108411104682e-05,
+      "source_image": "source-150feca69395fa769adccdc8e157e935.jpg"
+    }
+  ],
+  "overall": {
+    "map50": 0.8268550638093104,
+    "map50_95": 0.601223770384622,
+    "precision": 0.8811740652186787,
+    "recall": 0.7781256525127717
+  },
+  "per_class": [
+    {
+      "ap50": 0.9145128527,
+      "class_id": 0,
+      "class_name": "helmet",
+      "images": 146,
+      "instances": 294,
+      "map50_95": 0.7325285824,
+      "precision": 0.9475562099,
+      "recall": 0.8603831732
+    },
+    {
+      "ap50": 0.8743304928,
+      "class_id": 1,
+      "class_name": "gloves",
+      "images": 136,
+      "instances": 381,
+      "map50_95": 0.7018619026,
+      "precision": 0.8952067698,
+      "recall": 0.8057742782
+    },
+    {
+      "ap50": 0.9348364835,
+      "class_id": 2,
+      "class_name": "vest",
+      "images": 157,
+      "instances": 340,
+      "map50_95": 0.7642797393,
+      "precision": 0.9718122823,
+      "recall": 0.912613654
+    },
+    {
+      "ap50": 0.83980712,
+      "class_id": 3,
+      "class_name": "boots",
+      "images": 155,
+      "instances": 481,
+      "map50_95": 0.6527188661,
+      "precision": 0.8377886997,
+      "recall": 0.7731096937
+    },
+    {
+      "ap50": 0.9758994087,
+      "class_id": 4,
+      "class_name": "goggles",
+      "images": 102,
+      "instances": 139,
+      "map50_95": 0.6810566653,
+      "precision": 0.9485835403,
+      "recall": 0.9712230216
+    },
+    {
+      "ap50": 0.9661965473,
+      "class_id": 5,
+      "class_name": "Person",
+      "images": 200,
+      "instances": 481,
+      "map50_95": 0.8219486912,
+      "precision": 0.9270175887,
+      "recall": 0.9417879418
+    },
+    {
+      "ap50": 0.7420286816,
+      "class_id": 6,
+      "class_name": "no_helmet",
+      "images": 91,
+      "instances": 179,
+      "map50_95": 0.4541169421,
+      "precision": 0.7991007413,
+      "recall": 0.6815642458
+    },
+    {
+      "ap50": 0.5074055072,
+      "class_id": 7,
+      "class_name": "no_goggle",
+      "images": 56,
+      "instances": 82,
+      "map50_95": 0.1638610112,
+      "precision": 0.7022749694,
+      "recall": 0.4390243902
+    },
+    {
+      "ap50": 0.7674377675,
+      "class_id": 8,
+      "class_name": "no_gloves",
+      "images": 94,
+      "instances": 203,
+      "map50_95": 0.4644083546,
+      "precision": 0.9000492124,
+      "recall": 0.7097499109
+    },
+    {
+      "ap50": 0.8019819352,
+      "class_id": 9,
+      "class_name": "no_boots",
+      "images": 71,
+      "instances": 178,
+      "map50_95": 0.6392556184,
+      "precision": 0.8869128497,
+      "recall": 0.704975097
+    },
+    {
+      "ap50": 0.8373970996,
+      "class_id": 10,
+      "class_name": "forklift",
+      "images": 46,
+      "instances": 73,
+      "map50_95": 0.6061308242,
+      "precision": 0.8688312682,
+      "recall": 0.8219178082
+    },
+    {
+      "ap50": 0.7604268697,
+      "class_id": 11,
+      "class_name": "no_vest",
+      "images": 84,
+      "instances": 130,
+      "map50_95": 0.5325180472,
+      "precision": 0.8889546509,
+      "recall": 0.7153846154
+    }
+  ],
+  "training": {
+    "actual_batch": 8,
+    "best_epoch": 91,
+    "duration_seconds": 5581.866962499917,
+    "early_stopping_occurred": false,
+    "final_epoch": 100,
+    "peak_gpu_memory_allocated_gib": 3.044909954071045,
+    "peak_gpu_memory_reserved_gib": 3.458984375,
+    "requested_epochs": 100
+  },
+  "validation_duration_seconds": 17.645591399865225,
+  "validation_output_directory": "E:\\visionops-ppe\\runs\\experiment_yolo26n_960_best_val",
+  "validation_speed_ms_per_image": {
+    "inference": 10.963992497418076,
+    "loss": 0.000712997280061245,
+    "postprocess": 0.9851825039368123,
+    "preprocess": 1.8069035082589835
+  }
+}

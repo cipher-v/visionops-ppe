@@ -1,4 +1,4 @@
-"""Repository-owned configuration helpers for the YOLO26n baseline."""
+"""Repository-owned configuration helpers for controlled YOLO experiments."""
 
 from __future__ import annotations
 
@@ -43,10 +43,21 @@ EXPECTED_BASELINE_VALUES: dict[str, Any] = {
     "name": "baseline_yolo26n_640",
 }
 
+EXPECTED_RESOLUTION_960_VALUES: dict[str, Any] = {
+    **EXPECTED_BASELINE_VALUES,
+    "imgsz": 960,
+    "name": "experiment_yolo26n_960",
+}
+
+EXPERIMENT_SPECIFICATIONS = {
+    EXPECTED_BASELINE_VALUES["name"]: EXPECTED_BASELINE_VALUES,
+    EXPECTED_RESOLUTION_960_VALUES["name"]: EXPECTED_RESOLUTION_960_VALUES,
+}
+
 
 @dataclass(frozen=True)
-class BaselineConfig:
-    """Validated, resolved baseline configuration."""
+class ExperimentConfig:
+    """Validated, resolved controlled-experiment configuration."""
 
     task: str
     model: str
@@ -79,7 +90,7 @@ class BaselineConfig:
         actual_batch = self.batch if batch is None else batch
         if actual_batch not in {4, 8}:
             raise ValueError(
-                "The baseline permits only batch 8 or the OOM fallback batch 4"
+                "Controlled experiments permit only batch 8 or OOM fallback 4"
             )
         return {
             "data": str(runtime_data),
@@ -102,26 +113,27 @@ class BaselineConfig:
         }
 
 
-def parse_baseline_config(
-    values: dict[str, Any], repo_root: Path = Path(".")
-) -> BaselineConfig:
-    """Validate the immutable Checkpoint 2 baseline specification."""
-    missing = EXPECTED_BASELINE_VALUES.keys() - values.keys()
+def _parse_config(
+    values: dict[str, Any], expected: dict[str, Any], repo_root: Path
+) -> ExperimentConfig:
+    """Validate and resolve one immutable experiment specification."""
+    missing = expected.keys() - values.keys()
     if missing:
-        raise ValueError(f"Missing baseline configuration keys: {sorted(missing)}")
+        raise ValueError(f"Missing experiment configuration keys: {sorted(missing)}")
 
     mismatches = {
-        key: {"expected": expected, "actual": values[key]}
-        for key, expected in EXPECTED_BASELINE_VALUES.items()
-        if values[key] != expected or type(values[key]) is not type(expected)
+        key: {"expected": expected_value, "actual": values[key]}
+        for key, expected_value in expected.items()
+        if values[key] != expected_value
+        or type(values[key]) is not type(expected_value)
     }
     if mismatches:
         raise ValueError(
-            f"Baseline configuration differs from specification: {mismatches}"
+            f"Experiment configuration differs from specification: {mismatches}"
         )
 
     root = repo_root.resolve()
-    return BaselineConfig(
+    return ExperimentConfig(
         task=values["task"],
         model=values["model"],
         data=(root / values["data"]).resolve(),
@@ -141,14 +153,40 @@ def parse_baseline_config(
     )
 
 
-def load_baseline_config(config_path: Path) -> BaselineConfig:
-    """Load and validate the baseline YAML relative to the repository root."""
+def parse_experiment_config(
+    values: dict[str, Any], repo_root: Path = Path(".")
+) -> ExperimentConfig:
+    """Validate either the historical baseline or controlled 960 experiment."""
+    experiment_name = values.get("name")
+    expected = EXPERIMENT_SPECIFICATIONS.get(experiment_name)
+    if expected is None:
+        raise ValueError(f"Unknown controlled experiment name: {experiment_name!r}")
+    return _parse_config(values, expected, repo_root)
+
+
+def parse_baseline_config(
+    values: dict[str, Any], repo_root: Path = Path(".")
+) -> ExperimentConfig:
+    """Validate the immutable Checkpoint 2 baseline specification."""
+    return _parse_config(values, EXPECTED_BASELINE_VALUES, repo_root)
+
+
+def load_experiment_config(config_path: Path) -> ExperimentConfig:
+    """Load a controlled experiment YAML relative to the repository root."""
     config_path = config_path.resolve()
     values = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     if not isinstance(values, dict):
         raise ValueError(f"Expected a YAML mapping in {config_path}")
     repo_root = config_path.parent.parent
-    return parse_baseline_config(values, repo_root)
+    return parse_experiment_config(values, repo_root)
+
+
+def load_baseline_config(config_path: Path) -> ExperimentConfig:
+    """Load and require the historical baseline configuration."""
+    config = load_experiment_config(config_path)
+    if config.name != EXPECTED_BASELINE_VALUES["name"]:
+        raise ValueError(f"Expected the baseline configuration, found {config.name}")
+    return config
 
 
 def ordered_class_names(names: dict[int, str] | list[str]) -> tuple[str, ...]:
