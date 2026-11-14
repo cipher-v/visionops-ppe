@@ -15,6 +15,7 @@ from typing import Any
 import torch
 from ultralytics import YOLO
 from ultralytics import __version__ as ultralytics_version
+from ultralytics.utils.torch_utils import get_flops
 
 from visionops.baseline import (
     EXPECTED_BASELINE_VALUES,
@@ -278,7 +279,12 @@ def main() -> None:
         )
 
     is_baseline = config.name == EXPECTED_BASELINE_VALUES["name"]
-    asset_name = "baseline" if is_baseline else "resolution_960"
+    output_names = {
+        "baseline_yolo26n_640": "baseline",
+        "experiment_yolo26n_960": "resolution_960",
+        "experiment_yolo26s_960": "model_capacity_960",
+    }
+    asset_name = output_names[config.name]
     assets_dir = Path("docs/assets", asset_name).resolve()
     curated_plots = copy_curated_plots(training_dir, validation_dir, assets_dir)
     metrics: dict[str, Any] = {
@@ -313,6 +319,14 @@ def main() -> None:
                 training_metadata["peak_gpu_memory_reserved_bytes"]
             )
             / 1024**3,
+            "model_parameter_count": sum(
+                parameter.numel() for parameter in model.model.parameters()
+            ),
+            "model_gflops": float(get_flops(model.model, imgsz=config.imgsz)),
+            "pretrained_weights_size_bytes": int(
+                training_metadata["model_weights_size_bytes"]
+            ),
+            "best_checkpoint_size_bytes": best_checkpoint.stat().st_size,
         },
         "overall": {
             "precision": precision,
@@ -327,7 +341,7 @@ def main() -> None:
         "curated_plots": curated_plots,
     }
 
-    output_name = "baseline" if is_baseline else "resolution_960"
+    output_name = output_names[config.name]
     output_dir = Path("docs/experiments", output_name).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     metrics_name = "baseline_metrics.json" if is_baseline else "metrics.json"

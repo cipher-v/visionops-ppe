@@ -16,6 +16,7 @@ from typing import Any
 import torch
 from ultralytics import YOLO
 from ultralytics import __version__ as ultralytics_version
+from ultralytics.utils.torch_utils import get_flops
 
 from visionops.baseline import (
     load_experiment_config,
@@ -56,8 +57,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--batch-override",
         type=int,
-        choices=(4,),
-        help="Use only after a genuine CUDA OOM at the configured batch size 8.",
+        choices=(2, 4),
+        help="Use only after a genuine CUDA OOM at the next larger allowed batch.",
     )
     return parser.parse_args()
 
@@ -105,9 +106,11 @@ def main() -> None:
         "runtime_dataset_yaml": str(runtime_data),
         "model_weights": str(weights_path),
         "model_weights_sha256": sha256_file(weights_path),
+        "model_weights_size_bytes": weights_path.stat().st_size,
         "model_parameter_count": sum(
             parameter.numel() for parameter in model.model.parameters()
         ),
+        "model_gflops": float(get_flops(model.model, imgsz=config.imgsz)),
         "environment": {
             "platform": platform.platform(),
             "python": sys.version,
@@ -123,9 +126,9 @@ def main() -> None:
     write_json(manifest_path, manifest)
 
     def enforce_allowed_batch(trainer: Any) -> None:
-        if trainer.batch_size < 4:
+        if trainer.batch_size < 2:
             raise RuntimeError(
-                "Batch 4 also exhausted CUDA memory; smaller batches are outside "
+                "Batch 2 also exhausted CUDA memory; smaller batches are outside "
                 "the controlled experiment specification"
             )
 

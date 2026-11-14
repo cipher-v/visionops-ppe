@@ -104,23 +104,29 @@ def predictions_from_result(result: Any) -> list[Detection]:
 
 
 def predict_validation(
-    checkpoint: Path, image_paths: list[Path], imgsz: int
+    checkpoint: Path, image_paths: list[Path], imgsz: int, batch: int = 8
 ) -> list[list[Detection]]:
-    """Run fixed-threshold predictions in deterministic image order."""
+    """Run fixed-threshold predictions in deterministic, memory-bounded chunks."""
     model = YOLO(checkpoint)
-    results = model.predict(
-        source=[str(path) for path in image_paths],
-        imgsz=imgsz,
-        conf=CONFIDENCE_THRESHOLD,
-        iou=NMS_IOU_THRESHOLD,
-        batch=8,
-        device=0,
-        max_det=300,
-        agnostic_nms=False,
-        verbose=False,
-        stream=False,
-    )
-    return [predictions_from_result(result) for result in results]
+    predictions: list[list[Detection]] = []
+    for start in range(0, len(image_paths), batch):
+        chunk = image_paths[start : start + batch]
+        results = model.predict(
+            source=[str(path) for path in chunk],
+            imgsz=imgsz,
+            conf=CONFIDENCE_THRESHOLD,
+            iou=NMS_IOU_THRESHOLD,
+            batch=batch,
+            device=0,
+            max_det=300,
+            agnostic_nms=False,
+            verbose=False,
+            stream=False,
+        )
+        predictions.extend(predictions_from_result(result) for result in results)
+        del results
+        torch.cuda.empty_cache()
+    return predictions
 
 
 def empty_counts() -> dict[str, dict[str, int]]:

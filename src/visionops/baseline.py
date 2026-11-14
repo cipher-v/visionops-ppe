@@ -49,9 +49,16 @@ EXPECTED_RESOLUTION_960_VALUES: dict[str, Any] = {
     "name": "experiment_yolo26n_960",
 }
 
+EXPECTED_MODEL_CAPACITY_960_VALUES: dict[str, Any] = {
+    **EXPECTED_RESOLUTION_960_VALUES,
+    "model": "yolo26s.pt",
+    "name": "experiment_yolo26s_960",
+}
+
 EXPERIMENT_SPECIFICATIONS = {
     EXPECTED_BASELINE_VALUES["name"]: EXPECTED_BASELINE_VALUES,
     EXPECTED_RESOLUTION_960_VALUES["name"]: EXPECTED_RESOLUTION_960_VALUES,
+    EXPECTED_MODEL_CAPACITY_960_VALUES["name"]: EXPECTED_MODEL_CAPACITY_960_VALUES,
 }
 
 
@@ -88,9 +95,9 @@ class ExperimentConfig:
     ) -> dict[str, Any]:
         """Return only the explicitly controlled Ultralytics training arguments."""
         actual_batch = self.batch if batch is None else batch
-        if actual_batch not in {4, 8}:
+        if actual_batch not in {2, 4, 8}:
             raise ValueError(
-                "Controlled experiments permit only batch 8 or OOM fallback 4"
+                "Controlled experiments permit only batch 8 or OOM fallbacks 4 and 2"
             )
         return {
             "data": str(runtime_data),

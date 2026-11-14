@@ -23,7 +23,7 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 3 — controlled YOLO26n resolution experiment**
+**Checkpoint 4 — controlled model-capacity experiment**
 
-The repository now includes the fixed 640-pixel baseline and a controlled 960-pixel experiment, best-checkpoint validation, a deterministic size-stratified recall diagnostic, and curated comparison artifacts. Only input resolution changed between the two training runs. No broader tuning, tracking, inference API, export, event logic, dashboards, or monitoring components have been added.
+The repository now includes the fixed YOLO26n baselines and a controlled YOLO26n-versus-YOLO26s comparison at 960 pixels, with best-checkpoint validation, deterministic size-stratified recall diagnostics, and curated failure-analysis artifacts. Only model capacity changed in the latest experiment. No broader tuning, tracking, inference API, export, event logic, dashboards, or monitoring components have been added.
 
