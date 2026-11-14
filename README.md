@@ -23,7 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 4 — controlled model-capacity experiment**
+**Checkpoint 5 — external generalization evaluation**
 
-The repository now includes the fixed YOLO26n baselines and a controlled YOLO26n-versus-YOLO26s comparison at 960 pixels, with best-checkpoint validation, deterministic size-stratified recall diagnostics, and curated failure-analysis artifacts. Only model capacity changed in the latest experiment. No broader tuning, tracking, inference API, export, event logic, dashboards, or monitoring components have been added.
+The repository now includes an integrity and leakage audit of RF100 Construction Safety
+v2 plus an independent comparison of the frozen YOLO26n and YOLO26s 960-pixel best
+checkpoints on its official test split. No training, fine-tuning, threshold tuning,
+tracking, inference API, export, event logic, dashboards, or monitoring components have
+been added.
 

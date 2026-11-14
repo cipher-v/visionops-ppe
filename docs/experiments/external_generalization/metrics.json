@@ -1,0 +1,643 @@
+{
+  "created_at": "2026-11-14T17:20:46.083959+00:00",
+  "models": {
+    "yolo26n": "E:\\visionops-ppe\\runs\\experiment_yolo26n_960\\weights\\best.pt",
+    "yolo26s": "E:\\visionops-ppe\\runs\\experiment_yolo26s_960\\weights\\best.pt"
+  },
+  "environment": {
+    "python": "3.12.6",
+    "torch": "2.5.1+cu121",
+    "torch_cuda": "12.1",
+    "cuda_available": true,
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "ultralytics": "8.4.212"
+  },
+  "evaluation": {
+    "imgsz": 960,
+    "classes": [
+      "helmet",
+      "vest",
+      "Person",
+      "no_helmet",
+      "no_vest"
+    ],
+    "primary": "official leakage-free test split",
+    "secondary": "all leakage-free external images; not independent"
+  },
+  "primary_test": {
+    "yolo26n": {
+      "overall": {
+        "precision": 0.6730453607,
+        "recall": 0.7044452945,
+        "map50": 0.6908174873,
+        "map50_95": 0.3028643136
+      },
+      "per_class": [
+        {
+          "class_id": 0,
+          "class_name": "helmet",
+          "precision": 0.8346971519,
+          "recall": 0.8545371632,
+          "map50": 0.8932322639,
+          "map50_95": 0.4486335856
+        },
+        {
+          "class_id": 2,
+          "class_name": "vest",
+          "precision": 0.8136374092,
+          "recall": 0.778428637,
+          "map50": 0.7938721792,
+          "map50_95": 0.370233717
+        },
+        {
+          "class_id": 5,
+          "class_name": "Person",
+          "precision": 0.814011518,
+          "recall": 0.8504672897,
+          "map50": 0.8262951998,
+          "map50_95": 0.4151436102
+        },
+        {
+          "class_id": 6,
+          "class_name": "no_helmet",
+          "precision": 0.2549517129,
+          "recall": 0.375,
+          "map50": 0.3750638313,
+          "map50_95": 0.0983893628
+        },
+        {
+          "class_id": 11,
+          "class_name": "no_vest",
+          "precision": 0.6479290116,
+          "recall": 0.6637933826,
+          "map50": 0.5656239624,
+          "map50_95": 0.1819212923
+        }
+      ],
+      "speed_ms_per_image": {
+        "preprocess": 2.5296022236,
+        "inference": 18.843818888,
+        "loss": 0.001507775,
+        "postprocess": 2.1974000071
+      }
+    },
+    "yolo26s": {
+      "overall": {
+        "precision": 0.6474284631,
+        "recall": 0.7176974632,
+        "map50": 0.6823281621,
+        "map50_95": 0.3012192368
+      },
+      "per_class": [
+        {
+          "class_id": 0,
+          "class_name": "helmet",
+          "precision": 0.8199174966,
+          "recall": 0.9128205128,
+          "map50": 0.9067715052,
+          "map50_95": 0.4390598171
+        },
+        {
+          "class_id": 2,
+          "class_name": "vest",
+          "precision": 0.7259108392,
+          "recall": 0.7519379845,
+          "map50": 0.7995082665,
+          "map50_95": 0.3791539756
+        },
+        {
+          "class_id": 5,
+          "class_name": "Person",
+          "precision": 0.7843811408,
+          "recall": 0.849958327,
+          "map50": 0.8053696956,
+          "map50_95": 0.3991030966
+        },
+        {
+          "class_id": 6,
+          "class_name": "no_helmet",
+          "precision": 0.4299126766,
+          "recall": 0.5,
+          "map50": 0.4346215362,
+          "map50_95": 0.1158948701
+        },
+        {
+          "class_id": 11,
+          "class_name": "no_vest",
+          "precision": 0.477020162,
+          "recall": 0.5737704918,
+          "map50": 0.4653698072,
+          "map50_95": 0.1728844248
+        }
+      ],
+      "speed_ms_per_image": {
+        "preprocess": 1.8340600059,
+        "inference": 25.2905033296,
+        "loss": 0.0016999974,
+        "postprocess": 1.1887577802
+      }
+    }
+  },
+  "secondary_all": {
+    "yolo26n": {
+      "overall": {
+        "precision": 0.6693307816,
+        "recall": 0.6922113021,
+        "map50": 0.6793628288,
+        "map50_95": 0.3219527201
+      },
+      "per_class": [
+        {
+          "class_id": 0,
+          "class_name": "helmet",
+          "precision": 0.8440345152,
+          "recall": 0.8363304527,
+          "map50": 0.8809116542,
+          "map50_95": 0.4161848532
+        },
+        {
+          "class_id": 2,
+          "class_name": "vest",
+          "precision": 0.7390738568,
+          "recall": 0.7915115413,
+          "map50": 0.7951568073,
+          "map50_95": 0.4134418649
+        },
+        {
+          "class_id": 5,
+          "class_name": "Person",
+          "precision": 0.8670267564,
+          "recall": 0.8656712771,
+          "map50": 0.8899784067,
+          "map50_95": 0.4861122814
+        },
+        {
+          "class_id": 6,
+          "class_name": "no_helmet",
+          "precision": 0.2512634301,
+          "recall": 0.4108527132,
+          "map50": 0.2462216335,
+          "map50_95": 0.059798237
+        },
+        {
+          "class_id": 11,
+          "class_name": "no_vest",
+          "precision": 0.6452553496,
+          "recall": 0.5566905261,
+          "map50": 0.5845456424,
+          "map50_95": 0.2342263639
+        }
+      ],
+      "speed_ms_per_image": {
+        "preprocess": 1.7043934487,
+        "inference": 9.8719830026,
+        "loss": 0.0018121051,
+        "postprocess": 1.3122550578
+      }
+    },
+    "yolo26s": {
+      "overall": {
+        "precision": 0.6518147095,
+        "recall": 0.7264903532,
+        "map50": 0.6848739213,
+        "map50_95": 0.324617266
+      },
+      "per_class": [
+        {
+          "class_id": 0,
+          "class_name": "helmet",
+          "precision": 0.8088561641,
+          "recall": 0.8919272684,
+          "map50": 0.8980523021,
+          "map50_95": 0.4255210839
+        },
+        {
+          "class_id": 2,
+          "class_name": "vest",
+          "precision": 0.7176793634,
+          "recall": 0.8361876396,
+          "map50": 0.8069904316,
+          "map50_95": 0.4120544398
+        },
+        {
+          "class_id": 5,
+          "class_name": "Person",
+          "precision": 0.8391243234,
+          "recall": 0.8591461881,
+          "map50": 0.8690637522,
+          "map50_95": 0.4715332809
+        },
+        {
+          "class_id": 6,
+          "class_name": "no_helmet",
+          "precision": 0.2648785219,
+          "recall": 0.4263565891,
+          "map50": 0.2391806329,
+          "map50_95": 0.0629739312
+        },
+        {
+          "class_id": 11,
+          "class_name": "no_vest",
+          "precision": 0.6285351746,
+          "recall": 0.6188340807,
+          "map50": 0.6110824876,
+          "map50_95": 0.2510035941
+        }
+      ],
+      "speed_ms_per_image": {
+        "preprocess": 1.7939844091,
+        "inference": 20.5744395498,
+        "loss": 0.0020324215,
+        "postprocess": 1.3001836654
+      }
+    }
+  },
+  "construction_ppe_validation_overlapping_classes": {
+    "yolo26n": {
+      "overall": {
+        "precision": 0.90688829462,
+        "recall": 0.82234672604,
+        "map50_95": 0.66107840044,
+        "map50": 0.86360028696
+      },
+      "per_class": [
+        {
+          "ap50": 0.9145128527,
+          "class_id": 0,
+          "class_name": "helmet",
+          "images": 146,
+          "instances": 294,
+          "map50_95": 0.7325285824,
+          "precision": 0.9475562099,
+          "recall": 0.8603831732
+        },
+        {
+          "ap50": 0.9348364835,
+          "class_id": 2,
+          "class_name": "vest",
+          "images": 157,
+          "instances": 340,
+          "map50_95": 0.7642797393,
+          "precision": 0.9718122823,
+          "recall": 0.912613654
+        },
+        {
+          "ap50": 0.9661965473,
+          "class_id": 5,
+          "class_name": "Person",
+          "images": 200,
+          "instances": 481,
+          "map50_95": 0.8219486912,
+          "precision": 0.9270175887,
+          "recall": 0.9417879418
+        },
+        {
+          "ap50": 0.7420286816,
+          "class_id": 6,
+          "class_name": "no_helmet",
+          "images": 91,
+          "instances": 179,
+          "map50_95": 0.4541169421,
+          "precision": 0.7991007413,
+          "recall": 0.6815642458
+        },
+        {
+          "ap50": 0.7604268697,
+          "class_id": 11,
+          "class_name": "no_vest",
+          "images": 84,
+          "instances": 130,
+          "map50_95": 0.5325180472,
+          "precision": 0.8889546509,
+          "recall": 0.7153846154
+        }
+      ]
+    },
+    "yolo26s": {
+      "overall": {
+        "precision": 0.923872751,
+        "recall": 0.8445859484,
+        "map50_95": 0.6870984892,
+        "map50": 0.88172145688
+      },
+      "per_class": [
+        {
+          "ap50": 0.9198008327,
+          "class_id": 0,
+          "class_name": "helmet",
+          "images": 146,
+          "instances": 294,
+          "map50_95": 0.7621180752,
+          "precision": 0.9388771136,
+          "recall": 0.8843537415
+        },
+        {
+          "ap50": 0.938799957,
+          "class_id": 2,
+          "class_name": "vest",
+          "images": 157,
+          "instances": 340,
+          "map50_95": 0.7852738111,
+          "precision": 0.9583234257,
+          "recall": 0.9352941176
+        },
+        {
+          "ap50": 0.9760720481,
+          "class_id": 5,
+          "class_name": "Person",
+          "images": 200,
+          "instances": 481,
+          "map50_95": 0.8577529697,
+          "precision": 0.9520129691,
+          "recall": 0.9604989605
+        },
+        {
+          "ap50": 0.814800034,
+          "class_id": 6,
+          "class_name": "no_helmet",
+          "images": 91,
+          "instances": 179,
+          "map50_95": 0.5002583072,
+          "precision": 0.8457381836,
+          "recall": 0.7350906147
+        },
+        {
+          "ap50": 0.7591344126,
+          "class_id": 11,
+          "class_name": "no_vest",
+          "images": 84,
+          "instances": 130,
+          "map50_95": 0.5300892828,
+          "precision": 0.924412063,
+          "recall": 0.7076923077
+        }
+      ]
+    }
+  },
+  "generalization_gap_external_minus_internal": {
+    "yolo26n": {
+      "precision": -0.23384293392,
+      "recall": -0.11790143153999999,
+      "map50": -0.17278279965999999,
+      "map50_95": -0.35821408684
+    },
+    "yolo26s": {
+      "precision": -0.2764442879,
+      "recall": -0.12688848519999996,
+      "map50": -0.19939329478,
+      "map50_95": -0.38587925240000004
+    }
+  },
+  "diagnostic_method": {
+    "confidence": 0.25,
+    "match_iou": 0.5,
+    "nms_iou": 0.7,
+    "size_bins": {
+      "tiny": "relative area < 0.001",
+      "small": "0.001 <= relative area < 0.01",
+      "large": "relative area >= 0.01"
+    }
+  },
+  "size_recall": {
+    "yolo26n": {
+      "overall": {
+        "tiny": {
+          "ground_truth_count": 4,
+          "matched_count": 4,
+          "recall": 1.0
+        },
+        "small": {
+          "ground_truth_count": 132,
+          "matched_count": 105,
+          "recall": 0.7954545454545454
+        },
+        "large": {
+          "ground_truth_count": 487,
+          "matched_count": 412,
+          "recall": 0.8459958932238193
+        }
+      },
+      "helmet": {
+        "tiny": {
+          "ground_truth_count": 4,
+          "matched_count": 4,
+          "recall": 1.0
+        },
+        "small": {
+          "ground_truth_count": 97,
+          "matched_count": 82,
+          "recall": 0.845360824742268
+        },
+        "large": {
+          "ground_truth_count": 94,
+          "matched_count": 83,
+          "recall": 0.8829787234042553
+        }
+      },
+      "vest": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 12,
+          "matched_count": 9,
+          "recall": 0.75
+        },
+        "large": {
+          "ground_truth_count": 117,
+          "matched_count": 98,
+          "recall": 0.8376068376068376
+        }
+      },
+      "Person": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 7,
+          "matched_count": 5,
+          "recall": 0.7142857142857143
+        },
+        "large": {
+          "ground_truth_count": 207,
+          "matched_count": 186,
+          "recall": 0.8985507246376812
+        }
+      },
+      "no_helmet": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 13,
+          "matched_count": 7,
+          "recall": 0.5384615384615384
+        },
+        "large": {
+          "ground_truth_count": 11,
+          "matched_count": 4,
+          "recall": 0.36363636363636365
+        }
+      },
+      "no_vest": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 3,
+          "matched_count": 2,
+          "recall": 0.6666666666666666
+        },
+        "large": {
+          "ground_truth_count": 58,
+          "matched_count": 41,
+          "recall": 0.7068965517241379
+        }
+      }
+    },
+    "yolo26s": {
+      "overall": {
+        "tiny": {
+          "ground_truth_count": 4,
+          "matched_count": 4,
+          "recall": 1.0
+        },
+        "small": {
+          "ground_truth_count": 132,
+          "matched_count": 110,
+          "recall": 0.8333333333333334
+        },
+        "large": {
+          "ground_truth_count": 487,
+          "matched_count": 398,
+          "recall": 0.8172484599589322
+        }
+      },
+      "helmet": {
+        "tiny": {
+          "ground_truth_count": 4,
+          "matched_count": 4,
+          "recall": 1.0
+        },
+        "small": {
+          "ground_truth_count": 97,
+          "matched_count": 88,
+          "recall": 0.9072164948453608
+        },
+        "large": {
+          "ground_truth_count": 94,
+          "matched_count": 88,
+          "recall": 0.9361702127659575
+        }
+      },
+      "vest": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 12,
+          "matched_count": 10,
+          "recall": 0.8333333333333334
+        },
+        "large": {
+          "ground_truth_count": 117,
+          "matched_count": 93,
+          "recall": 0.7948717948717948
+        }
+      },
+      "Person": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 7,
+          "matched_count": 5,
+          "recall": 0.7142857142857143
+        },
+        "large": {
+          "ground_truth_count": 207,
+          "matched_count": 175,
+          "recall": 0.8454106280193237
+        }
+      },
+      "no_helmet": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 13,
+          "matched_count": 5,
+          "recall": 0.38461538461538464
+        },
+        "large": {
+          "ground_truth_count": 11,
+          "matched_count": 8,
+          "recall": 0.7272727272727273
+        }
+      },
+      "no_vest": {
+        "tiny": {
+          "ground_truth_count": 0,
+          "matched_count": 0,
+          "recall": null
+        },
+        "small": {
+          "ground_truth_count": 3,
+          "matched_count": 2,
+          "recall": 0.6666666666666666
+        },
+        "large": {
+          "ground_truth_count": 58,
+          "matched_count": 34,
+          "recall": 0.5862068965517241
+        }
+      }
+    }
+  },
+  "failure_examples": [
+    {
+      "category": "correct",
+      "file": "correct.jpg",
+      "source": "ppe_0720_jpg.rf.45d95968e5c545a0e1e81d6bfd0be53d.jpg"
+    },
+    {
+      "category": "false_negative",
+      "file": "false_negative.jpg",
+      "source": "ppe_0720_jpg.rf.45d95968e5c545a0e1e81d6bfd0be53d.jpg"
+    },
+    {
+      "category": "false_positive",
+      "file": "false_positive.jpg",
+      "source": "ppe_0872_jpg.rf.c509a3792a934b4db8b20d2be884c187.jpg"
+    },
+    {
+      "category": "no_helmet_failure",
+      "file": "no_helmet_failure.jpg",
+      "source": "ppe_0357_jpg.rf.aec0f5d22284f4d174ba7fc228fc090f.jpg"
+    },
+    {
+      "category": "no_vest_failure",
+      "file": "no_vest_failure.jpg",
+      "source": "ppe_0920_jpg.rf.af045fa8a3381b13a661412630c19852.jpg"
+    },
+    {
+      "category": "small_object_failure",
+      "file": "small_object_failure.jpg",
+      "source": "ppe_0720_jpg.rf.45d95968e5c545a0e1e81d6bfd0be53d.jpg"
+    }
+  ]
+}
