@@ -22,6 +22,14 @@ data/
 datasets/
 *.csv
 *.parquet
+!docs/experiments/real_video_validation/review_manifest.csv
+
+# Track provenance only; keep demo video media ignored.
+!data/
+data/*
+!data/demo_videos/
+data/demo_videos/*
+!data/demo_videos/README.md
 
 # Model weights and exported models
 *.pt

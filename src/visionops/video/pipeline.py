@@ -51,6 +51,7 @@ class PipelineOptions:
     ppe_association_config: Path | None = None
     enable_temporal_compliance: bool = False
     temporal_compliance_config: Path | None = None
+    real_video_validation: bool = False
 
     def __post_init__(self) -> None:
         if self.frame_stride < 1:
@@ -318,6 +319,8 @@ def build_association_metadata(
 def build_temporal_metadata(
     engine: TemporalComplianceEngine | None,
     temporal_latencies: list[float],
+    *,
+    real_video_validation: bool = False,
 ) -> dict[str, object]:
     """Build temporal-engine metadata with an explicit real-video validation flag."""
     if engine is None:
@@ -327,7 +330,7 @@ def build_temporal_metadata(
         "engine": engine.metadata(),
         "diagnostics": engine.summary(),
         "timing": _summary(temporal_latencies),
-        "real_video_temporal_validation": False,
+        "real_video_temporal_validation": real_video_validation,
     }
 
 
@@ -663,6 +666,14 @@ def run_video_pipeline(
             ),
             "detector_latency": _summary(detector_latencies),
             "end_to_end_frame_latency": _summary(end_to_end_latencies),
+            "latency_samples_ms": (
+                {
+                    "detector": [value * 1000 for value in detector_latencies],
+                    "end_to_end": [value * 1000 for value in end_to_end_latencies],
+                }
+                if options.real_video_validation
+                else None
+            ),
             "ultralytics_preprocess": _component_summary(preprocess_ms),
             "ultralytics_inference": _component_summary(inference_ms),
             "ultralytics_postprocess": _component_summary(postprocess_ms),
@@ -690,6 +701,7 @@ def run_video_pipeline(
         "temporal_compliance": build_temporal_metadata(
             temporal_engine,
             temporal_latencies,
+            real_video_validation=options.real_video_validation,
         ),
         "outputs": {
             "detections_jsonl": str(detections_path),

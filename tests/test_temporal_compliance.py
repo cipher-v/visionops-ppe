@@ -259,3 +259,17 @@ def test_cli_dependencies_metadata_and_backward_compatibility() -> None:
     detector_only = PipelineOptions(source="video.mp4", output_dir=Path("results/test"))
     assert detector_only.enable_temporal_compliance is False
     assert build_temporal_metadata(None, []) == {"enabled": False}
+
+    temporal_config = TemporalComplianceConfig.from_yaml(
+        ROOT / "configs/compliance_temporal.yaml"
+    )
+    temporal_engine = TemporalComplianceEngine(
+        temporal_config,
+        run_id="metadata-real",
+    )
+    metadata = build_temporal_metadata(
+        temporal_engine,
+        [],
+        real_video_validation=True,
+    )
+    assert metadata["real_video_temporal_validation"] is True

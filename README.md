@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 12 - temporal PPE state and incident generation**
+**Checkpoint 13 - real-world video validation and demo evaluation**
 
-Production v1, ByteTrack, and frame-level PPE association remain frozen. The streaming
-pipeline now optionally converts explicit frame evidence into timestamp-driven per-track
-helmet/vest state, deduplicated incident open/close events, unknown/conflict grace,
-sustained-positive clearing, cooldown, and track-expiration closure. Spatial zones, model
+Three locally supplied real videos were processed end to end with the frozen detector,
+tracked Person IDs, PPE association, temporal compliance, and structured event records.
+Annotated outputs and compact review artifacts support qualitative operational inspection;
+this is not a formally annotated tracking or compliance benchmark. Spatial zones, model
 export, APIs, and drift monitoring remain deferred.
 

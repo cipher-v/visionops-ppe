@@ -30,6 +30,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--enable-tracking", action="store_true")
     parser.add_argument("--enable-ppe-association", action="store_true")
     parser.add_argument("--enable-temporal-compliance", action="store_true")
+    parser.add_argument(
+        "--real-video-validation",
+        action="store_true",
+        help="Mark temporal metadata as validation on genuine local video footage",
+    )
     parser.add_argument("--tracker-config", type=Path, default=DEFAULT_TRACKER_CONFIG)
     parser.add_argument(
         "--ppe-association-config", type=Path, default=DEFAULT_ASSOCIATION_CONFIG
@@ -73,6 +78,7 @@ def main() -> None:
                 if args.enable_temporal_compliance
                 else None
             ),
+            real_video_validation=args.real_video_validation,
         ),
     )
     print(json.dumps(metadata, indent=2))

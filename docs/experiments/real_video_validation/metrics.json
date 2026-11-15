@@ -1,0 +1,484 @@
+{
+  "purpose": "observational real-video system validation",
+  "accuracy_claim": false,
+  "provenance": {
+    "source": "locally supplied by project owner",
+    "original_urls": null,
+    "license": null,
+    "redistribution_allowed": null
+  },
+  "configuration_freeze": {
+    "configs/production_detector.yaml": "A5CB6E081E61E3316888AD35168D29CA7F3417E1F751C1032216517FCAFA1560",
+    "configs/bytetrack_person.yaml": "9E3EAB03889E86C3F5A3EFD74B9E7C3918EC95D497C07CB1E32E3A267ED6B42D",
+    "configs/ppe_association.yaml": "258B1C269D7340F535CB47F2D694224C856DB20F6EDF33B584EA48E7681CF048",
+    "configs/compliance_temporal.yaml": "C5154F40EEFB20C698223B7AF2ECEFD3560C5F84770480DEEEA7BE74478FD9DA"
+  },
+  "clips": {
+    "compliant_multiworker": {
+      "video": {
+        "filename": "compliant_multiworker.mp4",
+        "sha256": "B9183548A9EC8BFDDD2298BEA144476AA14C29DC7E67C7CE009A2821D0567EF5",
+        "width": 2160,
+        "height": 3840,
+        "fps": 25.0,
+        "frame_count": 315,
+        "duration_seconds": 12.6,
+        "source": "locally supplied; original URL not provided",
+        "license": null
+      },
+      "processing": {
+        "frame_stride": 1,
+        "frames_read": 315,
+        "frames_processed": 315,
+        "frames_skipped_by_stride": 0,
+        "frames_with_detections": 315,
+        "detections_written": 1890,
+        "read_failures": 0,
+        "dropped_frames": 0,
+        "reached_end_of_file": true,
+        "stopped_by_max_frames": false,
+        "output_fps": 25.0,
+        "fallback_fps_used": false,
+        "annotated_video_written": true
+      },
+      "performance": {
+        "processing_wall_clock_seconds": 58.1226270000916,
+        "total_wall_clock_seconds": 63.04349089995958,
+        "effective_fps": 5.419576097265933,
+        "detector_latency": {
+          "count": 315,
+          "mean_ms": 61.264935233408494,
+          "p50_ms": 55.46880001202226,
+          "p95_ms": 107.77591997757554
+        },
+        "end_to_end_latency": {
+          "count": 315,
+          "mean_ms": 152.91530887581524,
+          "p50_ms": 144.86810006201267,
+          "p95_ms": 203.0827298993245
+        }
+      },
+      "detections": {
+        "Person": 630,
+        "helmet": 630,
+        "vest": 630
+      },
+      "tracking": {
+        "unique_tracks_created": 2,
+        "track_observations": 630,
+        "mean_track_length_frames": 315.0,
+        "median_track_length_frames": 315.0,
+        "p95_track_length_frames": 315.0,
+        "singleton_tracks": 0,
+        "tracks_lasting_at_least_one_second": 2,
+        "frames_with_active_tracks": 315,
+        "maximum_simultaneous_active_tracks": 2,
+        "lost_transitions": 0,
+        "recovered_transitions": 0,
+        "expired_tracks": 0,
+        "rejected_person_detections": 0,
+        "live_track_ids_at_end": [
+          1,
+          2
+        ],
+        "observations_per_track": {
+          "1": 315,
+          "2": 315
+        },
+        "longest_track_frames": 315,
+        "very_short_tracks_under_one_second": 0
+      },
+      "association": {
+        "total_person_observations": 630,
+        "ppe_detections_considered": 1260,
+        "ppe_detections_assigned": 1260,
+        "ppe_detections_unassigned": 0,
+        "malformed_ppe_detections": 0,
+        "ambiguous_candidate_count": 0,
+        "mean_association_score": 0.8679429498980344,
+        "per_class_assignment_counts": {
+          "helmet": 630,
+          "vest": 630
+        },
+        "frame_level_equipment_states": {
+          "helmet": {
+            "present": 630,
+            "violation": 0,
+            "conflict": 0,
+            "unknown": 0
+          },
+          "vest": {
+            "present": 630,
+            "violation": 0,
+            "conflict": 0,
+            "unknown": 0
+          }
+        },
+        "assignment_rate_by_class": {
+          "helmet": 1.0,
+          "vest": 1.0,
+          "no_helmet": null,
+          "no_vest": null
+        }
+      },
+      "temporal": {
+        "state_counts": {
+          "compliant": 1260
+        },
+        "known_tracks_at_end": 2,
+        "incidents_opened": 0,
+        "incidents_closed": 0,
+        "incidents_active": 0,
+        "cooldown_confirmations_suppressed": 0,
+        "close_reasons": {},
+        "temporal_state_observations": {
+          "helmet:compliant": 630,
+          "vest:compliant": 630
+        }
+      },
+      "incidents": []
+    },
+    "helmet_transition": {
+      "video": {
+        "filename": "helmet_transition.mp4",
+        "sha256": "423513545128921B90FCABED8A9207EEA96678A8F6CEFE6639DB959F97D92120",
+        "width": 3840,
+        "height": 2160,
+        "fps": 25.0,
+        "frame_count": 297,
+        "duration_seconds": 11.88,
+        "source": "locally supplied; original URL not provided",
+        "license": null
+      },
+      "processing": {
+        "frame_stride": 1,
+        "frames_read": 297,
+        "frames_processed": 297,
+        "frames_skipped_by_stride": 0,
+        "frames_with_detections": 297,
+        "detections_written": 920,
+        "read_failures": 0,
+        "dropped_frames": 0,
+        "reached_end_of_file": true,
+        "stopped_by_max_frames": false,
+        "output_fps": 25.0,
+        "fallback_fps_used": false,
+        "annotated_video_written": true
+      },
+      "performance": {
+        "processing_wall_clock_seconds": 54.93356720008887,
+        "total_wall_clock_seconds": 59.570308999856934,
+        "effective_fps": 5.406530380927447,
+        "detector_latency": {
+          "count": 297,
+          "mean_ms": 60.67573400731715,
+          "p50_ms": 55.672400165349245,
+          "p95_ms": 106.85341986827552
+        },
+        "end_to_end_latency": {
+          "count": 297,
+          "mean_ms": 156.2198838399353,
+          "p50_ms": 144.72390012815595,
+          "p95_ms": 215.07097990252075
+        }
+      },
+      "detections": {
+        "Person": 299,
+        "helmet": 98,
+        "no_helmet": 212,
+        "no_vest": 309,
+        "vest": 2
+      },
+      "tracking": {
+        "unique_tracks_created": 2,
+        "track_observations": 298,
+        "mean_track_length_frames": 149.0,
+        "median_track_length_frames": 149.0,
+        "p95_track_length_frames": 280.4,
+        "singleton_tracks": 0,
+        "tracks_lasting_at_least_one_second": 1,
+        "frames_with_active_tracks": 297,
+        "maximum_simultaneous_active_tracks": 2,
+        "lost_transitions": 3,
+        "recovered_transitions": 2,
+        "expired_tracks": 1,
+        "rejected_person_detections": 0,
+        "live_track_ids_at_end": [
+          1
+        ],
+        "observations_per_track": {
+          "1": 295,
+          "2": 3
+        },
+        "longest_track_frames": 295,
+        "very_short_tracks_under_one_second": 1
+      },
+      "association": {
+        "total_person_observations": 298,
+        "ppe_detections_considered": 621,
+        "ppe_detections_assigned": 617,
+        "ppe_detections_unassigned": 4,
+        "malformed_ppe_detections": 0,
+        "ambiguous_candidate_count": 2,
+        "mean_association_score": 0.8922572438589038,
+        "per_class_assignment_counts": {
+          "helmet": 96,
+          "no_helmet": 212,
+          "no_vest": 309
+        },
+        "frame_level_equipment_states": {
+          "helmet": {
+            "present": 96,
+            "violation": 201,
+            "conflict": 0,
+            "unknown": 1
+          },
+          "vest": {
+            "present": 0,
+            "violation": 297,
+            "conflict": 0,
+            "unknown": 1
+          }
+        },
+        "assignment_rate_by_class": {
+          "helmet": 0.9795918367346939,
+          "vest": 0.0,
+          "no_helmet": 1.0,
+          "no_vest": 1.0
+        }
+      },
+      "temporal": {
+        "state_counts": {
+          "compliant": 96,
+          "confirmed_violation": 415,
+          "suspected_violation": 84,
+          "unknown": 1
+        },
+        "known_tracks_at_end": 1,
+        "incidents_opened": 2,
+        "incidents_closed": 2,
+        "incidents_active": 0,
+        "cooldown_confirmations_suppressed": 0,
+        "close_reasons": {
+          "source_ended": 2
+        },
+        "temporal_state_observations": {
+          "helmet:compliant": 96,
+          "helmet:confirmed_violation": 158,
+          "helmet:suspected_violation": 66,
+          "helmet:unknown": 11,
+          "vest:confirmed_violation": 259,
+          "vest:suspected_violation": 59,
+          "vest:unknown": 13
+        }
+      },
+      "incidents": [
+        {
+          "incident_id": "run-884936de311f44518a2d2a8da54fb991-track-1-helmet-0001",
+          "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+          "track_id": 1,
+          "equipment": "helmet",
+          "type": "ppe_violation",
+          "started_at_seconds": 3.84,
+          "confirmed_at_seconds": 5.56,
+          "cleared_at_seconds": 11.84,
+          "duration_seconds": 8.0,
+          "status": "closed",
+          "close_reason": "source_ended",
+          "evidence_summary": {
+            "observation_counts": {
+              "present": 96,
+              "unknown": 3,
+              "violation": 198
+            },
+            "continuous_violation_duration": 7.8,
+            "continuous_present_duration": 0.0,
+            "last_stable_state": "confirmed_violation"
+          }
+        },
+        {
+          "incident_id": "run-884936de311f44518a2d2a8da54fb991-track-1-vest-0001",
+          "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+          "track_id": 1,
+          "equipment": "vest",
+          "type": "ppe_violation",
+          "started_at_seconds": 0.0,
+          "confirmed_at_seconds": 1.52,
+          "cleared_at_seconds": 11.84,
+          "duration_seconds": 11.84,
+          "status": "closed",
+          "close_reason": "source_ended",
+          "evidence_summary": {
+            "observation_counts": {
+              "unknown": 2,
+              "violation": 295
+            },
+            "continuous_violation_duration": 11.719999999999999,
+            "continuous_present_duration": 0.0,
+            "last_stable_state": "confirmed_violation"
+          }
+        }
+      ]
+    },
+    "walking_multiworker": {
+      "video": {
+        "filename": "walking_multiworker.mp4",
+        "sha256": "DF2F645CAAD8D90EEE93AD1C5B012DE4394981E5EEABD92E37BFC16101EA2FA4",
+        "width": 1920,
+        "height": 1080,
+        "fps": 23.976023976023978,
+        "frame_count": 577,
+        "duration_seconds": 24.065708333333333,
+        "source": "locally supplied; original URL not provided",
+        "license": null
+      },
+      "processing": {
+        "frame_stride": 1,
+        "frames_read": 577,
+        "frames_processed": 577,
+        "frames_skipped_by_stride": 0,
+        "frames_with_detections": 577,
+        "detections_written": 2891,
+        "read_failures": 0,
+        "dropped_frames": 0,
+        "reached_end_of_file": true,
+        "stopped_by_max_frames": false,
+        "output_fps": 23.976023976023978,
+        "fallback_fps_used": false,
+        "annotated_video_written": true
+      },
+      "performance": {
+        "processing_wall_clock_seconds": 49.737769400002435,
+        "total_wall_clock_seconds": 54.12028389982879,
+        "effective_fps": 11.600841914715454,
+        "detector_latency": {
+          "count": 577,
+          "mean_ms": 50.07687625289609,
+          "p50_ms": 49.74930011667311,
+          "p95_ms": 54.87493993714451
+        },
+        "end_to_end_latency": {
+          "count": 577,
+          "mean_ms": 79.82247764490015,
+          "p50_ms": 78.21599999442697,
+          "p95_ms": 93.22840007953346
+        }
+      },
+      "detections": {
+        "Person": 1000,
+        "helmet": 711,
+        "no_helmet": 76,
+        "no_vest": 3,
+        "vest": 1101
+      },
+      "tracking": {
+        "unique_tracks_created": 4,
+        "track_observations": 998,
+        "mean_track_length_frames": 249.5,
+        "median_track_length_frames": 208.0,
+        "p95_track_length_frames": 502.69999999999993,
+        "singleton_tracks": 0,
+        "tracks_lasting_at_least_one_second": 4,
+        "frames_with_active_tracks": 577,
+        "maximum_simultaneous_active_tracks": 2,
+        "lost_transitions": 25,
+        "recovered_transitions": 23,
+        "expired_tracks": 2,
+        "rejected_person_detections": 0,
+        "live_track_ids_at_end": [
+          2,
+          4
+        ],
+        "observations_per_track": {
+          "1": 153,
+          "2": 545,
+          "3": 37,
+          "4": 263
+        },
+        "longest_track_frames": 545,
+        "very_short_tracks_under_one_second": 0
+      },
+      "association": {
+        "total_person_observations": 998,
+        "ppe_detections_considered": 1891,
+        "ppe_detections_assigned": 1766,
+        "ppe_detections_unassigned": 125,
+        "malformed_ppe_detections": 0,
+        "ambiguous_candidate_count": 4,
+        "mean_association_score": 0.8498078642838571,
+        "per_class_assignment_counts": {
+          "helmet": 711,
+          "no_helmet": 75,
+          "no_vest": 1,
+          "vest": 979
+        },
+        "frame_level_equipment_states": {
+          "helmet": {
+            "present": 686,
+            "violation": 50,
+            "conflict": 25,
+            "unknown": 237
+          },
+          "vest": {
+            "present": 977,
+            "violation": 0,
+            "conflict": 1,
+            "unknown": 20
+          }
+        },
+        "assignment_rate_by_class": {
+          "helmet": 1.0,
+          "vest": 0.8891916439600364,
+          "no_helmet": 0.9868421052631579,
+          "no_vest": 0.3333333333333333
+        }
+      },
+      "temporal": {
+        "state_counts": {
+          "compliant": 1691,
+          "conflict": 36,
+          "suspected_violation": 89,
+          "unknown": 180
+        },
+        "known_tracks_at_end": 2,
+        "incidents_opened": 0,
+        "incidents_closed": 0,
+        "incidents_active": 0,
+        "cooldown_confirmations_suppressed": 0,
+        "close_reasons": {},
+        "temporal_state_observations": {
+          "helmet:compliant": 714,
+          "helmet:conflict": 43,
+          "helmet:suspected_violation": 107,
+          "helmet:unknown": 280,
+          "vest:compliant": 1119,
+          "vest:conflict": 1,
+          "vest:unknown": 24
+        }
+      },
+      "incidents": []
+    }
+  },
+  "aggregate": {
+    "total_frames": 1189,
+    "total_processing_wall_clock_seconds": 162.7939636001829,
+    "total_wall_clock_seconds": 176.7340837996453,
+    "weighted_effective_fps": 7.30371061497187,
+    "detector_latency_ms": {
+      "p50": 53.47079993225634,
+      "p95": 105.26084001176059
+    },
+    "end_to_end_latency_ms": {
+      "p50": 125.93330000527203,
+      "p95": 197.63608011417088
+    },
+    "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "software": {
+      "python": "3.12.6",
+      "torch": "2.5.1+cu121",
+      "cuda": "12.1",
+      "opencv": "5.0.0",
+      "ultralytics": "8.4.212"
+    }
+  }
+}
