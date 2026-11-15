@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 8 - final model selection, calibration, and freeze**
+**Checkpoint 9 - production-style video ingestion and detector inference**
 
-Production v1 freezes the full-budget mixed-source YOLO26n model at 960 pixels with a
-five-class vocabulary and a calibrated detector-level confidence policy. Calibration uses
-only Construction-PPE validation and the leakage-filtered 118-image RF100 validation
-view. RF100 test remains frozen, and video inference, tracking, temporal event logic, and
-model export remain deferred.
+Production v1 remains frozen as the full-budget mixed-source YOLO26n model at 960 pixels
+with its calibrated five-class confidence policy. The repository now provides bounded
+streaming ingestion for files, device indices, and RTSP/HTTP-style URIs; structured JSONL
+detections; optional annotated video; and measured runtime metadata. Tracking, PPE-person
+association, temporal event logic, model export, and APIs remain deferred.
 
