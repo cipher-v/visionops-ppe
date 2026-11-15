@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 7B — leakage-corrected exposure-matched target-domain control**
+**Checkpoint 8 - final model selection, calibration, and freeze**
 
-The repository now includes a controlled five-class comparison of Construction-PPE-only,
-quantity-controlled, exposure-matched mixed-source, and full-budget mixed-source YOLO26n
-training. Primary RF100 results use a leakage-filtered 118-image held-out target-domain
-split. The matched-exposure model passes the predeclared diversity criteria. RF100 test
-remains frozen; final model selection and production work remain deferred.
+Production v1 freezes the full-budget mixed-source YOLO26n model at 960 pixels with a
+five-class vocabulary and a calibrated detector-level confidence policy. Calibration uses
+only Construction-PPE validation and the leakage-filtered 118-image RF100 validation
+view. RF100 test remains frozen, and video inference, tracking, temporal event logic, and
+model export remain deferred.
 

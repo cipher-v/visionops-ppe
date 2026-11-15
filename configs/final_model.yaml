@@ -1,0 +1,37 @@
+version: visionops-ppe-detector-v1
+architecture: YOLO26n detect
+weights: runs/experiment_mixed5_yolo26n_960/weights/best.pt
+weights_sha256: BF99E872A9B57A7C33A4EBF06F0620F9EB8A215AEC29DDE2A90CA1F72F9581F4
+weights_size_bytes: 5483390
+parameter_count: 2535830
+source_run: runs/experiment_mixed5_yolo26n_960
+best_epoch: 88
+training_configuration:
+  amp: true
+  batch: 8
+  cache: false
+  data: data/generated/mixed-five-class/mixed_data.yaml
+  deterministic: true
+  device: 0
+  epochs: 100
+  imgsz: 960
+  model: yolo26n.pt
+  name: experiment_mixed5_yolo26n_960
+  patience: 20
+  pretrained: true
+  project: runs
+  seed: 42
+  task: detect
+  workers: 4
+training_data:
+  unique_training_images: 1797
+  effective_entries_per_epoch: 1797
+  cppe_images: 800
+  rf100_images: 997
+classes:
+  0: helmet
+  1: vest
+  2: Person
+  3: no_helmet
+  4: no_vest
+rf100_test_used_for_selection: false

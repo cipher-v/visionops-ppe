@@ -1,0 +1,49 @@
+version: 1
+model:
+  manifest: configs/final_model.yaml
+  weights: runs/experiment_mixed5_yolo26n_960/weights/best.pt
+  sha256: BF99E872A9B57A7C33A4EBF06F0620F9EB8A215AEC29DDE2A90CA1F72F9581F4
+  architecture: YOLO26n detect
+input:
+  imgsz: 960
+  shape_policy: letterbox_preserve_aspect_ratio
+classes:
+  0: helmet
+  1: vest
+  2: Person
+  3: no_helmet
+  4: no_vest
+nms_iou: 0.7
+confidence_policy:
+  type: class_specific
+  global_threshold: 0.27
+  per_class:
+    helmet: 0.32
+    vest: 0.19
+    Person: 0.41
+    no_helmet: 0.27
+    no_vest: 0.11
+preprocessing:
+  color_space: RGB
+  pixel_scaling: uint8_0_255_to_float_0_1
+  layout: NCHW
+  letterbox_padding_value: 114
+calibration:
+  domains:
+  - construction_ppe_validation
+  - rf100_filtered_validation
+  matching_iou: 0.5
+  grid:
+    start: 0.05
+    stop: 0.9
+    step: 0.01
+  rf100_test_used: false
+operational_notes:
+  below_threshold: ignore detection
+  single_frame_violation: detector evidence only; not an incident
+  deferred:
+  - tracking
+  - PPE-to-person association
+  - temporal persistence
+  - dwell time
+  - cooldown
