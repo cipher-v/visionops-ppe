@@ -1,0 +1,16 @@
+task: detect
+model: yolo26n.pt
+data: data/generated/cppe-five-class/data.yaml
+pretrained: true
+epochs: 100
+imgsz: 960
+batch: 8
+device: 0
+seed: 42
+deterministic: true
+patience: 20
+amp: true
+workers: 4
+cache: false
+project: runs
+name: experiment_cppe5_yolo26n_960

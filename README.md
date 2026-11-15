@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 6 — systematic domain-shift characterization**
+**Checkpoint 7 — controlled training-data diversity experiment**
 
-The repository now includes a frozen external-test policy and deterministic comparisons
-of image, annotation, confidence, localization, classification, miss, false-positive, and
-class-by-size distributions between Construction-PPE and RF100 development data. No
-training, fine-tuning, threshold tuning, tracking, inference API, export, event logic,
-dashboards, or monitoring components have been added.
+The repository now includes a controlled five-class comparison of Construction-PPE-only,
+exposure-matched, and mixed-domain YOLO26n training. All three models are evaluated on
+Construction-PPE validation and RF100 validation under a predeclared decision rule. RF100
+test remains frozen. Tracking, inference APIs, export, event logic, dashboards, and
+monitoring remain deferred.
 
