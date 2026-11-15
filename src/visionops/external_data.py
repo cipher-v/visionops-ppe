@@ -39,7 +39,7 @@ def dhash64(path: Path) -> int:
     """Return a deterministic 64-bit difference hash after EXIF orientation."""
     with Image.open(path) as image:
         grayscale = ImageOps.exif_transpose(image).convert("L").resize((9, 8))
-        pixels = list(grayscale.getdata())
+        pixels = list(grayscale.get_flattened_data())
     value = 0
     for row in range(8):
         offset = row * 9

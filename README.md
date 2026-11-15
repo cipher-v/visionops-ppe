@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 7 — controlled training-data diversity experiment**
+**Checkpoint 7B — leakage-corrected exposure-matched target-domain control**
 
 The repository now includes a controlled five-class comparison of Construction-PPE-only,
-exposure-matched, and mixed-domain YOLO26n training. All three models are evaluated on
-Construction-PPE validation and RF100 validation under a predeclared decision rule. RF100
-test remains frozen. Tracking, inference APIs, export, event logic, dashboards, and
-monitoring remain deferred.
+quantity-controlled, exposure-matched mixed-source, and full-budget mixed-source YOLO26n
+training. Primary RF100 results use a leakage-filtered 118-image held-out target-domain
+split. The matched-exposure model passes the predeclared diversity criteria. RF100 test
+remains frozen; final model selection and production work remain deferred.
 

@@ -1,6 +1,7 @@
-# Controlled training-data diversity results
+# Controlled mixed-source target-domain adaptation results
 
-RF100 test remained frozen and was not read. RF100 validation is OOD-development data.
+RF100 test remained frozen and was not read. RF100 validation is unseen external
+development data for A/B and held-out target-domain validation for C.
 
 ## Derived datasets
 

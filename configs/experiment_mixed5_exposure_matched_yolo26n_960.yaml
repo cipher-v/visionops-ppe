@@ -1,0 +1,17 @@
+task: detect
+model: yolo26n.pt
+data: data/generated/mixed-five-class/mixed_data.yaml
+pretrained: true
+epochs: 100
+controlled_stop_epoch: 45
+imgsz: 960
+batch: 8
+device: 0
+seed: 42
+deterministic: true
+patience: 0
+amp: true
+workers: 4
+cache: false
+project: runs
+name: experiment_mixed5_exposure_matched_yolo26n_960

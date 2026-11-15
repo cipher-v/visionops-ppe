@@ -1,10 +1,12 @@
-# Controlled training-data diversity experiment
+# Controlled mixed-source target-domain adaptation experiment
 
 ## Hypothesis
 
-Adding genuinely different training scenes from RF100 should improve RF100 validation
-generalization more than merely repeating Construction-PPE training exposure, while
-preserving Construction-PPE validation performance.
+Adding target-domain RF100 training scenes should improve held-out RF100 validation more
+than merely repeating Construction-PPE training exposure, while preserving
+Construction-PPE validation performance. For A/B, RF100 is unseen external development
+data. For C, it is held-out target-domain validation and is not evidence of universal
+unseen-domain generalization.
 
 ## Five-class task
 
