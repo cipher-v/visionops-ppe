@@ -1,0 +1,33 @@
+version: 1
+regions:
+  head:
+    x_min: 0.125
+    x_max: 0.875
+    y_min: 0.0
+    y_max: 0.35
+  torso:
+    x_min: 0.075
+    x_max: 0.925
+    y_min: 0.20
+    y_max: 0.72
+gates:
+  require_center_inside_person: true
+  min_person_ioa: 0.60
+  min_region_ioa: 0.10
+  max_normalized_center_distance: 1.25
+  min_association_score: 0.50
+score_weights:
+  center_inside_region: 0.30
+  person_ioa: 0.20
+  region_ioa: 0.30
+  center_proximity: 0.20
+tie_breaking:
+  person_assignment:
+    - association_score_desc
+    - person_ioa_desc
+    - center_distance_asc
+    - track_id_asc
+  primary_same_class:
+    - association_score_desc
+    - confidence_desc
+    - detection_index_asc

@@ -12,6 +12,7 @@ from visionops.video.pipeline import PipelineOptions, run_video_pipeline
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "configs/production_detector.yaml"
 DEFAULT_TRACKER_CONFIG = ROOT / "configs/bytetrack_person.yaml"
+DEFAULT_ASSOCIATION_CONFIG = ROOT / "configs/ppe_association.yaml"
 
 
 def parse_args() -> argparse.Namespace:
@@ -26,7 +27,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--frame-stride", type=int, default=1)
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--enable-tracking", action="store_true")
+    parser.add_argument("--enable-ppe-association", action="store_true")
     parser.add_argument("--tracker-config", type=Path, default=DEFAULT_TRACKER_CONFIG)
+    parser.add_argument(
+        "--ppe-association-config", type=Path, default=DEFAULT_ASSOCIATION_CONFIG
+    )
     parser.add_argument("--fallback-fps", type=float, default=30.0)
     parser.add_argument("--device", default=None)
     parser.add_argument(
@@ -53,6 +58,10 @@ def main() -> None:
             max_frames=args.max_frames,
             enable_tracking=args.enable_tracking,
             tracker_config=args.tracker_config if args.enable_tracking else None,
+            enable_ppe_association=args.enable_ppe_association,
+            ppe_association_config=(
+                args.ppe_association_config if args.enable_ppe_association else None
+            ),
         ),
     )
     print(json.dumps(metadata, indent=2))

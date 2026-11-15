@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 10 - person-only multi-object tracking**
+**Checkpoint 11 - frame-level Person-to-PPE association**
 
-Production v1 remains frozen as the mixed-source YOLO26n model at 960 pixels with its
-calibrated five-class confidence policy. The streaming pipeline now optionally adds
-ByteTrack identities for Person detections only, with structured track records and
-ground-truth-free lifecycle diagnostics. PPE-person association, compliance decisions,
-zones, temporal incidents, model export, and APIs remain deferred.
+Production v1 and Person-only ByteTrack remain frozen. The streaming pipeline now
+optionally associates helmet and vest evidence with active Person tracks using documented
+head/torso geometry, PPE-box containment, deterministic one-to-one assignment, and
+explicit present/violation/conflict/unknown frame states. Temporal persistence, compliance
+decisions, zones, incidents, model export, and APIs remain deferred.
 

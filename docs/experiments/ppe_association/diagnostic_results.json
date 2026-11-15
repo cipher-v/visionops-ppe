@@ -1,0 +1,516 @@
+{
+  "created_at": "2026-11-15T15:17:46.283311+00:00",
+  "purpose": "known synthetic geometry; not real-world association performance",
+  "configuration": {
+    "name": "VisionOps deterministic geometry association",
+    "learned_association": false,
+    "configuration": {
+      "version": 1,
+      "regions": {
+        "head": {
+          "x_min": 0.125,
+          "x_max": 0.875,
+          "y_min": 0.0,
+          "y_max": 0.35
+        },
+        "torso": {
+          "x_min": 0.075,
+          "x_max": 0.925,
+          "y_min": 0.2,
+          "y_max": 0.72
+        }
+      },
+      "gates": {
+        "require_center_inside_person": true,
+        "min_person_ioa": 0.6,
+        "min_region_ioa": 0.1,
+        "max_normalized_center_distance": 1.25,
+        "min_association_score": 0.5
+      },
+      "score_weights": {
+        "center_inside_region": 0.3,
+        "person_ioa": 0.2,
+        "region_ioa": 0.3,
+        "center_proximity": 0.2
+      },
+      "tie_breaking": {
+        "person_assignment": [
+          "association_score_desc",
+          "person_ioa_desc",
+          "center_distance_asc",
+          "track_id_asc"
+        ],
+        "primary_same_class": [
+          "association_score_desc",
+          "confidence_desc",
+          "detection_index_asc"
+        ]
+      }
+    },
+    "supported_ppe_classes": {
+      "0": "helmet",
+      "1": "vest",
+      "3": "no_helmet",
+      "4": "no_vest"
+    },
+    "missing_detection_semantics": "unknown"
+  },
+  "crowded_scene": {
+    "expected_owner_by_detection": {
+      "0": 1,
+      "1": 2,
+      "2": 3,
+      "3": 1,
+      "4": 2,
+      "5": 3,
+      "6": 1,
+      "7": null
+    },
+    "observed_owner_by_detection": {
+      "0": 1,
+      "1": 2,
+      "2": 3,
+      "3": 1,
+      "4": 2,
+      "5": 3,
+      "6": 1,
+      "7": null
+    },
+    "correct_assignments": 8,
+    "total_expected_decisions": 8,
+    "synthetic_decision_accuracy": 1.0,
+    "assigned": 7,
+    "unassigned": 1,
+    "ambiguous": 1,
+    "records": [
+      {
+        "frame_index": 0,
+        "timestamp_seconds": 0.0,
+        "track_id": 1,
+        "person_bbox_xyxy": [
+          20.0,
+          20.0,
+          140.0,
+          420.0
+        ],
+        "person_bbox_normalized": [
+          0.04,
+          0.04,
+          0.28,
+          0.84
+        ],
+        "source_id": "crowded-synthetic",
+        "helmet": {
+          "state": "conflict",
+          "positive_detection": {
+            "detection_index": 0,
+            "ppe_class_id": 0,
+            "ppe_class_name": "helmet",
+            "ppe_confidence": 0.9,
+            "ppe_bbox_xyxy": [
+              45.0,
+              40.0,
+              85.0,
+              90.0
+            ],
+            "association_score": 0.9299304110728572,
+            "center_inside_region": true,
+            "person_ioa": 1.0,
+            "region_ioa": 1.0,
+            "normalized_center_distance": 0.350347944635714,
+            "candidate_person_count": 1,
+            "ambiguous": false,
+            "alternative_track_ids": [],
+            "primary_for_class": true
+          },
+          "negative_detection": {
+            "detection_index": 6,
+            "ppe_class_id": 3,
+            "ppe_class_name": "no_helmet",
+            "ppe_confidence": 0.9,
+            "ppe_bbox_xyxy": [
+              110.0,
+              50.0,
+              130.0,
+              100.0
+            ],
+            "association_score": 0.8223281136557462,
+            "center_inside_region": true,
+            "person_ioa": 1.0,
+            "region_ioa": 0.75,
+            "normalized_center_distance": 0.5133594317212689,
+            "candidate_person_count": 2,
+            "ambiguous": true,
+            "alternative_track_ids": [
+              2
+            ],
+            "primary_for_class": true
+          },
+          "positive_candidates": [
+            {
+              "detection_index": 0,
+              "ppe_class_id": 0,
+              "ppe_class_name": "helmet",
+              "ppe_confidence": 0.9,
+              "ppe_bbox_xyxy": [
+                45.0,
+                40.0,
+                85.0,
+                90.0
+              ],
+              "association_score": 0.9299304110728572,
+              "center_inside_region": true,
+              "person_ioa": 1.0,
+              "region_ioa": 1.0,
+              "normalized_center_distance": 0.350347944635714,
+              "candidate_person_count": 1,
+              "ambiguous": false,
+              "alternative_track_ids": [],
+              "primary_for_class": true
+            }
+          ],
+          "negative_candidates": [
+            {
+              "detection_index": 6,
+              "ppe_class_id": 3,
+              "ppe_class_name": "no_helmet",
+              "ppe_confidence": 0.9,
+              "ppe_bbox_xyxy": [
+                110.0,
+                50.0,
+                130.0,
+                100.0
+              ],
+              "association_score": 0.8223281136557462,
+              "center_inside_region": true,
+              "person_ioa": 1.0,
+              "region_ioa": 0.75,
+              "normalized_center_distance": 0.5133594317212689,
+              "candidate_person_count": 2,
+              "ambiguous": true,
+              "alternative_track_ids": [
+                2
+              ],
+              "primary_for_class": true
+            }
+          ]
+        },
+        "vest": {
+          "state": "present",
+          "positive_detection": {
+            "detection_index": 3,
+            "ppe_class_id": 1,
+            "ppe_class_name": "vest",
+            "ppe_confidence": 0.9,
+            "ppe_bbox_xyxy": [
+              45.0,
+              160.0,
+              100.0,
+              290.0
+            ],
+            "association_score": 0.9614974333186423,
+            "center_inside_region": true,
+            "person_ioa": 1.0,
+            "region_ioa": 1.0,
+            "normalized_center_distance": 0.1925128334067885,
+            "candidate_person_count": 1,
+            "ambiguous": false,
+            "alternative_track_ids": [],
+            "primary_for_class": true
+          },
+          "negative_detection": null,
+          "positive_candidates": [
+            {
+              "detection_index": 3,
+              "ppe_class_id": 1,
+              "ppe_class_name": "vest",
+              "ppe_confidence": 0.9,
+              "ppe_bbox_xyxy": [
+                45.0,
+                160.0,
+                100.0,
+                290.0
+              ],
+              "association_score": 0.9614974333186423,
+              "center_inside_region": true,
+              "person_ioa": 1.0,
+              "region_ioa": 1.0,
+              "normalized_center_distance": 0.1925128334067885,
+              "candidate_person_count": 1,
+              "ambiguous": false,
+              "alternative_track_ids": [],
+              "primary_for_class": true
+            }
+          ],
+          "negative_candidates": []
+        }
+      },
+      {
+        "frame_index": 0,
+        "timestamp_seconds": 0.0,
+        "track_id": 2,
+        "person_bbox_xyxy": [
+          100.0,
+          20.0,
+          220.0,
+          420.0
+        ],
+        "person_bbox_normalized": [
+          0.2,
+          0.04,
+          0.44,
+          0.84
+        ],
+        "source_id": "crowded-synthetic",
+        "helmet": {
+          "state": "present",
+          "positive_detection": {
+            "detection_index": 1,
+            "ppe_class_id": 0,
+            "ppe_class_name": "helmet",
+            "ppe_confidence": 0.9,
+            "ppe_bbox_xyxy": [
+              130.0,
+              40.0,
+              170.0,
+              90.0
+            ],
+            "association_score": 0.9352873611126161,
+            "center_inside_region": true,
+            "person_ioa": 1.0,
+            "region_ioa": 1.0,
+            "normalized_center_distance": 0.32356319443691955,
+            "candidate_person_count": 1,
+            "ambiguous": false,
+            "alternative_track_ids": [],
+            "primary_for_class": true
+          },
+          "negative_detection": null,
+          "positive_candidates": [
+            {
+              "detection_index": 1,
+              "ppe_class_id": 0,
+              "ppe_class_name": "helmet",
+              "ppe_confidence": 0.9,
+              "ppe_bbox_xyxy": [
+                130.0,
+                40.0,
+                170.0,
+                90.0
+              ],
+              "association_score": 0.9352873611126161,
+              "center_inside_region": true,
+              "person_ioa": 1.0,
+              "region_ioa": 1.0,
+              "normalized_center_distance": 0.32356319443691955,
+              "candidate_person_count": 1,
+              "ambiguous": false,
+              "alternative_track_ids": [],
+              "primary_for_class": true
+            }
+          ],
+          "negative_candidates": []
+        },
+        "vest": {
+          "state": "present",
+          "positive_detection": {
+            "detection_index": 4,
+            "ppe_class_id": 1,
+            "ppe_class_name": "vest",
+            "ppe_confidence": 0.9,
+            "ppe_bbox_xyxy": [
+              130.0,
+              160.0,
+              190.0,
+              290.0
+            ],
+            "association_score": 0.9637405192521905,
+            "center_inside_region": true,
+            "person_ioa": 1.0,
+            "region_ioa": 1.0,
+            "normalized_center_distance": 0.1812974037390475,
+            "candidate_person_count": 1,
+            "ambiguous": false,
+            "alternative_track_ids": [],
+            "primary_for_class": true
+          },
+          "negative_detection": null,
+          "positive_candidates": [
+            {
+              "detection_index": 4,
+              "ppe_class_id": 1,
+              "ppe_class_name": "vest",
+              "ppe_confidence": 0.9,
+              "ppe_bbox_xyxy": [
+                130.0,
+                160.0,
+                190.0,
+                290.0
+              ],
+              "association_score": 0.9637405192521905,
+              "center_inside_region": true,
+              "person_ioa": 1.0,
+              "region_ioa": 1.0,
+              "normalized_center_distance": 0.1812974037390475,
+              "candidate_person_count": 1,
+              "ambiguous": false,
+              "alternative_track_ids": [],
+              "primary_for_class": true
+            }
+          ],
+          "negative_candidates": []
+        }
+      },
+      {
+        "frame_index": 0,
+        "timestamp_seconds": 0.0,
+        "track_id": 3,
+        "person_bbox_xyxy": [
+          180.0,
+          20.0,
+          300.0,
+          420.0
+        ],
+        "person_bbox_normalized": [
+          0.36,
+          0.04,
+          0.6,
+          0.84
+        ],
+        "source_id": "crowded-synthetic",
+        "helmet": {
+          "state": "present",
+          "positive_detection": {
+            "detection_index": 2,
+            "ppe_class_id": 0,
+            "ppe_class_name": "helmet",
+            "ppe_confidence": 0.9,
+            "ppe_bbox_xyxy": [
+              215.0,
+              40.0,
+              255.0,
+              90.0
+            ],
+            "association_score": 0.9387259219948676,
+            "center_inside_region": true,
+            "person_ioa": 1.0,
+            "region_ioa": 1.0,
+            "normalized_center_distance": 0.30637039002566246,
+            "candidate_person_count": 1,
+            "ambiguous": false,
+            "alternative_track_ids": [],
+            "primary_for_class": true
+          },
+          "negative_detection": null,
+          "positive_candidates": [
+            {
+              "detection_index": 2,
+              "ppe_class_id": 0,
+              "ppe_class_name": "helmet",
+              "ppe_confidence": 0.9,
+              "ppe_bbox_xyxy": [
+                215.0,
+                40.0,
+                255.0,
+                90.0
+              ],
+              "association_score": 0.9387259219948676,
+              "center_inside_region": true,
+              "person_ioa": 1.0,
+              "region_ioa": 1.0,
+              "normalized_center_distance": 0.30637039002566246,
+              "candidate_person_count": 1,
+              "ambiguous": false,
+              "alternative_track_ids": [],
+              "primary_for_class": true
+            }
+          ],
+          "negative_candidates": []
+        },
+        "vest": {
+          "state": "present",
+          "positive_detection": {
+            "detection_index": 5,
+            "ppe_class_id": 1,
+            "ppe_class_name": "vest",
+            "ppe_confidence": 0.9,
+            "ppe_bbox_xyxy": [
+              220.0,
+              160.0,
+              275.0,
+              290.0
+            ],
+            "association_score": 0.9614974333186423,
+            "center_inside_region": true,
+            "person_ioa": 1.0,
+            "region_ioa": 1.0,
+            "normalized_center_distance": 0.1925128334067885,
+            "candidate_person_count": 1,
+            "ambiguous": false,
+            "alternative_track_ids": [],
+            "primary_for_class": true
+          },
+          "negative_detection": null,
+          "positive_candidates": [
+            {
+              "detection_index": 5,
+              "ppe_class_id": 1,
+              "ppe_class_name": "vest",
+              "ppe_confidence": 0.9,
+              "ppe_bbox_xyxy": [
+                220.0,
+                160.0,
+                275.0,
+                290.0
+              ],
+              "association_score": 0.9614974333186423,
+              "center_inside_region": true,
+              "person_ioa": 1.0,
+              "region_ioa": 1.0,
+              "normalized_center_distance": 0.1925128334067885,
+              "candidate_person_count": 1,
+              "ambiguous": false,
+              "alternative_track_ids": [],
+              "primary_for_class": true
+            }
+          ],
+          "negative_candidates": []
+        }
+      }
+    ]
+  },
+  "diagnostics": {
+    "total_person_observations": 3,
+    "ppe_detections_considered": 8,
+    "ppe_detections_assigned": 7,
+    "ppe_detections_unassigned": 1,
+    "malformed_ppe_detections": 0,
+    "ambiguous_candidate_count": 1,
+    "mean_association_score": 0.9304295991036519,
+    "per_class_assignment_counts": {
+      "helmet": 3,
+      "no_helmet": 1,
+      "vest": 3
+    },
+    "frame_level_equipment_states": {
+      "helmet": {
+        "present": 2,
+        "violation": 0,
+        "conflict": 1,
+        "unknown": 0
+      },
+      "vest": {
+        "present": 3,
+        "violation": 0,
+        "conflict": 0,
+        "unknown": 0
+      }
+    }
+  },
+  "crowded_scene_association_timing": {
+    "iterations": 1000,
+    "mean_ms": 0.85585179599002,
+    "p50_ms": 0.8577500702813268,
+    "p95_ms": 1.230459939688444
+  }
+}

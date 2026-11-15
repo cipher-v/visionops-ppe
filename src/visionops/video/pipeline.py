@@ -17,6 +17,10 @@ import numpy as np
 import torch
 from ultralytics import YOLO
 
+from visionops.association.associator import PPEAssociator
+from visionops.association.config import AssociationConfig
+from visionops.association.metrics import AssociationDiagnostics
+from visionops.association.schema import PersonPPEFrame
 from visionops.tracking.metrics import TrackingDiagnostics
 from visionops.tracking.schema import PersonTrack
 from visionops.tracking.tracker import PersonByteTracker, TrackerSettings
@@ -39,6 +43,8 @@ class PipelineOptions:
     max_frames: int | None = None
     enable_tracking: bool = False
     tracker_config: Path | None = None
+    enable_ppe_association: bool = False
+    ppe_association_config: Path | None = None
 
     def __post_init__(self) -> None:
         if self.frame_stride < 1:
@@ -49,6 +55,10 @@ class PipelineOptions:
             raise ValueError("Maximum processed frames must be positive")
         if self.enable_tracking and self.tracker_config is None:
             raise ValueError("Tracking requires a tracker configuration path")
+        if self.enable_ppe_association and not self.enable_tracking:
+            raise ValueError("PPE association requires tracking to be enabled")
+        if self.enable_ppe_association and self.ppe_association_config is None:
+            raise ValueError("PPE association requires an association configuration")
 
 
 def _summary(values: list[float]) -> dict[str, float | int | None]:
@@ -169,6 +179,43 @@ def render_tracked_detections(
     return rendered
 
 
+def render_ppe_associations(
+    frame: np.ndarray,
+    detections: list[VideoDetection],
+    tracks: tuple[PersonTrack, ...],
+    records: tuple[PersonPPEFrame, ...],
+) -> np.ndarray:
+    """Add frame-level H/V evidence states without compliance conclusions."""
+    rendered = render_tracked_detections(frame, detections, tracks)
+    record_by_track = {record.track_id: record for record in records}
+    for track in tracks:
+        record = record_by_track.get(track.track_id)
+        if record is None:
+            continue
+        x1, y1, _, _ = (round(value) for value in track.bbox_xyxy)
+        cv2.putText(
+            rendered,
+            f"H: {record.helmet.state}",
+            (x1, y1 + 18),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 170, 0),
+            1,
+            cv2.LINE_AA,
+        )
+        cv2.putText(
+            rendered,
+            f"V: {record.vest.state}",
+            (x1, y1 + 36),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 170, 0),
+            1,
+            cv2.LINE_AA,
+        )
+    return rendered
+
+
 def build_tracking_metadata(
     tracker: PersonByteTracker | None,
     diagnostics: TrackingDiagnostics | None,
@@ -186,6 +233,22 @@ def build_tracking_metadata(
     }
 
 
+def build_association_metadata(
+    associator: PPEAssociator | None,
+    diagnostics: AssociationDiagnostics | None,
+    association_latencies: list[float],
+) -> dict[str, object]:
+    """Build explicit enabled/disabled association metadata."""
+    if associator is None or diagnostics is None:
+        return {"enabled": False}
+    return {
+        "enabled": True,
+        "associator": associator.metadata(),
+        "diagnostics": diagnostics.summary(),
+        "timing": _summary(association_latencies),
+    }
+
+
 def run_video_pipeline(
     config: FrozenDetectorConfig, options: PipelineOptions
 ) -> dict[str, object]:
@@ -197,6 +260,7 @@ def run_video_pipeline(
     metadata_path = options.output_dir / "run_metadata.json"
     annotated_path = options.output_dir / "annotated.mp4"
     tracks_path = options.output_dir / "tracks.jsonl"
+    associations_path = options.output_dir / "ppe_associations.jsonl"
 
     model_load_started = time.perf_counter()
     model = YOLO(str(config.weights_path))
@@ -213,6 +277,7 @@ def run_video_pipeline(
     inference_ms: list[float] = []
     postprocess_ms: list[float] = []
     tracking_latencies: list[float] = []
+    association_latencies: list[float] = []
     frames_processed = 0
     frames_with_detections = 0
     detections_written = 0
@@ -226,6 +291,15 @@ def run_video_pipeline(
             raise ValueError("Tracking configuration was not provided")
         tracker = PersonByteTracker(TrackerSettings.from_yaml(options.tracker_config))
         tracking_diagnostics = TrackingDiagnostics()
+    associator = None
+    association_diagnostics = None
+    if options.enable_ppe_association:
+        if options.ppe_association_config is None:
+            raise ValueError("PPE association configuration was not provided")
+        associator = PPEAssociator(
+            AssociationConfig.from_yaml(options.ppe_association_config)
+        )
+        association_diagnostics = AssociationDiagnostics()
 
     with ExitStack() as stack:
         reader = stack.enter_context(VideoReader(options.source))
@@ -250,6 +324,13 @@ def run_video_pipeline(
         tracks_file = (
             stack.enter_context(tracks_path.open("w", encoding="utf-8", newline="\n"))
             if options.enable_tracking
+            else None
+        )
+        associations_file = (
+            stack.enter_context(
+                associations_path.open("w", encoding="utf-8", newline="\n")
+            )
+            if options.enable_ppe_association
             else None
         )
 
@@ -320,9 +401,31 @@ def run_video_pipeline(
                     raise RuntimeError("Tracking output file was not initialized")
                 for track in frame_tracks:
                     tracks_file.write(json.dumps(track.to_dict()) + "\n")
+            association_records: tuple[PersonPPEFrame, ...] = ()
+            if associator is not None and association_diagnostics is not None:
+                association_started = time.perf_counter()
+                association_result = associator.associate(frame_tracks, detections)
+                association_latencies.append(time.perf_counter() - association_started)
+                association_diagnostics.update(association_result)
+                association_records = association_result.records
+                if associations_file is None:
+                    raise RuntimeError(
+                        "PPE association output file was not initialized"
+                    )
+                for record in association_records:
+                    associations_file.write(json.dumps(record.to_dict()) + "\n")
             if writer is not None:
                 rendered = (
-                    render_tracked_detections(packet.image, detections, frame_tracks)
+                    render_ppe_associations(
+                        packet.image,
+                        detections,
+                        frame_tracks,
+                        association_records,
+                    )
+                    if associator is not None
+                    else render_tracked_detections(
+                        packet.image, detections, frame_tracks
+                    )
                     if tracker is not None
                     else render_detections(packet.image, detections)
                 )
@@ -422,10 +525,18 @@ def run_video_pipeline(
             source_metadata.reported_fps,
             tracking_latencies,
         ),
+        "ppe_association": build_association_metadata(
+            associator,
+            association_diagnostics,
+            association_latencies,
+        ),
         "outputs": {
             "detections_jsonl": str(detections_path),
             "run_metadata_json": str(metadata_path),
             "tracks_jsonl": str(tracks_path) if options.enable_tracking else None,
+            "ppe_associations_jsonl": (
+                str(associations_path) if options.enable_ppe_association else None
+            ),
             "annotated_video": str(annotated_path) if effective_render else None,
         },
     }
