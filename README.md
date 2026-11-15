@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 9 - production-style video ingestion and detector inference**
+**Checkpoint 10 - person-only multi-object tracking**
 
-Production v1 remains frozen as the full-budget mixed-source YOLO26n model at 960 pixels
-with its calibrated five-class confidence policy. The repository now provides bounded
-streaming ingestion for files, device indices, and RTSP/HTTP-style URIs; structured JSONL
-detections; optional annotated video; and measured runtime metadata. Tracking, PPE-person
-association, temporal event logic, model export, and APIs remain deferred.
+Production v1 remains frozen as the mixed-source YOLO26n model at 960 pixels with its
+calibrated five-class confidence policy. The streaming pipeline now optionally adds
+ByteTrack identities for Person detections only, with structured track records and
+ground-truth-free lifecycle diagnostics. PPE-person association, compliance decisions,
+zones, temporal incidents, model export, and APIs remain deferred.
 

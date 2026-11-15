@@ -17,6 +17,9 @@ import numpy as np
 import torch
 from ultralytics import YOLO
 
+from visionops.tracking.metrics import TrackingDiagnostics
+from visionops.tracking.schema import PersonTrack
+from visionops.tracking.tracker import PersonByteTracker, TrackerSettings
 from visionops.video.config import FrozenDetectorConfig, verify_weights
 from visionops.video.policy import CandidateBox, apply_class_thresholds
 from visionops.video.schema import VideoDetection, normalized_box
@@ -34,6 +37,8 @@ class PipelineOptions:
     fallback_fps: float = 30.0
     device: str | int | None = None
     max_frames: int | None = None
+    enable_tracking: bool = False
+    tracker_config: Path | None = None
 
     def __post_init__(self) -> None:
         if self.frame_stride < 1:
@@ -42,6 +47,8 @@ class PipelineOptions:
             raise ValueError("Fallback FPS must be positive")
         if self.max_frames is not None and self.max_frames < 1:
             raise ValueError("Maximum processed frames must be positive")
+        if self.enable_tracking and self.tracker_config is None:
+            raise ValueError("Tracking requires a tracker configuration path")
 
 
 def _summary(values: list[float]) -> dict[str, float | int | None]:
@@ -136,6 +143,49 @@ def render_detections(
     return rendered
 
 
+def render_tracked_detections(
+    frame: np.ndarray,
+    detections: list[VideoDetection],
+    tracks: tuple[PersonTrack, ...],
+) -> np.ndarray:
+    """Draw PPE as detections and Person as local track observations."""
+    rendered = render_detections(
+        frame, [detection for detection in detections if detection.class_id != 2]
+    )
+    for track in tracks:
+        x1, y1, x2, y2 = (round(value) for value in track.bbox_xyxy)
+        cv2.rectangle(rendered, (x1, y1), (x2, y2), (255, 170, 0), 2)
+        label = f"Person #{track.track_id} {track.confidence:.2f}"
+        cv2.putText(
+            rendered,
+            label,
+            (x1, max(16, y1 - 5)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 170, 0),
+            1,
+            cv2.LINE_AA,
+        )
+    return rendered
+
+
+def build_tracking_metadata(
+    tracker: PersonByteTracker | None,
+    diagnostics: TrackingDiagnostics | None,
+    reported_fps: float | None,
+    tracking_latencies: list[float],
+) -> dict[str, object]:
+    """Build explicit enabled/disabled tracking metadata for a completed run."""
+    if tracker is None or diagnostics is None:
+        return {"enabled": False}
+    return {
+        "enabled": True,
+        "tracker": tracker.metadata(),
+        "diagnostics": diagnostics.summary(reported_fps, tracker.live_track_ids),
+        "timing": _summary(tracking_latencies),
+    }
+
+
 def run_video_pipeline(
     config: FrozenDetectorConfig, options: PipelineOptions
 ) -> dict[str, object]:
@@ -146,6 +196,7 @@ def run_video_pipeline(
     detections_path = options.output_dir / "detections.jsonl"
     metadata_path = options.output_dir / "run_metadata.json"
     annotated_path = options.output_dir / "annotated.mp4"
+    tracks_path = options.output_dir / "tracks.jsonl"
 
     model_load_started = time.perf_counter()
     model = YOLO(str(config.weights_path))
@@ -161,12 +212,20 @@ def run_video_pipeline(
     preprocess_ms: list[float] = []
     inference_ms: list[float] = []
     postprocess_ms: list[float] = []
+    tracking_latencies: list[float] = []
     frames_processed = 0
     frames_with_detections = 0
     detections_written = 0
     frames_skipped_by_stride = 0
     warmup_seconds = 0.0
     stopped_by_max_frames = False
+    tracker = None
+    tracking_diagnostics = None
+    if options.enable_tracking:
+        if options.tracker_config is None:
+            raise ValueError("Tracking configuration was not provided")
+        tracker = PersonByteTracker(TrackerSettings.from_yaml(options.tracker_config))
+        tracking_diagnostics = TrackingDiagnostics()
 
     with ExitStack() as stack:
         reader = stack.enter_context(VideoReader(options.source))
@@ -175,7 +234,8 @@ def run_video_pipeline(
         source_metadata = reader.metadata
         output_fps = source_metadata.reported_fps or options.fallback_fps
         writer = None
-        if options.render:
+        effective_render = options.render or options.enable_tracking
+        if effective_render:
             writer = stack.enter_context(
                 AnnotatedVideoWriter(
                     annotated_path,
@@ -186,6 +246,11 @@ def run_video_pipeline(
             )
         detections_file = stack.enter_context(
             detections_path.open("w", encoding="utf-8", newline="\n")
+        )
+        tracks_file = (
+            stack.enter_context(tracks_path.open("w", encoding="utf-8", newline="\n"))
+            if options.enable_tracking
+            else None
         )
 
         warmup_frame = np.zeros(
@@ -238,8 +303,30 @@ def run_video_pipeline(
             )
             for detection in detections:
                 detections_file.write(json.dumps(detection.to_dict()) + "\n")
+            frame_tracks: tuple[PersonTrack, ...] = ()
+            if tracker is not None and tracking_diagnostics is not None:
+                tracking_started = time.perf_counter()
+                tracking_result = tracker.update(
+                    packet.frame_index,
+                    packet.timestamp_seconds,
+                    detections,
+                    packet.image.shape[:2],
+                    source_metadata.source_id,
+                )
+                tracking_latencies.append(time.perf_counter() - tracking_started)
+                tracking_diagnostics.update(tracking_result)
+                frame_tracks = tracking_result.tracks
+                if tracks_file is None:
+                    raise RuntimeError("Tracking output file was not initialized")
+                for track in frame_tracks:
+                    tracks_file.write(json.dumps(track.to_dict()) + "\n")
             if writer is not None:
-                writer.write(render_detections(packet.image, detections))
+                rendered = (
+                    render_tracked_detections(packet.image, detections, frame_tracks)
+                    if tracker is not None
+                    else render_detections(packet.image, detections)
+                )
+                writer.write(rendered)
 
             speed = result.speed or {}
             if "preprocess" in speed:
@@ -295,7 +382,7 @@ def run_video_pipeline(
             "stopped_by_max_frames": stopped_by_max_frames,
             "output_fps": output_fps,
             "fallback_fps_used": source_metadata.reported_fps is None,
-            "annotated_video_written": options.render,
+            "annotated_video_written": effective_render,
         },
         "timing": {
             "model_load_seconds": model_load_seconds,
@@ -329,10 +416,17 @@ def run_video_pipeline(
             "cuda_available": torch.cuda.is_available(),
             "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         },
+        "tracking": build_tracking_metadata(
+            tracker,
+            tracking_diagnostics,
+            source_metadata.reported_fps,
+            tracking_latencies,
+        ),
         "outputs": {
             "detections_jsonl": str(detections_path),
             "run_metadata_json": str(metadata_path),
-            "annotated_video": str(annotated_path) if options.render else None,
+            "tracks_jsonl": str(tracks_path) if options.enable_tracking else None,
+            "annotated_video": str(annotated_path) if effective_render else None,
         },
     }
     metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")

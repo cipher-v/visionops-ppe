@@ -1,0 +1,658 @@
+{
+  "created_at": "2026-11-15T15:04:10.081484+00:00",
+  "purpose": "deterministic adapter diagnostics; not formal MOT evaluation",
+  "tracker": {
+    "name": "Ultralytics ByteTrack",
+    "ultralytics_version": "8.4.212",
+    "implementation": "ultralytics.trackers.byte_tracker.BYTETracker",
+    "appearance_reid": false,
+    "configuration": {
+      "tracker_type": "bytetrack",
+      "track_high_thresh": 0.25,
+      "track_low_thresh": 0.1,
+      "new_track_thresh": 0.25,
+      "track_buffer": 30,
+      "match_thresh": 0.8,
+      "fuse_score": true,
+      "appearance_reid": false
+    },
+    "person_class_id": 2,
+    "person_confidence_threshold": 0.41,
+    "track_ids_local_to_run": true
+  },
+  "smooth_motion": {
+    "observed_ids": [
+      1
+    ],
+    "one_id_preserved": true,
+    "metrics": {
+      "unique_tracks_created": 1,
+      "track_observations": 20,
+      "mean_track_length_frames": 20.0,
+      "median_track_length_frames": 20,
+      "p95_track_length_frames": 20.0,
+      "singleton_tracks": 0,
+      "tracks_lasting_at_least_one_second": 1,
+      "frames_with_active_tracks": 20,
+      "maximum_simultaneous_active_tracks": 1,
+      "lost_transitions": 0,
+      "recovered_transitions": 0,
+      "expired_tracks": 0,
+      "rejected_person_detections": 0,
+      "live_track_ids_at_end": [
+        1
+      ]
+    }
+  },
+  "two_independent": {
+    "observed_ids": [
+      1,
+      2
+    ],
+    "two_ids_preserved": true,
+    "metrics": {
+      "unique_tracks_created": 2,
+      "track_observations": 40,
+      "mean_track_length_frames": 20.0,
+      "median_track_length_frames": 20.0,
+      "p95_track_length_frames": 20.0,
+      "singleton_tracks": 0,
+      "tracks_lasting_at_least_one_second": 2,
+      "frames_with_active_tracks": 20,
+      "maximum_simultaneous_active_tracks": 2,
+      "lost_transitions": 0,
+      "recovered_transitions": 0,
+      "expired_tracks": 0,
+      "rejected_person_detections": 0,
+      "live_track_ids_at_end": [
+        1,
+        2
+      ]
+    }
+  },
+  "disappearance": {
+    "short_gap": {
+      "initial_id": 1,
+      "reappeared_id": 1,
+      "state": "recovered",
+      "same_id_recovered": true,
+      "metrics": {
+        "unique_tracks_created": 1,
+        "track_observations": 4,
+        "mean_track_length_frames": 4.0,
+        "median_track_length_frames": 4,
+        "p95_track_length_frames": 4.0,
+        "singleton_tracks": 0,
+        "tracks_lasting_at_least_one_second": 0,
+        "frames_with_active_tracks": 4,
+        "maximum_simultaneous_active_tracks": 1,
+        "lost_transitions": 1,
+        "recovered_transitions": 1,
+        "expired_tracks": 0,
+        "rejected_person_detections": 0,
+        "live_track_ids_at_end": [
+          1
+        ]
+      }
+    },
+    "beyond_buffer": {
+      "old_id": 1,
+      "new_id": 2,
+      "new_id_created": true,
+      "metrics": {
+        "unique_tracks_created": 2,
+        "track_observations": 3,
+        "mean_track_length_frames": 1.5,
+        "median_track_length_frames": 1.5,
+        "p95_track_length_frames": 1.95,
+        "singleton_tracks": 1,
+        "tracks_lasting_at_least_one_second": 0,
+        "frames_with_active_tracks": 3,
+        "maximum_simultaneous_active_tracks": 1,
+        "lost_transitions": 1,
+        "recovered_transitions": 0,
+        "expired_tracks": 1,
+        "rejected_person_detections": 0,
+        "live_track_ids_at_end": [
+          2
+        ]
+      }
+    }
+  },
+  "no_detections": {
+    "unique_tracks_created": 0,
+    "track_observations": 0,
+    "mean_track_length_frames": 0.0,
+    "median_track_length_frames": 0.0,
+    "p95_track_length_frames": 0.0,
+    "singleton_tracks": 0,
+    "tracks_lasting_at_least_one_second": 0,
+    "frames_with_active_tracks": 0,
+    "maximum_simultaneous_active_tracks": 0,
+    "lost_transitions": 0,
+    "recovered_transitions": 0,
+    "expired_tracks": 0,
+    "rejected_person_detections": 0,
+    "live_track_ids_at_end": []
+  },
+  "crossing_with_occlusion": {
+    "initial_trajectory_ids": {
+      "a": 1,
+      "b": 2
+    },
+    "final_trajectory_ids": {
+      "a": 1,
+      "b": 2
+    },
+    "ids_preserved": true,
+    "ids_switched": false,
+    "observations": [
+      {
+        "frame": 0,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 40.0,
+            "state": "new"
+          },
+          {
+            "track_id": 2,
+            "center_x": 240.0,
+            "state": "new"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 1,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 46.94214725494385,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 233.05784606933594,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 2,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 54.36761474609375,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 225.63238525390625,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 3,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 62.67584037780762,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 217.32415771484375,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 4,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 71.00335693359375,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 208.99664306640625,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 5,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 79.23558616638184,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 200.76441955566406,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 6,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 87.39543151855469,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 192.6045684814453,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 7,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 95.50894927978516,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 184.4910430908203,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 8,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 103.59288787841797,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 176.4071044921875,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 9,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 111.65727233886719,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 168.3427276611328,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 10,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 119.70818710327148,
+            "state": "tracked"
+          },
+          {
+            "track_id": 2,
+            "center_x": 160.29180908203125,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 11,
+        "tracks": [
+          {
+            "track_id": 1,
+            "center_x": 135.78627014160156,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [
+            2
+          ],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 12,
+        "tracks": [],
+        "events": {
+          "lost": [
+            1
+          ],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 13,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 139.66305923461914,
+            "state": "recovered"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [
+            2
+          ],
+          "expired": []
+        }
+      },
+      {
+        "frame": 14,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 129.35891342163086,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 153.4392852783203,
+            "state": "recovered"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [
+            1
+          ],
+          "expired": []
+        }
+      },
+      {
+        "frame": 15,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 120.56855392456055,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 160.36964416503906,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 16,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 112.2634162902832,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 168.00633239746094,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 17,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 104.14083862304688,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 175.88339233398438,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 18,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 96.08892059326172,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 183.85049438476562,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 19,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 88.06475830078125,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 191.85049438476562,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 20,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 80.05179023742676,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 199.861572265625,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 21,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 72.04358673095703,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 207.87551879882812,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 22,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 64.0376033782959,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 215.889404296875,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 23,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 56.032819747924805,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 223.9022216796875,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      },
+      {
+        "frame": 24,
+        "tracks": [
+          {
+            "track_id": 2,
+            "center_x": 48.02879333496094,
+            "state": "tracked"
+          },
+          {
+            "track_id": 1,
+            "center_x": 231.9137191772461,
+            "state": "tracked"
+          }
+        ],
+        "events": {
+          "lost": [],
+          "recovered": [],
+          "expired": []
+        }
+      }
+    ],
+    "metrics": {
+      "unique_tracks_created": 2,
+      "track_observations": 46,
+      "mean_track_length_frames": 23.0,
+      "median_track_length_frames": 23.0,
+      "p95_track_length_frames": 23.0,
+      "singleton_tracks": 0,
+      "tracks_lasting_at_least_one_second": 2,
+      "frames_with_active_tracks": 24,
+      "maximum_simultaneous_active_tracks": 2,
+      "lost_transitions": 2,
+      "recovered_transitions": 2,
+      "expired_tracks": 0,
+      "rejected_person_detections": 0,
+      "live_track_ids_at_end": [
+        1,
+        2
+      ]
+    }
+  }
+}
