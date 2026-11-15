@@ -1,0 +1,13 @@
+version: 1
+helmet:
+  violation_confirm_seconds: 1.5
+  clear_confirm_seconds: 1.0
+vest:
+  violation_confirm_seconds: 1.5
+  clear_confirm_seconds: 1.0
+unknown_grace_seconds: 0.75
+conflict_grace_seconds: 0.50
+incident_cooldown_seconds: 5.0
+timestamp_policy:
+  require_strictly_increasing_per_track: true
+  decisions_use_elapsed_seconds: true

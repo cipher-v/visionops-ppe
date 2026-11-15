@@ -6,6 +6,7 @@ import json
 import platform
 import statistics
 import time
+import uuid
 from contextlib import ExitStack
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -21,6 +22,9 @@ from visionops.association.associator import PPEAssociator
 from visionops.association.config import AssociationConfig
 from visionops.association.metrics import AssociationDiagnostics
 from visionops.association.schema import PersonPPEFrame
+from visionops.compliance.config import TemporalComplianceConfig
+from visionops.compliance.engine import TemporalComplianceEngine
+from visionops.compliance.schema import TemporalComplianceRecord
 from visionops.tracking.metrics import TrackingDiagnostics
 from visionops.tracking.schema import PersonTrack
 from visionops.tracking.tracker import PersonByteTracker, TrackerSettings
@@ -45,6 +49,8 @@ class PipelineOptions:
     tracker_config: Path | None = None
     enable_ppe_association: bool = False
     ppe_association_config: Path | None = None
+    enable_temporal_compliance: bool = False
+    temporal_compliance_config: Path | None = None
 
     def __post_init__(self) -> None:
         if self.frame_stride < 1:
@@ -59,6 +65,14 @@ class PipelineOptions:
             raise ValueError("PPE association requires tracking to be enabled")
         if self.enable_ppe_association and self.ppe_association_config is None:
             raise ValueError("PPE association requires an association configuration")
+        if self.enable_temporal_compliance and not self.enable_tracking:
+            raise ValueError("Temporal compliance requires tracking to be enabled")
+        if self.enable_temporal_compliance and not self.enable_ppe_association:
+            raise ValueError(
+                "Temporal compliance requires PPE association to be enabled"
+            )
+        if self.enable_temporal_compliance and self.temporal_compliance_config is None:
+            raise ValueError("Temporal compliance requires a temporal configuration")
 
 
 def _summary(values: list[float]) -> dict[str, float | int | None]:
@@ -216,6 +230,58 @@ def render_ppe_associations(
     return rendered
 
 
+def _temporal_label(state: object) -> str:
+    if state.temporal_state == "compliant":
+        return "OK"
+    if state.temporal_state == "suspected_violation":
+        return f"SUSPECT {state.continuous_violation_duration:.1f}s"
+    if state.temporal_state == "confirmed_violation":
+        duration = (
+            state.incident_duration_seconds
+            if state.incident_duration_seconds is not None
+            else state.continuous_violation_duration
+        )
+        return f"VIOLATION {duration:.1f}s"
+    return state.temporal_state.upper()
+
+
+def render_temporal_compliance(
+    frame: np.ndarray,
+    detections: list[VideoDetection],
+    tracks: tuple[PersonTrack, ...],
+    records: tuple[TemporalComplianceRecord, ...],
+) -> np.ndarray:
+    """Render explicit temporal evidence without zones or alert semantics."""
+    rendered = render_tracked_detections(frame, detections, tracks)
+    record_by_track = {record.track_id: record for record in records}
+    for track in tracks:
+        record = record_by_track.get(track.track_id)
+        if record is None:
+            continue
+        x1, y1, _, _ = (round(value) for value in track.bbox_xyxy)
+        cv2.putText(
+            rendered,
+            f"H: {_temporal_label(record.helmet)}",
+            (x1, y1 + 18),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 170, 0),
+            1,
+            cv2.LINE_AA,
+        )
+        cv2.putText(
+            rendered,
+            f"V: {_temporal_label(record.vest)}",
+            (x1, y1 + 36),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 170, 0),
+            1,
+            cv2.LINE_AA,
+        )
+    return rendered
+
+
 def build_tracking_metadata(
     tracker: PersonByteTracker | None,
     diagnostics: TrackingDiagnostics | None,
@@ -249,6 +315,22 @@ def build_association_metadata(
     }
 
 
+def build_temporal_metadata(
+    engine: TemporalComplianceEngine | None,
+    temporal_latencies: list[float],
+) -> dict[str, object]:
+    """Build temporal-engine metadata with an explicit real-video validation flag."""
+    if engine is None:
+        return {"enabled": False}
+    return {
+        "enabled": True,
+        "engine": engine.metadata(),
+        "diagnostics": engine.summary(),
+        "timing": _summary(temporal_latencies),
+        "real_video_temporal_validation": False,
+    }
+
+
 def run_video_pipeline(
     config: FrozenDetectorConfig, options: PipelineOptions
 ) -> dict[str, object]:
@@ -261,6 +343,8 @@ def run_video_pipeline(
     annotated_path = options.output_dir / "annotated.mp4"
     tracks_path = options.output_dir / "tracks.jsonl"
     associations_path = options.output_dir / "ppe_associations.jsonl"
+    compliance_path = options.output_dir / "compliance_states.jsonl"
+    incidents_path = options.output_dir / "incidents.jsonl"
 
     model_load_started = time.perf_counter()
     model = YOLO(str(config.weights_path))
@@ -278,6 +362,7 @@ def run_video_pipeline(
     postprocess_ms: list[float] = []
     tracking_latencies: list[float] = []
     association_latencies: list[float] = []
+    temporal_latencies: list[float] = []
     frames_processed = 0
     frames_with_detections = 0
     detections_written = 0
@@ -300,6 +385,14 @@ def run_video_pipeline(
             AssociationConfig.from_yaml(options.ppe_association_config)
         )
         association_diagnostics = AssociationDiagnostics()
+    temporal_engine = None
+    if options.enable_temporal_compliance:
+        if options.temporal_compliance_config is None:
+            raise ValueError("Temporal compliance configuration was not provided")
+        temporal_engine = TemporalComplianceEngine(
+            TemporalComplianceConfig.from_yaml(options.temporal_compliance_config),
+            run_id=f"run-{uuid.uuid4().hex}",
+        )
 
     with ExitStack() as stack:
         reader = stack.enter_context(VideoReader(options.source))
@@ -333,6 +426,20 @@ def run_video_pipeline(
             if options.enable_ppe_association
             else None
         )
+        compliance_file = (
+            stack.enter_context(
+                compliance_path.open("w", encoding="utf-8", newline="\n")
+            )
+            if options.enable_temporal_compliance
+            else None
+        )
+        incidents_file = (
+            stack.enter_context(
+                incidents_path.open("w", encoding="utf-8", newline="\n")
+            )
+            if options.enable_temporal_compliance
+            else None
+        )
 
         warmup_frame = np.zeros(
             (
@@ -353,6 +460,7 @@ def run_video_pipeline(
         )
         warmup_seconds = time.perf_counter() - warmup_started
         processing_started = time.perf_counter()
+        last_processed_timestamp = 0.0
 
         while True:
             packet = reader.read()
@@ -365,6 +473,7 @@ def run_video_pipeline(
                 continue
 
             frame_started = time.perf_counter()
+            last_processed_timestamp = packet.timestamp_seconds
             detector_started = time.perf_counter()
             results = model.predict(
                 source=packet.image,
@@ -385,6 +494,7 @@ def run_video_pipeline(
             for detection in detections:
                 detections_file.write(json.dumps(detection.to_dict()) + "\n")
             frame_tracks: tuple[PersonTrack, ...] = ()
+            tracking_result = None
             if tracker is not None and tracking_diagnostics is not None:
                 tracking_started = time.perf_counter()
                 tracking_result = tracker.update(
@@ -414,9 +524,50 @@ def run_video_pipeline(
                     )
                 for record in association_records:
                     associations_file.write(json.dumps(record.to_dict()) + "\n")
+            temporal_records: tuple[TemporalComplianceRecord, ...] = ()
+            if temporal_engine is not None:
+                temporal_started = time.perf_counter()
+                if compliance_file is None or incidents_file is None:
+                    raise RuntimeError("Temporal compliance files were not initialized")
+                active_ids = {record.track_id for record in association_records}
+                expired_ids = (
+                    set(tracking_result.events.expired_ids)
+                    if tracking_result is not None
+                    else set()
+                )
+                for track_id in sorted(expired_ids):
+                    for event in temporal_engine.expire_track(
+                        track_id, packet.timestamp_seconds
+                    ):
+                        incidents_file.write(json.dumps(event.to_dict()) + "\n")
+                live_ids = set(tracker.live_track_ids) if tracker is not None else set()
+                missing_ids = (
+                    set(temporal_engine.known_track_ids) - active_ids - expired_ids
+                ) & live_ids
+                for track_id in sorted(missing_ids):
+                    for event in temporal_engine.mark_missing(
+                        track_id, packet.timestamp_seconds
+                    ):
+                        incidents_file.write(json.dumps(event.to_dict()) + "\n")
+                produced_records = []
+                for association_record in association_records:
+                    update = temporal_engine.update(association_record)
+                    produced_records.append(update.record)
+                    compliance_file.write(json.dumps(update.record.to_dict()) + "\n")
+                    for event in update.events:
+                        incidents_file.write(json.dumps(event.to_dict()) + "\n")
+                temporal_records = tuple(produced_records)
+                temporal_latencies.append(time.perf_counter() - temporal_started)
             if writer is not None:
                 rendered = (
-                    render_ppe_associations(
+                    render_temporal_compliance(
+                        packet.image,
+                        detections,
+                        frame_tracks,
+                        temporal_records,
+                    )
+                    if temporal_engine is not None
+                    else render_ppe_associations(
                         packet.image,
                         detections,
                         frame_tracks,
@@ -449,6 +600,12 @@ def run_video_pipeline(
             ):
                 stopped_by_max_frames = True
                 break
+
+        if temporal_engine is not None:
+            if incidents_file is None:
+                raise RuntimeError("Temporal incident file was not initialized")
+            for event in temporal_engine.finalize(last_processed_timestamp):
+                incidents_file.write(json.dumps(event.to_dict()) + "\n")
 
         processing_seconds = time.perf_counter() - processing_started
         frames_read = reader.frames_read
@@ -530,12 +687,22 @@ def run_video_pipeline(
             association_diagnostics,
             association_latencies,
         ),
+        "temporal_compliance": build_temporal_metadata(
+            temporal_engine,
+            temporal_latencies,
+        ),
         "outputs": {
             "detections_jsonl": str(detections_path),
             "run_metadata_json": str(metadata_path),
             "tracks_jsonl": str(tracks_path) if options.enable_tracking else None,
             "ppe_associations_jsonl": (
                 str(associations_path) if options.enable_ppe_association else None
+            ),
+            "compliance_states_jsonl": (
+                str(compliance_path) if options.enable_temporal_compliance else None
+            ),
+            "incidents_jsonl": (
+                str(incidents_path) if options.enable_temporal_compliance else None
             ),
             "annotated_video": str(annotated_path) if effective_render else None,
         },

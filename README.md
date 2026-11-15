@@ -23,11 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 11 - frame-level Person-to-PPE association**
+**Checkpoint 12 - temporal PPE state and incident generation**
 
-Production v1 and Person-only ByteTrack remain frozen. The streaming pipeline now
-optionally associates helmet and vest evidence with active Person tracks using documented
-head/torso geometry, PPE-box containment, deterministic one-to-one assignment, and
-explicit present/violation/conflict/unknown frame states. Temporal persistence, compliance
-decisions, zones, incidents, model export, and APIs remain deferred.
+Production v1, ByteTrack, and frame-level PPE association remain frozen. The streaming
+pipeline now optionally converts explicit frame evidence into timestamp-driven per-track
+helmet/vest state, deduplicated incident open/close events, unknown/conflict grace,
+sustained-positive clearing, cooldown, and track-expiration closure. Spatial zones, model
+export, APIs, and drift monitoring remain deferred.
 

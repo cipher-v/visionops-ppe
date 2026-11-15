@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "configs/production_detector.yaml"
 DEFAULT_TRACKER_CONFIG = ROOT / "configs/bytetrack_person.yaml"
 DEFAULT_ASSOCIATION_CONFIG = ROOT / "configs/ppe_association.yaml"
+DEFAULT_TEMPORAL_CONFIG = ROOT / "configs/compliance_temporal.yaml"
 
 
 def parse_args() -> argparse.Namespace:
@@ -28,9 +29,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--enable-tracking", action="store_true")
     parser.add_argument("--enable-ppe-association", action="store_true")
+    parser.add_argument("--enable-temporal-compliance", action="store_true")
     parser.add_argument("--tracker-config", type=Path, default=DEFAULT_TRACKER_CONFIG)
     parser.add_argument(
         "--ppe-association-config", type=Path, default=DEFAULT_ASSOCIATION_CONFIG
+    )
+    parser.add_argument(
+        "--temporal-compliance-config", type=Path, default=DEFAULT_TEMPORAL_CONFIG
     )
     parser.add_argument("--fallback-fps", type=float, default=30.0)
     parser.add_argument("--device", default=None)
@@ -61,6 +66,12 @@ def main() -> None:
             enable_ppe_association=args.enable_ppe_association,
             ppe_association_config=(
                 args.ppe_association_config if args.enable_ppe_association else None
+            ),
+            enable_temporal_compliance=args.enable_temporal_compliance,
+            temporal_compliance_config=(
+                args.temporal_compliance_config
+                if args.enable_temporal_compliance
+                else None
             ),
         ),
     )

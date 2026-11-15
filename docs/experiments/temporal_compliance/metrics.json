@@ -1,0 +1,219 @@
+{
+  "created_at": "2026-11-15T15:34:55.499886+00:00",
+  "real_video_temporal_validation": false,
+  "purpose": "deterministic synthetic decision validation only",
+  "configuration": {
+    "version": 1,
+    "helmet": {
+      "violation_confirm_seconds": 1.5,
+      "clear_confirm_seconds": 1.0
+    },
+    "vest": {
+      "violation_confirm_seconds": 1.5,
+      "clear_confirm_seconds": 1.0
+    },
+    "unknown_grace_seconds": 0.75,
+    "conflict_grace_seconds": 0.5,
+    "incident_cooldown_seconds": 5.0,
+    "timestamp_policy": {
+      "require_strictly_increasing_per_track": true,
+      "decisions_use_elapsed_seconds": true
+    }
+  },
+  "scenario": {
+    "workers": {
+      "1": "sustained helmet and vest positive evidence",
+      "2": "persistent no_helmet, short unknown, conflict, then cleared",
+      "3": "transient no_vest shorter than confirmation threshold"
+    },
+    "expected_events": [
+      {
+        "event_type": "incident_opened",
+        "track_id": 2,
+        "equipment": "helmet",
+        "timestamp": 1.5
+      },
+      {
+        "event_type": "incident_closed",
+        "track_id": 2,
+        "equipment": "helmet",
+        "timestamp": 4.0
+      }
+    ],
+    "actual_events": [
+      {
+        "event_type": "incident_opened",
+        "track_id": 2,
+        "equipment": "helmet",
+        "timestamp": 1.5
+      },
+      {
+        "event_type": "incident_closed",
+        "track_id": 2,
+        "equipment": "helmet",
+        "timestamp": 4.0
+      }
+    ],
+    "exact_event_match": true,
+    "expected_incident_count": 1,
+    "actual_incident_count": 1,
+    "events": [
+      {
+        "event_type": "incident_opened",
+        "event_timestamp_seconds": 1.5,
+        "incident": {
+          "incident_id": "diagnostic-run-track-2-helmet-0001",
+          "source_id": "deterministic-temporal-scenario",
+          "track_id": 2,
+          "equipment": "helmet",
+          "type": "ppe_violation",
+          "started_at_seconds": 0.0,
+          "confirmed_at_seconds": 1.5,
+          "cleared_at_seconds": null,
+          "duration_seconds": null,
+          "status": "active",
+          "close_reason": null,
+          "evidence_summary": {
+            "observation_counts": {
+              "violation": 5
+            },
+            "continuous_violation_duration": 1.5,
+            "continuous_present_duration": 0.0,
+            "last_stable_state": "confirmed_violation"
+          }
+        }
+      },
+      {
+        "event_type": "incident_closed",
+        "event_timestamp_seconds": 4.0,
+        "incident": {
+          "incident_id": "diagnostic-run-track-2-helmet-0001",
+          "source_id": "deterministic-temporal-scenario",
+          "track_id": 2,
+          "equipment": "helmet",
+          "type": "ppe_violation",
+          "started_at_seconds": 0.0,
+          "confirmed_at_seconds": 1.5,
+          "cleared_at_seconds": 4.0,
+          "duration_seconds": 4.0,
+          "status": "closed",
+          "close_reason": "sustained_present",
+          "evidence_summary": {
+            "observation_counts": {
+              "conflict": 1,
+              "present": 2,
+              "unknown": 1,
+              "violation": 7
+            },
+            "continuous_violation_duration": 0.0,
+            "continuous_present_duration": 1.0,
+            "last_stable_state": "compliant"
+          }
+        }
+      }
+    ],
+    "track_2_helmet_timeline": [
+      {
+        "timestamp": 0.0,
+        "evidence": "violation",
+        "temporal_state": "suspected_violation",
+        "violation_duration": 0.0,
+        "incident_active": false
+      },
+      {
+        "timestamp": 0.6,
+        "evidence": "violation",
+        "temporal_state": "suspected_violation",
+        "violation_duration": 0.6,
+        "incident_active": false
+      },
+      {
+        "timestamp": 0.75,
+        "evidence": "violation",
+        "temporal_state": "suspected_violation",
+        "violation_duration": 0.75,
+        "incident_active": false
+      },
+      {
+        "timestamp": 1.0,
+        "evidence": "violation",
+        "temporal_state": "suspected_violation",
+        "violation_duration": 1.0,
+        "incident_active": false
+      },
+      {
+        "timestamp": 1.5,
+        "evidence": "violation",
+        "temporal_state": "confirmed_violation",
+        "violation_duration": 1.5,
+        "incident_active": true
+      },
+      {
+        "timestamp": 2.0,
+        "evidence": "unknown",
+        "temporal_state": "confirmed_violation",
+        "violation_duration": 1.5,
+        "incident_active": true
+      },
+      {
+        "timestamp": 2.2,
+        "evidence": "violation",
+        "temporal_state": "confirmed_violation",
+        "violation_duration": 1.5,
+        "incident_active": true
+      },
+      {
+        "timestamp": 2.5,
+        "evidence": "conflict",
+        "temporal_state": "conflict",
+        "violation_duration": 1.5,
+        "incident_active": true
+      },
+      {
+        "timestamp": 2.8,
+        "evidence": "violation",
+        "temporal_state": "confirmed_violation",
+        "violation_duration": 1.5,
+        "incident_active": true
+      },
+      {
+        "timestamp": 3.0,
+        "evidence": "present",
+        "temporal_state": "confirmed_violation",
+        "violation_duration": 0.0,
+        "incident_active": true
+      },
+      {
+        "timestamp": 4.0,
+        "evidence": "present",
+        "temporal_state": "compliant",
+        "violation_duration": 0.0,
+        "incident_active": false
+      }
+    ]
+  },
+  "engine_summary": {
+    "known_tracks_at_end": 3,
+    "incidents_opened": 1,
+    "incidents_closed": 1,
+    "incidents_active": 0,
+    "cooldown_confirmations_suppressed": 0,
+    "close_reasons": {
+      "sustained_present": 1
+    },
+    "temporal_state_observations": {
+      "helmet:compliant": 23,
+      "helmet:confirmed_violation": 5,
+      "helmet:conflict": 1,
+      "helmet:suspected_violation": 4,
+      "vest:compliant": 31,
+      "vest:suspected_violation": 2
+    }
+  },
+  "temporal_engine_timing": {
+    "observations": 2000,
+    "mean_ms": 0.035186602850444615,
+    "p50_ms": 0.02159993164241314,
+    "p95_ms": 0.0420999713242054
+  }
+}
