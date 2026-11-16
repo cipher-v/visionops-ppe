@@ -16,7 +16,6 @@ from typing import Any
 import cv2
 import numpy as np
 import torch
-from ultralytics import YOLO
 
 from visionops.association.associator import PPEAssociator
 from visionops.association.config import AssociationConfig
@@ -25,9 +24,11 @@ from visionops.association.schema import PersonPPEFrame
 from visionops.compliance.config import TemporalComplianceConfig
 from visionops.compliance.engine import TemporalComplianceEngine
 from visionops.compliance.schema import TemporalComplianceRecord
+from visionops.deployment.profiler import StageProfiler
 from visionops.tracking.metrics import TrackingDiagnostics
 from visionops.tracking.schema import PersonTrack
 from visionops.tracking.tracker import PersonByteTracker, TrackerSettings
+from visionops.video.backend import DetectorBackend
 from visionops.video.config import FrozenDetectorConfig, verify_weights
 from visionops.video.policy import CandidateBox, apply_class_thresholds
 from visionops.video.schema import VideoDetection, normalized_box
@@ -56,6 +57,8 @@ class PipelineOptions:
     temporal_compliance_config: Path | None = None
     real_video_validation: bool = False
     zones_config: Path | None = None
+    detector_backend: str = "pytorch"
+    deployment_config: Path | None = None
 
     def __post_init__(self) -> None:
         if self.frame_stride < 1:
@@ -84,6 +87,10 @@ class PipelineOptions:
             raise ValueError("Zones require PPE association to be enabled")
         if self.zones_config is not None and not self.enable_temporal_compliance:
             raise ValueError("Zones require temporal compliance to be enabled")
+        if self.detector_backend not in {"pytorch", "onnx", "tensorrt"}:
+            raise ValueError(f"Unsupported detector backend: {self.detector_backend}")
+        if self.detector_backend != "pytorch" and self.deployment_config is None:
+            raise ValueError("Non-PyTorch backends require deployment configuration")
 
 
 def _summary(values: list[float]) -> dict[str, float | int | None]:
@@ -436,7 +443,12 @@ def run_video_pipeline(
     zone_membership_path = options.output_dir / "zone_membership.jsonl"
 
     model_load_started = time.perf_counter()
-    model = YOLO(str(config.weights_path))
+    detector = DetectorBackend(
+        options.detector_backend,
+        config,
+        options.deployment_config,
+        repository_root=Path(__file__).resolve().parents[3],
+    )
     model_load_seconds = time.perf_counter() - model_load_started
     selected_device: str | int = (
         options.device
@@ -453,6 +465,7 @@ def run_video_pipeline(
     association_latencies: list[float] = []
     temporal_latencies: list[float] = []
     zone_latencies: list[float] = []
+    profiler = StageProfiler()
     frames_processed = 0
     frames_with_detections = 0
     detections_written = 0
@@ -552,22 +565,24 @@ def run_video_pipeline(
             dtype=np.uint8,
         )
         warmup_started = time.perf_counter()
-        model.predict(
-            source=warmup_frame,
+        detector.predict(
+            warmup_frame,
             imgsz=config.imgsz,
-            conf=config.inference_confidence_floor,
+            confidence=config.inference_confidence_floor,
             iou=config.nms_iou,
             device=selected_device,
-            verbose=False,
         )
         warmup_seconds = time.perf_counter() - warmup_started
         processing_started = time.perf_counter()
         last_processed_timestamp = 0.0
 
         while True:
+            decode_started = time.perf_counter()
             packet = reader.read()
+            decode_elapsed = time.perf_counter() - decode_started
             if packet is None:
                 break
+            profiler.record("video_decode", decode_elapsed)
             if packet.frame_index % options.frame_stride != 0:
                 frames_skipped_by_stride += 1
                 if writer is not None:
@@ -577,16 +592,14 @@ def run_video_pipeline(
             frame_started = time.perf_counter()
             last_processed_timestamp = packet.timestamp_seconds
             detector_started = time.perf_counter()
-            results = model.predict(
-                source=packet.image,
+            result = detector.predict(
+                packet.image,
                 imgsz=config.imgsz,
-                conf=config.inference_confidence_floor,
+                confidence=config.inference_confidence_floor,
                 iou=config.nms_iou,
                 device=selected_device,
-                verbose=False,
             )
             detector_latencies.append(time.perf_counter() - detector_started)
-            result = results[0]
             candidates = apply_class_thresholds(
                 _candidates(result), config.classes, config.confidence_thresholds
             )
@@ -608,6 +621,7 @@ def run_video_pipeline(
                     frame=packet.image,
                 )
                 tracking_latencies.append(time.perf_counter() - tracking_started)
+                profiler.record("tracker_update", tracking_latencies[-1])
                 tracking_diagnostics.update(tracking_result)
                 frame_tracks = tracking_result.tracks
                 if tracks_file is None:
@@ -619,6 +633,7 @@ def run_video_pipeline(
                 association_started = time.perf_counter()
                 association_result = associator.associate(frame_tracks, detections)
                 association_latencies.append(time.perf_counter() - association_started)
+                profiler.record("ppe_association", association_latencies[-1])
                 association_diagnostics.update(association_result)
                 association_records = association_result.records
                 if associations_file is None:
@@ -631,6 +646,7 @@ def run_video_pipeline(
             zone_records: tuple[ZoneMembershipRecord, ...] = ()
             if temporal_engine is not None:
                 temporal_started = time.perf_counter()
+                zone_elapsed_frame = 0.0
                 if compliance_file is None or incidents_file is None:
                     raise RuntimeError("Temporal compliance files were not initialized")
                 active_ids = {record.track_id for record in association_records}
@@ -682,6 +698,8 @@ def run_video_pipeline(
                             ),
                         )
                         zone_latencies.append(time.perf_counter() - zone_started)
+                        zone_elapsed_frame += zone_latencies[-1]
+                        profiler.record("zone_policy", zone_latencies[-1])
                         produced_zone_records.append(membership)
                         zone_membership_file.write(
                             json.dumps(membership.to_dict()) + "\n"
@@ -709,8 +727,14 @@ def run_video_pipeline(
                         incidents_file.write(json.dumps(event.to_dict()) + "\n")
                 temporal_records = tuple(produced_records)
                 zone_records = tuple(produced_zone_records)
-                temporal_latencies.append(time.perf_counter() - temporal_started)
+                temporal_latencies.append(
+                    max(
+                        0.0, time.perf_counter() - temporal_started - zone_elapsed_frame
+                    )
+                )
+                profiler.record("temporal_compliance", temporal_latencies[-1])
             if writer is not None:
+                render_started = time.perf_counter()
                 rendered = (
                     render_zone_policy(
                         packet.image,
@@ -741,7 +765,14 @@ def run_video_pipeline(
                     if tracker is not None
                     else render_detections(packet.image, detections)
                 )
+                profiler.record(
+                    "overlay_rendering", time.perf_counter() - render_started
+                )
+                encode_started = time.perf_counter()
                 writer.write(rendered)
+                profiler.record(
+                    "video_encode_write", time.perf_counter() - encode_started
+                )
 
             speed = result.speed or {}
             if "preprocess" in speed:
@@ -750,6 +781,16 @@ def run_video_pipeline(
                 inference_ms.append(float(speed["inference"]))
             if "postprocess" in speed:
                 postprocess_ms.append(float(speed["postprocess"]))
+            if "preprocess" in speed:
+                profiler.record(
+                    "detector_preprocess", float(speed["preprocess"]) / 1000
+                )
+            if "inference" in speed:
+                profiler.record("detector_inference", float(speed["inference"]) / 1000)
+            if "postprocess" in speed:
+                profiler.record(
+                    "detector_postprocess", float(speed["postprocess"]) / 1000
+                )
             frames_processed += 1
             detections_written += len(detections)
             if detections:
@@ -789,6 +830,7 @@ def run_video_pipeline(
             "confidence_thresholds": config.confidence_thresholds,
             "ultralytics_confidence_floor": config.inference_confidence_floor,
             "nms_iou": config.nms_iou,
+            "backend": detector.metadata(),
         },
         "processing": {
             "frame_stride": options.frame_stride,
@@ -835,6 +877,7 @@ def run_video_pipeline(
             "ultralytics_preprocess": _component_summary(preprocess_ms),
             "ultralytics_inference": _component_summary(inference_ms),
             "ultralytics_postprocess": _component_summary(postprocess_ms),
+            "stage_profile": profiler.summary(),
         },
         "environment": {
             "python": platform.python_version(),

@@ -25,6 +25,10 @@ dev = [
     "pytest==9.2.0",
     "ruff==0.17.5",
 ]
+deployment = [
+    "onnx==1.19.1",
+    "onnxruntime-gpu==1.23.2",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

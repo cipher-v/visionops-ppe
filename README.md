@@ -23,11 +23,12 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 14 - spatial safety zones and zone-aware PPE policy**
+**Checkpoint 15 - deployment export, backend parity, and performance profiling**
 
-The frozen detector and production BoT-SORT pipeline now supports optional normalized
-polygon zones, timestamp-stabilized bottom-center membership, overlapping-zone requirement
-union, and zone-aware helmet/vest incidents. Zone-disabled behavior is unchanged. The
-included polygon is illustrative rather than an authoritative site policy; model export,
-APIs, and drift monitoring remain deferred.
+The frozen production pipeline now has a hash-verified detector-backend abstraction and
+stage-level performance instrumentation. ONNX FP32 was exported and rigorously evaluated,
+but it failed the predeclared detection and downstream behavioral parity gates and was
+slower in the controlled detector benchmark, so PyTorch remains production. TensorRT was
+not forced into an incompatible local runtime stack. APIs and drift monitoring remain
+deferred.
 

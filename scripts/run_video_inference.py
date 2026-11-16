@@ -14,6 +14,7 @@ DEFAULT_CONFIG = ROOT / "configs/production_detector.yaml"
 DEFAULT_TRACKER_CONFIG = ROOT / "configs/production_tracker.yaml"
 DEFAULT_ASSOCIATION_CONFIG = ROOT / "configs/ppe_association.yaml"
 DEFAULT_TEMPORAL_CONFIG = ROOT / "configs/compliance_temporal.yaml"
+DEFAULT_DEPLOYMENT_CONFIG = ROOT / "configs/deployment_backends.yaml"
 
 
 def parse_args() -> argparse.Namespace:
@@ -25,6 +26,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument(
+        "--detector-backend",
+        choices=("pytorch", "onnx", "tensorrt"),
+        default="pytorch",
+    )
+    parser.add_argument(
+        "--deployment-config", type=Path, default=DEFAULT_DEPLOYMENT_CONFIG
+    )
     parser.add_argument("--frame-stride", type=int, default=1)
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--enable-tracking", action="store_true")
@@ -86,6 +95,8 @@ def main() -> None:
             ),
             real_video_validation=args.real_video_validation,
             zones_config=args.zones,
+            detector_backend=args.detector_backend,
+            deployment_config=args.deployment_config,
         ),
     )
     print(json.dumps(metadata, indent=2))

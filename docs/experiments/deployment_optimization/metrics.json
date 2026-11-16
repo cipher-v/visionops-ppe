@@ -1,0 +1,1667 @@
+{
+  "checkpoint": 15,
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.6",
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "nvidia_driver": "546.18",
+    "driver_cuda_capability": "12.3",
+    "torch_cuda_runtime": "12.1",
+    "packages": {
+      "torch": "2.5.1+cu121",
+      "torchvision": "0.20.1+cu121",
+      "ultralytics": "8.4.212",
+      "opencv-python": "5.0.0.93",
+      "onnx": "1.19.1",
+      "onnxruntime-gpu": "1.23.2"
+    },
+    "onnxruntime_providers": [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "onnx_provider_used": "CUDAExecutionProvider"
+  },
+  "detector_evaluation": {
+    "protocol": {
+      "reference": "pytorch",
+      "candidate": "onnx",
+      "imgsz": 960,
+      "batch": 1,
+      "static_shape": true,
+      "class_specific_thresholds": {
+        "helmet": 0.32,
+        "vest": 0.19,
+        "Person": 0.41,
+        "no_helmet": 0.27,
+        "no_vest": 0.11
+      },
+      "nms_iou": 0.7,
+      "acceptance": {
+        "match_rate_minimum": 0.995,
+        "mean_iou_minimum": 0.995,
+        "p95_confidence_delta_maximum": 0.005
+      },
+      "rf100_test_used": false
+    },
+    "parity_set": [
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-00f1fbfd9c8193a3c5a071512cf8c0a7.jpg",
+        "sha256": "E3ACE9301365E02E0FF2EF08BE2C4E2A655D6FA00EE07F752C91684BE218A3FB",
+        "width": 2048,
+        "height": 1536
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-150feca69395fa769adccdc8e157e935.jpg",
+        "sha256": "68F1A59FA437A103418D58A65D10273E862DA3C33E318AB347D71CB23F303AD3",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-17e8cd16e406c9f394f05f7ec1b33947.jpg",
+        "sha256": "11B20875EE5F26201507FA3C5E3408ABA19371B4A9515852C7390F9129492F7C",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-1bf1b490d2ff04f9db9bb55f74db9bd5.jpg",
+        "sha256": "577A802A2AF960563A742EF7FBBB497E3B62B24F2609FECB13F0F4118AF6D349",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-223442b1ecf2d156710f2b828bb05db2.jpg",
+        "sha256": "04B9ACA27FE4067E2FEC765B258B69D9E83E73C8B842CC9592CFB3C249F9238F",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-23d79ca5bf1c6544231641a70af3f37d.jpg",
+        "sha256": "CD9A42CE6284241BFC0A3C0B045AEB148D2AEFC7CE4731880997AF30F5DC4FED",
+        "width": 2048,
+        "height": 1536
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-241f49c7c7ae0145e383951c72962fb9.jpg",
+        "sha256": "C4EA2C525C7E9F95CBA0DBB6BED81E323A389C655BD7315973E78C88FA9E8C34",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-38d248f0e2100035cc7c30a81392baa8.jpg",
+        "sha256": "280361D53249AFEEF846C54A8CCB5CC7B575AB94411951D9D1B111257EBF4CAF",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-3dec6deaf0d256258b125015a036bb67.jpg",
+        "sha256": "3388219915B796988D9098B9CAD5082545CDC5BF0915A8765C9F19339086AA2E",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-3f184ae68fc6f7534cd774fed7b212fb.jpg",
+        "sha256": "DAFF828856D648A5141C82984409C409B707B8F24176205CF1DEE5DAEC8D6CC8",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-485eb05877af0e242d34e297d390c7cd.jpg",
+        "sha256": "24F563C3CD690520FB3FA3A036B874CCC465668F40F36FB7A0C7C2FD7F491DC4",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-49167518cb619cd5c12a8f33872f9b7e.jpg",
+        "sha256": "49281BFEAE6F1C50B533863EC641699DF0D96E31DC9F9D0EB72FF98971E1DC91",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-4c206d0f090805255c642a9a3d58d0e5.jpg",
+        "sha256": "8303154E548824AA122197809FD39ACAE45ADCB6CFC12FB3E55682536B075C0B",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-4cd393d3dd8a7a83a25d413bdeadfd23.jpg",
+        "sha256": "892855A42950094C3C7B647A3B4DAB71068291DD048175D20435371C72317B81",
+        "width": 2048,
+        "height": 1536
+      },
+      {
+        "source": "cppe_validation",
+        "path": "data\\generated\\cppe-five-class\\images\\val\\source-4e4870d31f0c2ff366debd49c66a0803.jpg",
+        "sha256": "B5CA63B2BA7D93D99B0B0B7436818F6076D72E179CE0DB90BC6ECA991D5E25B9",
+        "width": 2048,
+        "height": 1360
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0006_jpg.rf.c30b65b71e733ddc7e2ab9b9aa0283b2.jpg",
+        "sha256": "04BAAACBE365A34F494272AF29CC4E167795AFB1331DB304F6FA950843C3F8C6",
+        "width": 600,
+        "height": 420
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0021_jpg.rf.64d91fac2a98c12151f9709a72c42292.jpg",
+        "sha256": "3083DC0564346A2F1C0B2058BF8146488ECD8E51C6E00D31B8989D92A3FBDE67",
+        "width": 310,
+        "height": 204
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0024_jpg.rf.90ff5b26ededea273809f45f9f6ffa13.jpg",
+        "sha256": "4B4DADAA3E7DD4CAC3F9283F5C5C1FD63001B0E5753A259F593E975C8DBB3E4F",
+        "width": 635,
+        "height": 300
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0032_jpg.rf.8abb264496e4547792a40bd65280ce2e.jpg",
+        "sha256": "20A1A886577C4D46EBEE46B1D45AB69CEFFAA07626BB6A8D996C8B157FFC7450",
+        "width": 1300,
+        "height": 957
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0089_jpg.rf.9d060c755050e9baecc8b4abf2f15df0.jpg",
+        "sha256": "30743BE05EECABF4F1058756364B3BB9165B94418B1BEF82EE0450D4AFDE89D2",
+        "width": 626,
+        "height": 501
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0129_jpg.rf.0674af835a5f30e5bcd981f8708c96d5.jpg",
+        "sha256": "13DD1B6A488471987201C95553A1A582D78879E175FDDB690F0F404469427CD2",
+        "width": 1500,
+        "height": 776
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0036_jpg.rf.144b7b30870ec78ca13373992e574c61.jpg",
+        "sha256": "B1F098442A0CC313640D2A2EBF6C8C7F8823DFF97292C34A4A1D072D919A4A6E",
+        "width": 440,
+        "height": 295
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0042_jpg.rf.0d67f6e82bfae39684166158f6a09b49.jpg",
+        "sha256": "A17E9F873CC5A4ED9317EA4C6F84B4D8584ECCDAF00FE9787CEC56BE6D55CC16",
+        "width": 6700,
+        "height": 4472
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0043_jpg.rf.7128b287dda8c57b2a4bc6c9ba7a5834.jpg",
+        "sha256": "365E22E6E5A7A20451D670D555A6F147A5A17B7E3AF41EFD5A49428A0763E1FA",
+        "width": 640,
+        "height": 425
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0056_jpg.rf.c0fbb87a6bcd4e8142d4ef96a1b5aede.jpg",
+        "sha256": "6929C841B3851DEEF65105C9B7526F335E0C9ACFFE68793B29E3779E7696513E",
+        "width": 1000,
+        "height": 1000
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0062_jpg.rf.2b512ee0b561e28b1397dd129b3314ea.jpg",
+        "sha256": "15ED3628B2E5AE0AE4881A1846CBF0A85361B9FD75795ACC752F32911650B892",
+        "width": 583,
+        "height": 408
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0069_jpg.rf.efde105c8a24a495e7bf53fc76c1b432.jpg",
+        "sha256": "55A5583913D9DC1A11A2D95FF69E4557DD2B2F93FDE1725B0395C642D312205A",
+        "width": 600,
+        "height": 400
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0072_jpg.rf.d4186e19b186e5bd4ac40a7ed2ec9be5.jpg",
+        "sha256": "8F4467FCA822623AA386871E0688A4EC3198D480F1A9536EE58FE613604A5E89",
+        "width": 751,
+        "height": 1000
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0073_jpg.rf.c7f98911e188620c900856318b7589c1.jpg",
+        "sha256": "9FA8D5CDE6BA498DDB99ADC2251AB0F287DF6C06D46A58E0DD2E919683C44929",
+        "width": 687,
+        "height": 690
+      },
+      {
+        "source": "rf100_filtered_validation",
+        "path": "data\\generated\\rf100-valid-filtered\\images\\valid\\ppe_0078_jpg.rf.b7ca74d8af221bffe38ddbdd4a8e638a.jpg",
+        "sha256": "82A0093D4C36CC8B2EB02378D691C242F01CF7B5E9A1263D9975E523E7FB6F3A",
+        "width": 596,
+        "height": 900
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\compliant_multiworker.mp4",
+        "video_sha256": "B9183548A9EC8BFDDD2298BEA144476AA14C29DC7E67C7CE009A2821D0567EF5",
+        "frame_index": 0,
+        "pixel_sha256": "EA729CF4E3BC06DAFD1A1475AD22ECDF4A9244122BC73CC421E8BAA29CA232EF",
+        "width": 2160,
+        "height": 3840
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\compliant_multiworker.mp4",
+        "video_sha256": "B9183548A9EC8BFDDD2298BEA144476AA14C29DC7E67C7CE009A2821D0567EF5",
+        "frame_index": 78,
+        "pixel_sha256": "5BEF1E995E6D1D6F7861F6C8F544DBA638F95BADA3A2D20855FE67673738F5DD",
+        "width": 2160,
+        "height": 3840
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\compliant_multiworker.mp4",
+        "video_sha256": "B9183548A9EC8BFDDD2298BEA144476AA14C29DC7E67C7CE009A2821D0567EF5",
+        "frame_index": 157,
+        "pixel_sha256": "8E609D98A94A845D42EF3BF5BBE938504FA17B169B64B5E2120204188F82A5EC",
+        "width": 2160,
+        "height": 3840
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\compliant_multiworker.mp4",
+        "video_sha256": "B9183548A9EC8BFDDD2298BEA144476AA14C29DC7E67C7CE009A2821D0567EF5",
+        "frame_index": 314,
+        "pixel_sha256": "BF386CEAE685DBA467B2BC5DAE34DE9AC86FA216496972CE1C9332CBFECF89C8",
+        "width": 2160,
+        "height": 3840
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\helmet_transition.mp4",
+        "video_sha256": "423513545128921B90FCABED8A9207EEA96678A8F6CEFE6639DB959F97D92120",
+        "frame_index": 0,
+        "pixel_sha256": "D3C87E8D0BC250C3D3B77FA3BF2F168523F3A994567C87A6FF7FB2F3D8A75CDC",
+        "width": 3840,
+        "height": 2160
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\helmet_transition.mp4",
+        "video_sha256": "423513545128921B90FCABED8A9207EEA96678A8F6CEFE6639DB959F97D92120",
+        "frame_index": 74,
+        "pixel_sha256": "7A8CFAE150ABEC450F64D4556E3D8FAE6002DE2D2E6E5E0AE22AC2969D036534",
+        "width": 3840,
+        "height": 2160
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\helmet_transition.mp4",
+        "video_sha256": "423513545128921B90FCABED8A9207EEA96678A8F6CEFE6639DB959F97D92120",
+        "frame_index": 148,
+        "pixel_sha256": "9D92E985A2B59A1A7F3B8520E483A9049029240F6B55FA64D10671DFD572D96F",
+        "width": 3840,
+        "height": 2160
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\helmet_transition.mp4",
+        "video_sha256": "423513545128921B90FCABED8A9207EEA96678A8F6CEFE6639DB959F97D92120",
+        "frame_index": 296,
+        "pixel_sha256": "017CE432D0A35A1BCA8C19D02EBFA830905969FECA473886835A27D299558BE3",
+        "width": 3840,
+        "height": 2160
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\walking_multiworker.mp4",
+        "video_sha256": "DF2F645CAAD8D90EEE93AD1C5B012DE4394981E5EEABD92E37BFC16101EA2FA4",
+        "frame_index": 0,
+        "pixel_sha256": "21A87B6C11D62B0E0407F2F751B36D0D8683C2E57AC96DA964E0AA974B8DD487",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\walking_multiworker.mp4",
+        "video_sha256": "DF2F645CAAD8D90EEE93AD1C5B012DE4394981E5EEABD92E37BFC16101EA2FA4",
+        "frame_index": 144,
+        "pixel_sha256": "BE4F89B51F61F8B2219C9B683E3F432861E38D187DB527D3E8EBBBB17D22996A",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\walking_multiworker.mp4",
+        "video_sha256": "DF2F645CAAD8D90EEE93AD1C5B012DE4394981E5EEABD92E37BFC16101EA2FA4",
+        "frame_index": 288,
+        "pixel_sha256": "473F38ECF59752053CEDB846E140AF32BBF9ABC5FC9585369C4B5E87420E1077",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "source": "internal_real_video_frame",
+        "path": "data\\demo_videos\\walking_multiworker.mp4",
+        "video_sha256": "DF2F645CAAD8D90EEE93AD1C5B012DE4394981E5EEABD92E37BFC16101EA2FA4",
+        "frame_index": 576,
+        "pixel_sha256": "F0D1B7BA4DDEBAC374FF34A9EE94F3B1C61B1407823DA42EF83BD80050853D68",
+        "width": 1920,
+        "height": 1080
+      }
+    ],
+    "detection_parity": {
+      "matching_iou": 0.9,
+      "reference_detection_count": 279,
+      "candidate_detection_count": 277,
+      "matched_detections": 273,
+      "unmatched_reference_detections": 6,
+      "unmatched_candidate_detections": 4,
+      "match_rate": 0.978494623655914,
+      "mean_matched_iou": 0.9812891770656662,
+      "p5_matched_iou": 0.9384901089161186,
+      "mean_absolute_confidence_delta": 0.012837851440513528,
+      "p95_absolute_confidence_delta": 0.05624967813491821,
+      "per_class": {
+        "helmet": {
+          "reference": 61,
+          "candidate": 62,
+          "matched": 61
+        },
+        "vest": {
+          "reference": 72,
+          "candidate": 72,
+          "matched": 71
+        },
+        "Person": {
+          "reference": 97,
+          "candidate": 96,
+          "matched": 96
+        },
+        "no_helmet": {
+          "reference": 25,
+          "candidate": 24,
+          "matched": 24
+        },
+        "no_vest": {
+          "reference": 24,
+          "candidate": 23,
+          "matched": 21
+        }
+      },
+      "samples": [
+        {
+          "sample_index": 0,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 1,
+          "reference": 9,
+          "candidate": 9,
+          "matched": 9
+        },
+        {
+          "sample_index": 2,
+          "reference": 9,
+          "candidate": 9,
+          "matched": 9
+        },
+        {
+          "sample_index": 3,
+          "reference": 12,
+          "candidate": 12,
+          "matched": 12
+        },
+        {
+          "sample_index": 4,
+          "reference": 16,
+          "candidate": 15,
+          "matched": 15
+        },
+        {
+          "sample_index": 5,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 6,
+          "reference": 9,
+          "candidate": 9,
+          "matched": 9
+        },
+        {
+          "sample_index": 7,
+          "reference": 13,
+          "candidate": 12,
+          "matched": 12
+        },
+        {
+          "sample_index": 8,
+          "reference": 12,
+          "candidate": 12,
+          "matched": 12
+        },
+        {
+          "sample_index": 9,
+          "reference": 9,
+          "candidate": 9,
+          "matched": 9
+        },
+        {
+          "sample_index": 10,
+          "reference": 21,
+          "candidate": 22,
+          "matched": 21
+        },
+        {
+          "sample_index": 11,
+          "reference": 12,
+          "candidate": 12,
+          "matched": 12
+        },
+        {
+          "sample_index": 12,
+          "reference": 7,
+          "candidate": 7,
+          "matched": 7
+        },
+        {
+          "sample_index": 13,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 14,
+          "reference": 15,
+          "candidate": 15,
+          "matched": 15
+        },
+        {
+          "sample_index": 15,
+          "reference": 7,
+          "candidate": 7,
+          "matched": 7
+        },
+        {
+          "sample_index": 16,
+          "reference": 9,
+          "candidate": 9,
+          "matched": 9
+        },
+        {
+          "sample_index": 17,
+          "reference": 5,
+          "candidate": 5,
+          "matched": 5
+        },
+        {
+          "sample_index": 18,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 19,
+          "reference": 6,
+          "candidate": 7,
+          "matched": 6
+        },
+        {
+          "sample_index": 20,
+          "reference": 12,
+          "candidate": 12,
+          "matched": 12
+        },
+        {
+          "sample_index": 21,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 22,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 23,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 24,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 25,
+          "reference": 2,
+          "candidate": 2,
+          "matched": 2
+        },
+        {
+          "sample_index": 26,
+          "reference": 6,
+          "candidate": 4,
+          "matched": 3
+        },
+        {
+          "sample_index": 27,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 28,
+          "reference": 5,
+          "candidate": 5,
+          "matched": 5
+        },
+        {
+          "sample_index": 29,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 30,
+          "reference": 6,
+          "candidate": 6,
+          "matched": 6
+        },
+        {
+          "sample_index": 31,
+          "reference": 6,
+          "candidate": 6,
+          "matched": 6
+        },
+        {
+          "sample_index": 32,
+          "reference": 6,
+          "candidate": 6,
+          "matched": 6
+        },
+        {
+          "sample_index": 33,
+          "reference": 6,
+          "candidate": 6,
+          "matched": 6
+        },
+        {
+          "sample_index": 34,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 35,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 36,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 37,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 2
+        },
+        {
+          "sample_index": 38,
+          "reference": 5,
+          "candidate": 5,
+          "matched": 5
+        },
+        {
+          "sample_index": 39,
+          "reference": 3,
+          "candidate": 3,
+          "matched": 3
+        },
+        {
+          "sample_index": 40,
+          "reference": 4,
+          "candidate": 4,
+          "matched": 4
+        },
+        {
+          "sample_index": 41,
+          "reference": 5,
+          "candidate": 5,
+          "matched": 5
+        }
+      ],
+      "accepted": false
+    },
+    "detector_benchmark": {
+      "pytorch": {
+        "warmup_samples": 5,
+        "measured_rounds": 3,
+        "measured_samples": 126,
+        "wall_latency": {
+          "mean_ms": 14.708321436219627,
+          "p50_ms": 14.390449970960617,
+          "p95_ms": 18.872999818995595
+        },
+        "throughput_fps": 67.98872354920621,
+        "ultralytics_components": {
+          "inference": {
+            "mean_ms": 9.591274597268137,
+            "p50_ms": 9.167749900370836,
+            "p95_ms": 13.232599943876266
+          },
+          "postprocess": {
+            "mean_ms": 1.1547269902029444,
+            "p50_ms": 1.0389999952167273,
+            "p95_ms": 1.9427998922765255
+          },
+          "preprocess": {
+            "mean_ms": 3.147265077420762,
+            "p50_ms": 3.1167500419542193,
+            "p95_ms": 4.08360012806952
+          }
+        },
+        "peak_torch_allocated_mib": 94.69775390625,
+        "memory_note": "PyTorch CUDA allocator peak"
+      },
+      "onnx": {
+        "warmup_samples": 5,
+        "measured_rounds": 3,
+        "measured_samples": 126,
+        "wall_latency": {
+          "mean_ms": 19.541421424715764,
+          "p50_ms": 19.494200125336647,
+          "p95_ms": 21.19460003450513
+        },
+        "throughput_fps": 51.17335009904712,
+        "ultralytics_components": {
+          "inference": {
+            "mean_ms": 13.509692071700497,
+            "p50_ms": 13.358600088395178,
+            "p95_ms": 14.268000144511461
+          },
+          "postprocess": {
+            "mean_ms": 1.4177690415332715,
+            "p50_ms": 1.2734499759972095,
+            "p95_ms": 2.276899991557002
+          },
+          "preprocess": {
+            "mean_ms": 3.755925372908158,
+            "p50_ms": 3.7415497936308384,
+            "p95_ms": 4.575700033456087
+          }
+        },
+        "peak_torch_allocated_mib": null,
+        "memory_note": "ONNX Runtime GPU allocation is not exposed reliably by this API"
+      }
+    },
+    "validation_metrics": {
+      "cppe_validation": {
+        "pytorch": {
+          "precision": 0.9423345750376141,
+          "recall": 0.8131105752089999,
+          "map50": 0.873890479487369,
+          "map50_95": 0.6639190306717448
+        },
+        "onnx": {
+          "precision": 0.9370925503773757,
+          "recall": 0.8166016805429612,
+          "map50": 0.8722318787771085,
+          "map50_95": 0.6618862324027406
+        },
+        "onnx_minus_pytorch": {
+          "precision": -0.005242024660238376,
+          "recall": 0.003491105333961353,
+          "map50": -0.0016586007102604716,
+          "map50_95": -0.0020327982690042656
+        }
+      },
+      "rf100_filtered_validation": {
+        "pytorch": {
+          "precision": 0.8823323441795512,
+          "recall": 0.8182202682683867,
+          "map50": 0.8833795840573618,
+          "map50_95": 0.4961993506513858
+        },
+        "onnx": {
+          "precision": 0.8751142389918678,
+          "recall": 0.8279993982882287,
+          "map50": 0.8764549839746604,
+          "map50_95": 0.4956233219545168
+        },
+        "onnx_minus_pytorch": {
+          "precision": -0.007218105187683399,
+          "recall": 0.009779130019841986,
+          "map50": -0.00692460008270146,
+          "map50_95": -0.0005760286968690131
+        }
+      }
+    }
+  },
+  "video_runs": {
+    "pytorch": {
+      "compliant_multiworker": {
+        "frames": 315,
+        "resolution": [
+          2160,
+          3840
+        ],
+        "effective_fps": 5.836918065769304,
+        "detector_latency": {
+          "count": 315,
+          "mean_ms": 54.088674281679445,
+          "p50_ms": 52.99140000715852,
+          "p95_ms": 103.40771009214222
+        },
+        "end_to_end_latency": {
+          "count": 315,
+          "mean_ms": 153.2128031823843,
+          "p50_ms": 151.8637000117451,
+          "p95_ms": 202.85216004122051
+        },
+        "stage_profile": {
+          "detector_inference": {
+            "count": 315,
+            "total_ms": 13666.359696770087,
+            "mean_ms": 43.385268878635195,
+            "p50_ms": 42.48639987781644,
+            "p95_ms": 89.5346200093627
+          },
+          "detector_postprocess": {
+            "count": 315,
+            "total_ms": 529.726701322943,
+            "mean_ms": 1.6816720676918824,
+            "p50_ms": 1.3978001661598682,
+            "p95_ms": 2.5585100054740906
+          },
+          "detector_preprocess": {
+            "count": 315,
+            "total_ms": 2158.54460070841,
+            "mean_ms": 6.85252254193146,
+            "p50_ms": 6.5617000218480825,
+            "p95_ms": 10.340179898776114
+          },
+          "overlay_rendering": {
+            "count": 315,
+            "total_ms": 2509.3653018120676,
+            "mean_ms": 7.966239053371644,
+            "p50_ms": 7.811899995431304,
+            "p95_ms": 9.651250066235663
+          },
+          "ppe_association": {
+            "count": 315,
+            "total_ms": 42.39730071276426,
+            "mean_ms": 0.13459460543734686,
+            "p50_ms": 0.12389989569783211,
+            "p95_ms": 0.19791987724602225
+          },
+          "temporal_compliance": {
+            "count": 315,
+            "total_ms": 30.165199423208833,
+            "mean_ms": 0.09576253785145661,
+            "p50_ms": 0.08810008876025677,
+            "p95_ms": 0.1404998591169715
+          },
+          "tracker_update": {
+            "count": 315,
+            "total_ms": 16793.24819962494,
+            "mean_ms": 53.31189904642839,
+            "p50_ms": 53.10350004583597,
+            "p95_ms": 58.956530108116574
+          },
+          "video_decode": {
+            "count": 315,
+            "total_ms": 5703.173400135711,
+            "mean_ms": 18.105312381383207,
+            "p50_ms": 17.65640010125935,
+            "p95_ms": 19.754150020889938
+          },
+          "video_encode_write": {
+            "count": 315,
+            "total_ms": 11497.23449954763,
+            "mean_ms": 36.49915714142105,
+            "p50_ms": 35.60409997589886,
+            "p95_ms": 43.767659924924374
+          }
+        },
+        "detector_class_counts": {
+          "Person": 630,
+          "helmet": 630,
+          "vest": 630
+        },
+        "unique_tracks": 2,
+        "track_observations": 630,
+        "association_records": 630,
+        "association_states": {
+          "helmet": {
+            "present": 630,
+            "violation": 0,
+            "conflict": 0,
+            "unknown": 0
+          },
+          "vest": {
+            "present": 630,
+            "violation": 0,
+            "conflict": 0,
+            "unknown": 0
+          }
+        },
+        "temporal_state_counts": {
+          "helmet:compliant": 630,
+          "vest:compliant": 630
+        },
+        "incidents": []
+      },
+      "helmet_transition": {
+        "frames": 297,
+        "resolution": [
+          3840,
+          2160
+        ],
+        "effective_fps": 6.893106931359982,
+        "detector_latency": {
+          "count": 297,
+          "mean_ms": 45.847649489269166,
+          "p50_ms": 50.53339991718531,
+          "p95_ms": 56.92501999437809
+        },
+        "end_to_end_latency": {
+          "count": 297,
+          "mean_ms": 132.63356498119606,
+          "p50_ms": 136.67119992896914,
+          "p95_ms": 150.9270800743252
+        },
+        "stage_profile": {
+          "detector_inference": {
+            "count": 297,
+            "total_ms": 10925.693802069873,
+            "mean_ms": 36.78684781841708,
+            "p50_ms": 41.061699856072664,
+            "p95_ms": 47.376539930701256
+          },
+          "detector_postprocess": {
+            "count": 297,
+            "total_ms": 474.181400379166,
+            "mean_ms": 1.5965703716470236,
+            "p50_ms": 1.3246999587863684,
+            "p95_ms": 2.4896400049328804
+          },
+          "detector_preprocess": {
+            "count": 297,
+            "total_ms": 1844.0365984570235,
+            "mean_ms": 6.208877435882234,
+            "p50_ms": 6.294800201430917,
+            "p95_ms": 9.704119991511106
+          },
+          "overlay_rendering": {
+            "count": 297,
+            "total_ms": 1629.235097905621,
+            "mean_ms": 5.4856400602882855,
+            "p50_ms": 5.232500145211816,
+            "p95_ms": 6.679579941555858
+          },
+          "ppe_association": {
+            "count": 297,
+            "total_ms": 25.443501072004437,
+            "mean_ms": 0.08566835377779271,
+            "p50_ms": 0.07420009933412075,
+            "p95_ms": 0.10734000243246553
+          },
+          "temporal_compliance": {
+            "count": 297,
+            "total_ms": 21.24809962697327,
+            "mean_ms": 0.07154242298644199,
+            "p50_ms": 0.06310013122856617,
+            "p95_ms": 0.11224010959267615
+          },
+          "tracker_update": {
+            "count": 297,
+            "total_ms": 13575.34300093539,
+            "mean_ms": 45.70822559237505,
+            "p50_ms": 45.467100106179714,
+            "p95_ms": 50.55529987439513
+          },
+          "video_decode": {
+            "count": 297,
+            "total_ms": 3692.581999581307,
+            "mean_ms": 12.432936025526287,
+            "p50_ms": 11.926700128242373,
+            "p95_ms": 14.023320097476244
+          },
+          "video_encode_write": {
+            "count": 297,
+            "total_ms": 10312.539998907596,
+            "mean_ms": 34.722356898678775,
+            "p50_ms": 34.169499995186925,
+            "p95_ms": 39.05305992811918
+          }
+        },
+        "detector_class_counts": {
+          "Person": 299,
+          "helmet": 98,
+          "no_helmet": 212,
+          "no_vest": 309,
+          "vest": 2
+        },
+        "unique_tracks": 2,
+        "track_observations": 298,
+        "association_records": 298,
+        "association_states": {
+          "helmet": {
+            "present": 96,
+            "violation": 201,
+            "conflict": 0,
+            "unknown": 1
+          },
+          "vest": {
+            "present": 0,
+            "violation": 297,
+            "conflict": 0,
+            "unknown": 1
+          }
+        },
+        "temporal_state_counts": {
+          "helmet:compliant": 96,
+          "helmet:confirmed_violation": 158,
+          "helmet:suspected_violation": 44,
+          "vest:confirmed_violation": 257,
+          "vest:suspected_violation": 40,
+          "vest:unknown": 1
+        },
+        "incidents": [
+          {
+            "event_type": "incident_opened",
+            "equipment": "vest",
+            "started_at_seconds": 0.0,
+            "confirmed_at_seconds": 1.52,
+            "cleared_at_seconds": null,
+            "close_reason": null
+          },
+          {
+            "event_type": "incident_opened",
+            "equipment": "helmet",
+            "started_at_seconds": 3.84,
+            "confirmed_at_seconds": 5.56,
+            "cleared_at_seconds": null,
+            "close_reason": null
+          },
+          {
+            "event_type": "incident_closed",
+            "equipment": "helmet",
+            "started_at_seconds": 3.84,
+            "confirmed_at_seconds": 5.56,
+            "cleared_at_seconds": 11.84,
+            "close_reason": "source_ended"
+          },
+          {
+            "event_type": "incident_closed",
+            "equipment": "vest",
+            "started_at_seconds": 0.0,
+            "confirmed_at_seconds": 1.52,
+            "cleared_at_seconds": 11.84,
+            "close_reason": "source_ended"
+          }
+        ]
+      },
+      "walking_multiworker": {
+        "frames": 577,
+        "resolution": [
+          1920,
+          1080
+        ],
+        "effective_fps": 19.920948291193163,
+        "detector_latency": {
+          "count": 577,
+          "mean_ms": 20.2442998243286,
+          "p50_ms": 22.412799997255206,
+          "p95_ms": 24.260459933429953
+        },
+        "end_to_end_latency": {
+          "count": 577,
+          "mean_ms": 46.692481280612775,
+          "p50_ms": 47.78919997625053,
+          "p95_ms": 52.98653994686901
+        },
+        "stage_profile": {
+          "detector_inference": {
+            "count": 577,
+            "total_ms": 8984.98819838278,
+            "mean_ms": 15.571903290091473,
+            "p50_ms": 17.781700007617474,
+            "p95_ms": 18.977959919720888
+          },
+          "detector_postprocess": {
+            "count": 577,
+            "total_ms": 816.7019966058433,
+            "mean_ms": 1.4154280703740785,
+            "p50_ms": 1.2601001653820276,
+            "p95_ms": 2.259699907153845
+          },
+          "detector_preprocess": {
+            "count": 577,
+            "total_ms": 1517.549201613292,
+            "mean_ms": 2.630067940404319,
+            "p50_ms": 2.6221999432891607,
+            "p95_ms": 3.0594599433243252
+          },
+          "overlay_rendering": {
+            "count": 577,
+            "total_ms": 904.161297949031,
+            "mean_ms": 1.567003982580643,
+            "p50_ms": 1.488999929279089,
+            "p95_ms": 1.860479870811104
+          },
+          "ppe_association": {
+            "count": 577,
+            "total_ms": 68.03559558466077,
+            "mean_ms": 0.11791264399421277,
+            "p50_ms": 0.10649999603629112,
+            "p95_ms": 0.14505996368825425
+          },
+          "temporal_compliance": {
+            "count": 577,
+            "total_ms": 56.35349988006055,
+            "mean_ms": 0.09766637760842384,
+            "p50_ms": 0.089599983766675,
+            "p95_ms": 0.1544200349599123
+          },
+          "tracker_update": {
+            "count": 577,
+            "total_ms": 7930.111603578553,
+            "mean_ms": 13.743694286964562,
+            "p50_ms": 13.49490019492805,
+            "p95_ms": 15.366839990019797
+          },
+          "video_decode": {
+            "count": 577,
+            "total_ms": 2019.8189015500247,
+            "mean_ms": 3.5005526889948433,
+            "p50_ms": 3.373099956661463,
+            "p95_ms": 4.128339979797601
+          },
+          "video_encode_write": {
+            "count": 577,
+            "total_ms": 5835.7621969189495,
+            "mean_ms": 10.113972611644627,
+            "p50_ms": 9.86480014398694,
+            "p95_ms": 11.994280107319351
+          }
+        },
+        "detector_class_counts": {
+          "Person": 1000,
+          "helmet": 711,
+          "no_helmet": 76,
+          "no_vest": 3,
+          "vest": 1101
+        },
+        "unique_tracks": 4,
+        "track_observations": 998,
+        "association_records": 998,
+        "association_states": {
+          "helmet": {
+            "present": 686,
+            "violation": 50,
+            "conflict": 25,
+            "unknown": 237
+          },
+          "vest": {
+            "present": 975,
+            "violation": 0,
+            "conflict": 1,
+            "unknown": 22
+          }
+        },
+        "temporal_state_counts": {
+          "helmet:compliant": 694,
+          "helmet:conflict": 35,
+          "helmet:suspected_violation": 89,
+          "helmet:unknown": 180,
+          "vest:compliant": 997,
+          "vest:conflict": 1
+        },
+        "incidents": []
+      }
+    },
+    "onnx": {
+      "compliant_multiworker": {
+        "frames": 315,
+        "resolution": [
+          2160,
+          3840
+        ],
+        "effective_fps": 6.652245864731689,
+        "detector_latency": {
+          "count": 315,
+          "mean_ms": 47.20895428151365,
+          "p50_ms": 49.858300015330315,
+          "p95_ms": 56.190050090663135
+        },
+        "end_to_end_latency": {
+          "count": 315,
+          "mean_ms": 135.43941110875164,
+          "p50_ms": 137.06839992664754,
+          "p95_ms": 149.90042997524142
+        },
+        "stage_profile": {
+          "detector_inference": {
+            "count": 315,
+            "total_ms": 12270.96579875797,
+            "mean_ms": 38.955446980184036,
+            "p50_ms": 41.68520006351173,
+            "p95_ms": 47.23010009620339
+          },
+          "detector_postprocess": {
+            "count": 315,
+            "total_ms": 543.4578009881079,
+            "mean_ms": 1.7252628602797078,
+            "p50_ms": 1.4581999275833368,
+            "p95_ms": 2.45214004535228
+          },
+          "detector_preprocess": {
+            "count": 315,
+            "total_ms": 1518.139898777008,
+            "mean_ms": 4.819491742149232,
+            "p50_ms": 4.740099888294935,
+            "p95_ms": 5.765270092524588
+          },
+          "overlay_rendering": {
+            "count": 315,
+            "total_ms": 1809.75820007734,
+            "mean_ms": 5.745264127229651,
+            "p50_ms": 5.400599911808968,
+            "p95_ms": 7.327909977175296
+          },
+          "ppe_association": {
+            "count": 315,
+            "total_ms": 44.592299964278936,
+            "mean_ms": 0.14156285702945695,
+            "p50_ms": 0.1251001376658678,
+            "p95_ms": 0.23050005547702318
+          },
+          "temporal_compliance": {
+            "count": 315,
+            "total_ms": 32.68489753827453,
+            "mean_ms": 0.1037615794865858,
+            "p50_ms": 0.08909986354410648,
+            "p95_ms": 0.17189003992825755
+          },
+          "tracker_update": {
+            "count": 315,
+            "total_ms": 14508.233001455665,
+            "mean_ms": 46.0578825443037,
+            "p50_ms": 45.31800001859665,
+            "p95_ms": 51.689490000717356
+          },
+          "video_decode": {
+            "count": 315,
+            "total_ms": 4687.217198545113,
+            "mean_ms": 14.880054598555915,
+            "p50_ms": 14.408100163564086,
+            "p95_ms": 16.61436993163079
+          },
+          "video_encode_write": {
+            "count": 315,
+            "total_ms": 11073.561001336202,
+            "mean_ms": 35.15416190900381,
+            "p50_ms": 34.42979999817908,
+            "p95_ms": 41.032299934886396
+          }
+        },
+        "detector_class_counts": {
+          "Person": 630,
+          "helmet": 630,
+          "vest": 630
+        },
+        "unique_tracks": 2,
+        "track_observations": 630,
+        "association_records": 630,
+        "association_states": {
+          "helmet": {
+            "present": 630,
+            "violation": 0,
+            "conflict": 0,
+            "unknown": 0
+          },
+          "vest": {
+            "present": 630,
+            "violation": 0,
+            "conflict": 0,
+            "unknown": 0
+          }
+        },
+        "temporal_state_counts": {
+          "helmet:compliant": 630,
+          "vest:compliant": 630
+        },
+        "incidents": []
+      },
+      "helmet_transition": {
+        "frames": 297,
+        "resolution": [
+          3840,
+          2160
+        ],
+        "effective_fps": 5.891270158577061,
+        "detector_latency": {
+          "count": 297,
+          "mean_ms": 53.09231042930925,
+          "p50_ms": 58.725700015202165,
+          "p95_ms": 95.25948013179004
+        },
+        "end_to_end_latency": {
+          "count": 297,
+          "mean_ms": 152.89439798037986,
+          "p50_ms": 157.1905999444425,
+          "p95_ms": 199.08067993819714
+        },
+        "stage_profile": {
+          "detector_inference": {
+            "count": 297,
+            "total_ms": 13042.284302180633,
+            "mean_ms": 43.91341515885735,
+            "p50_ms": 50.06349994800985,
+            "p95_ms": 80.89779997244477
+          },
+          "detector_postprocess": {
+            "count": 297,
+            "total_ms": 502.61799804866314,
+            "mean_ms": 1.6923164917463407,
+            "p50_ms": 1.4422000385820866,
+            "p95_ms": 2.4742398411035538
+          },
+          "detector_preprocess": {
+            "count": 297,
+            "total_ms": 1580.403603380546,
+            "mean_ms": 5.321224253806553,
+            "p50_ms": 5.114399828016758,
+            "p95_ms": 9.210300073027609
+          },
+          "overlay_rendering": {
+            "count": 297,
+            "total_ms": 2396.096299868077,
+            "mean_ms": 8.067664309320126,
+            "p50_ms": 7.88530008867383,
+            "p95_ms": 9.883460029959675
+          },
+          "ppe_association": {
+            "count": 297,
+            "total_ms": 23.75410054810345,
+            "mean_ms": 0.07998013652560085,
+            "p50_ms": 0.0724999699741602,
+            "p95_ms": 0.11642002500593661
+          },
+          "temporal_compliance": {
+            "count": 297,
+            "total_ms": 22.53880095668137,
+            "mean_ms": 0.07588821870936488,
+            "p50_ms": 0.06310013122856617,
+            "p95_ms": 0.13628005981445307
+          },
+          "tracker_update": {
+            "count": 297,
+            "total_ms": 16267.749699065462,
+            "mean_ms": 54.77356801032142,
+            "p50_ms": 54.620099952444434,
+            "p95_ms": 60.79804007895291
+          },
+          "video_decode": {
+            "count": 297,
+            "total_ms": 5002.231097314507,
+            "mean_ms": 16.84252894718689,
+            "p50_ms": 16.52589999139309,
+            "p95_ms": 18.534779967740178
+          },
+          "video_encode_write": {
+            "count": 297,
+            "total_ms": 10736.28860176541,
+            "mean_ms": 36.149119871264006,
+            "p50_ms": 35.667800111696124,
+            "p95_ms": 41.48154011927545
+          }
+        },
+        "detector_class_counts": {
+          "Person": 297,
+          "helmet": 96,
+          "no_helmet": 201,
+          "no_vest": 305
+        },
+        "unique_tracks": 1,
+        "track_observations": 297,
+        "association_records": 297,
+        "association_states": {
+          "helmet": {
+            "present": 96,
+            "violation": 201,
+            "conflict": 0,
+            "unknown": 0
+          },
+          "vest": {
+            "present": 0,
+            "violation": 297,
+            "conflict": 0,
+            "unknown": 0
+          }
+        },
+        "temporal_state_counts": {
+          "helmet:compliant": 96,
+          "helmet:confirmed_violation": 163,
+          "helmet:suspected_violation": 38,
+          "vest:confirmed_violation": 259,
+          "vest:suspected_violation": 38
+        },
+        "incidents": [
+          {
+            "event_type": "incident_opened",
+            "equipment": "vest",
+            "started_at_seconds": 0.0,
+            "confirmed_at_seconds": 1.52,
+            "cleared_at_seconds": null,
+            "close_reason": null
+          },
+          {
+            "event_type": "incident_opened",
+            "equipment": "helmet",
+            "started_at_seconds": 3.84,
+            "confirmed_at_seconds": 5.36,
+            "cleared_at_seconds": null,
+            "close_reason": null
+          },
+          {
+            "event_type": "incident_closed",
+            "equipment": "helmet",
+            "started_at_seconds": 3.84,
+            "confirmed_at_seconds": 5.36,
+            "cleared_at_seconds": 11.84,
+            "close_reason": "source_ended"
+          },
+          {
+            "event_type": "incident_closed",
+            "equipment": "vest",
+            "started_at_seconds": 0.0,
+            "confirmed_at_seconds": 1.52,
+            "cleared_at_seconds": 11.84,
+            "close_reason": "source_ended"
+          }
+        ]
+      },
+      "walking_multiworker": {
+        "frames": 577,
+        "resolution": [
+          1920,
+          1080
+        ],
+        "effective_fps": 17.91702643684894,
+        "detector_latency": {
+          "count": 577,
+          "mean_ms": 24.50088180353029,
+          "p50_ms": 24.91449983790517,
+          "p95_ms": 27.036040043458346
+        },
+        "end_to_end_latency": {
+          "count": 577,
+          "mean_ms": 52.043463950056704,
+          "p50_ms": 52.05920012667775,
+          "p95_ms": 56.834039930254214
+        },
+        "stage_profile": {
+          "detector_inference": {
+            "count": 577,
+            "total_ms": 10842.375700594857,
+            "mean_ms": 18.790945754930426,
+            "p50_ms": 19.45510017685592,
+            "p95_ms": 20.53394014947116
+          },
+          "detector_postprocess": {
+            "count": 577,
+            "total_ms": 946.5667000040412,
+            "mean_ms": 1.6404968804229483,
+            "p50_ms": 1.377499895170331,
+            "p95_ms": 2.5254201609641296
+          },
+          "detector_preprocess": {
+            "count": 577,
+            "total_ms": 1969.9598010629416,
+            "mean_ms": 3.414141769606484,
+            "p50_ms": 3.311700187623501,
+            "p95_ms": 4.102759994566439
+          },
+          "overlay_rendering": {
+            "count": 577,
+            "total_ms": 959.9363007582724,
+            "mean_ms": 1.6636677656122572,
+            "p50_ms": 1.5583999920636415,
+            "p95_ms": 2.085140021517873
+          },
+          "ppe_association": {
+            "count": 577,
+            "total_ms": 65.53020072169602,
+            "mean_ms": 0.11357053851247144,
+            "p50_ms": 0.10950001887977123,
+            "p95_ms": 0.15461989678442467
+          },
+          "temporal_compliance": {
+            "count": 577,
+            "total_ms": 57.552499929443,
+            "mean_ms": 0.09974436729539515,
+            "p50_ms": 0.09029987268149853,
+            "p95_ms": 0.15702014788985247
+          },
+          "tracker_update": {
+            "count": 577,
+            "total_ms": 8313.809500075877,
+            "mean_ms": 14.40868197586807,
+            "p50_ms": 14.162400038912892,
+            "p95_ms": 16.669220058247443
+          },
+          "video_decode": {
+            "count": 577,
+            "total_ms": 2171.6005962807685,
+            "mean_ms": 3.763605886101852,
+            "p50_ms": 3.54369985871017,
+            "p95_ms": 4.779620049521325
+          },
+          "video_encode_write": {
+            "count": 577,
+            "total_ms": 5993.390299845487,
+            "mean_ms": 10.387158231967915,
+            "p50_ms": 10.154200019314885,
+            "p95_ms": 12.296620011329649
+          }
+        },
+        "detector_class_counts": {
+          "Person": 1017,
+          "helmet": 712,
+          "no_helmet": 74,
+          "no_vest": 6,
+          "vest": 1097
+        },
+        "unique_tracks": 4,
+        "track_observations": 1013,
+        "association_records": 1013,
+        "association_states": {
+          "helmet": {
+            "present": 688,
+            "violation": 46,
+            "conflict": 24,
+            "unknown": 255
+          },
+          "vest": {
+            "present": 989,
+            "violation": 0,
+            "conflict": 1,
+            "unknown": 23
+          }
+        },
+        "temporal_state_counts": {
+          "helmet:compliant": 708,
+          "helmet:conflict": 24,
+          "helmet:suspected_violation": 86,
+          "helmet:unknown": 195,
+          "vest:compliant": 1012,
+          "vest:conflict": 1
+        },
+        "incidents": []
+      }
+    }
+  },
+  "video_aggregate": {
+    "pytorch": {
+      "frames": 1189,
+      "effective_fps": 9.43517187872861,
+      "detector_latency": {
+        "mean_ms": 35.606093604440346,
+        "p50_ms": 23.746500024572015,
+        "p95_ms": 56.80450005456805
+      },
+      "end_to_end_latency": {
+        "mean_ms": 96.37995248173243,
+        "p50_ms": 99.17599987238646,
+        "p95_ms": 161.08789993450046
+      }
+    },
+    "onnx": {
+      "frames": 1189,
+      "effective_fps": 9.14826426627106,
+      "detector_latency": {
+        "mean_ms": 37.65874314282475,
+        "p50_ms": 26.80260012857616,
+        "p95_ms": 59.77419996634126
+      },
+      "end_to_end_latency": {
+        "mean_ms": 99.3289566010196,
+        "p50_ms": 108.42900001443923,
+        "p95_ms": 164.37019989825785
+      }
+    }
+  },
+  "behavioral_comparison": {
+    "compliant_multiworker": {
+      "detector_class_counts_equal": true,
+      "unique_tracks_equal": true,
+      "association_states_equal": true,
+      "temporal_states_equal": true,
+      "incidents_equal": true,
+      "pytorch_incidents": [],
+      "onnx_incidents": []
+    },
+    "helmet_transition": {
+      "detector_class_counts_equal": false,
+      "unique_tracks_equal": false,
+      "association_states_equal": false,
+      "temporal_states_equal": false,
+      "incidents_equal": false,
+      "pytorch_incidents": [
+        {
+          "event_type": "incident_opened",
+          "equipment": "vest",
+          "started_at_seconds": 0.0,
+          "confirmed_at_seconds": 1.52,
+          "cleared_at_seconds": null,
+          "close_reason": null
+        },
+        {
+          "event_type": "incident_opened",
+          "equipment": "helmet",
+          "started_at_seconds": 3.84,
+          "confirmed_at_seconds": 5.56,
+          "cleared_at_seconds": null,
+          "close_reason": null
+        },
+        {
+          "event_type": "incident_closed",
+          "equipment": "helmet",
+          "started_at_seconds": 3.84,
+          "confirmed_at_seconds": 5.56,
+          "cleared_at_seconds": 11.84,
+          "close_reason": "source_ended"
+        },
+        {
+          "event_type": "incident_closed",
+          "equipment": "vest",
+          "started_at_seconds": 0.0,
+          "confirmed_at_seconds": 1.52,
+          "cleared_at_seconds": 11.84,
+          "close_reason": "source_ended"
+        }
+      ],
+      "onnx_incidents": [
+        {
+          "event_type": "incident_opened",
+          "equipment": "vest",
+          "started_at_seconds": 0.0,
+          "confirmed_at_seconds": 1.52,
+          "cleared_at_seconds": null,
+          "close_reason": null
+        },
+        {
+          "event_type": "incident_opened",
+          "equipment": "helmet",
+          "started_at_seconds": 3.84,
+          "confirmed_at_seconds": 5.36,
+          "cleared_at_seconds": null,
+          "close_reason": null
+        },
+        {
+          "event_type": "incident_closed",
+          "equipment": "helmet",
+          "started_at_seconds": 3.84,
+          "confirmed_at_seconds": 5.36,
+          "cleared_at_seconds": 11.84,
+          "close_reason": "source_ended"
+        },
+        {
+          "event_type": "incident_closed",
+          "equipment": "vest",
+          "started_at_seconds": 0.0,
+          "confirmed_at_seconds": 1.52,
+          "cleared_at_seconds": 11.84,
+          "close_reason": "source_ended"
+        }
+      ]
+    },
+    "walking_multiworker": {
+      "detector_class_counts_equal": false,
+      "unique_tracks_equal": true,
+      "association_states_equal": false,
+      "temporal_states_equal": false,
+      "incidents_equal": true,
+      "pytorch_incidents": [],
+      "onnx_incidents": []
+    }
+  },
+  "tensorrt": {
+    "status": "not_built",
+    "blocker": "No installed TensorRT runtime, Python bindings, or trtexec. The local CUDA toolkit is 11.8 while PyTorch uses CUDA 12.1 and the driver exposes CUDA 12.3; an additional runtime stack was not forced."
+  },
+  "decision": {
+    "preferred_backend": "pytorch",
+    "onnx_accepted": false,
+    "reason": "ONNX failed predeclared detection parity and was slower on this GPU; PyTorch remains the production reference and selected backend."
+  }
+}
