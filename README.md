@@ -8,6 +8,24 @@ VisionOps PPE is a production-oriented computer-vision prototype for detecting c
 
 Images or video pass through a frozen PyTorch YOLO26n detector at 960 pixels. Class-specific thresholds filter detections; BoT-SORT tracks people; deterministic geometry associates PPE with each anonymous, run-local track; temporal rules distinguish unknown, conflict, suspected, confirmed, and cleared states; optional normalized-image zones control where equipment rules apply. Missing evidence means `unknown`, not a violation.
 
+## Demo
+
+Two short side-by-side demonstrations show the production pipeline on real video.
+
+### Multi-worker tracking
+
+Stable run-local person tracks through camera motion, with per-person Helmet/Vest association.
+
+[Watch the multi-worker tracking demo](docs/demo/camera_transition_workers_side_by_side.mp4)
+
+### Temporal compliance and incident detection
+
+Shows timestamp-driven compliance progression from `SUSPECT` to `VIOLATION` and incident generation.
+
+https://github.com/user-attachments/assets/8bb27949-8546-405e-9974-19182fe64bed
+
+> Track IDs are anonymous and run-local. Short occlusions are handled substantially better after continuity tuning, but severe crowd overlap or merged Person detections can still fragment tracks.
+
 ## Architecture
 
 ```mermaid
@@ -54,11 +72,11 @@ See [architecture.md](docs/architecture.md) for component and safety boundaries.
 | Calibrated operational F1, Construction-PPE / RF100 | **0.9020 / 0.9073** | Frozen class-specific policy |
 | Review queue | 1,137 raw → **28** | Timestamp, perceptual, and budget deduplication |
 
-The three internal videos validate integration and expose failures qualitatively; they are not an annotated accuracy or formal MOT benchmark. See [experiment_summary.md](docs/experiment_summary.md) and [docs/experiments](docs/experiments).
+The public demo clips provide qualitative integration evidence; they are not an annotated accuracy or formal MOT benchmark. See [experiment_summary.md](docs/experiment_summary.md) and [docs/experiments](docs/experiments).
 
 ## Production pipeline
 
-Production classes are `helmet`, `vest`, `Person`, `no_helmet`, and `no_vest`. Temporal confirmation, clearing, cooldown, track expiry, and optional zone applicability produce auditable incident events. Track IDs are local technical identifiers, never worker identity.
+Production classes are `helmet`, `vest`, `Person`, `no_helmet`, and `no_vest`. Temporal confirmation, clearing, cooldown, track expiry, and optional zone applicability produce auditable incident events. Track IDs are local technical identifiers, never worker identity. Production BoT-SORT keeps the reportable Person evidence threshold at `0.41`; lower-confidence Person candidates down to `0.11` support track continuity only, with sparse-optical-flow motion compensation and no appearance ReID.
 
 ## Deployment, robustness, and monitoring
 
@@ -139,4 +157,4 @@ data/, runs/, results/  local ignored datasets, weights, media, and artifacts
 
 ## License, datasets, and media
 
-No repository code license has been chosen and there is no `LICENSE` file. Construction-PPE and RF100 Construction Safety v2 are CC BY 4.0 and require separate attribution; datasets are not redistributed. Ultralytics, PyTorch, OpenCV, and other dependencies retain their upstream licenses. Internal validation videos and derived frames remain ignored and are not approved as public demo media. See [dataset_card.md](docs/dataset_card.md) and [project_status.md](docs/project_status.md).
+No repository code license has been chosen and there is no `LICENSE` file. Construction-PPE and RF100 Construction Safety v2 are CC BY 4.0 and require separate attribution; datasets and model weights are not redistributed. Ultralytics, PyTorch, OpenCV, and other dependencies retain their upstream licenses. Selected portfolio demo media under `docs/demo/` and GitHub-hosted attachments is intentionally public; other internal or local validation media remains excluded from the repository. This public selection does not establish or expand any underlying footage rights. See [dataset_card.md](docs/dataset_card.md) and [project_status.md](docs/project_status.md).
