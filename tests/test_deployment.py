@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 
 import numpy as np
@@ -14,17 +15,43 @@ from visionops.video.schema import VideoDetection
 from visionops.video.source import FramePacket
 
 ROOT = Path(__file__).parents[1]
+PRODUCTION_SHA256 = "BF99E872A9B57A7C33A4EBF06F0620F9EB8A215AEC29DDE2A90CA1F72F9581F4"
 
 
 def _box(class_id: int, confidence: float, xyxy=(0.0, 0.0, 10.0, 10.0)):
     return CandidateBox(class_id, confidence, xyxy)
 
 
-def test_deployment_config_loads_and_verifies_artifacts() -> None:
-    config = DeploymentConfig.from_yaml(ROOT / "configs/deployment_backends.yaml", ROOT)
-    artifact = config.select("pytorch", config.source_sha256)
+def _synthetic_deployment_config(
+    tmp_path: Path,
+) -> tuple[DeploymentConfig, Path, str]:
+    artifact_path = tmp_path / "synthetic.pt"
+    artifact_path.write_bytes(b"self-contained deployment artifact")
+    artifact_sha256 = hashlib.sha256(artifact_path.read_bytes()).hexdigest().upper()
+    source = (ROOT / "configs/deployment_backends.yaml").read_text(encoding="utf-8")
+    source = source.replace(
+        "runs/experiment_mixed5_yolo26n_960/weights/best.pt",
+        artifact_path.name,
+    ).replace(PRODUCTION_SHA256, artifact_sha256)
+    config_path = tmp_path / "deployment.yaml"
+    config_path.write_text(source, encoding="utf-8")
+    return (
+        DeploymentConfig.from_yaml(config_path, repository_root=tmp_path),
+        artifact_path,
+        artifact_sha256,
+    )
+
+
+def test_deployment_config_loads_and_verifies_artifacts(tmp_path: Path) -> None:
+    config, artifact_path, artifact_sha256 = _synthetic_deployment_config(tmp_path)
+
+    artifact = config.select("pytorch", artifact_sha256)
     assert artifact.name == "pytorch"
-    assert artifact.verify() == config.source_sha256
+    assert artifact.verify() == artifact_sha256
+
+    artifact_path.unlink()
+    with pytest.raises(FileNotFoundError, match="does not exist"):
+        config.select("pytorch", artifact_sha256)
 
 
 def test_backend_selection_rejects_unavailable_and_unknown() -> None:
@@ -36,16 +63,11 @@ def test_backend_selection_rejects_unavailable_and_unknown() -> None:
 
 
 def test_backend_hash_mismatch_rejects(tmp_path: Path) -> None:
-    source = (ROOT / "configs/deployment_backends.yaml").read_text(encoding="utf-8")
-    altered = source.replace(
-        "BF99E872A9B57A7C33A4EBF06F0620F9EB8A215AEC29DDE2A90CA1F72F9581F4",
-        "A" * 64,
-    )
-    path = tmp_path / "deployment.yaml"
-    path.write_text(altered, encoding="utf-8")
-    config = DeploymentConfig.from_yaml(path, ROOT)
+    config, artifact_path, artifact_sha256 = _synthetic_deployment_config(tmp_path)
+    artifact_path.write_bytes(b"tampered deployment artifact")
+
     with pytest.raises(ValueError, match="hash"):
-        config.select("pytorch", "A" * 64)
+        config.select("pytorch", artifact_sha256)
 
 
 def test_deterministic_parity_matcher_and_summary() -> None:
@@ -78,6 +100,7 @@ def test_stage_profiler_accounting() -> None:
         profiler.record("", 1.0)
 
 
+@pytest.mark.gpu_model
 def test_pytorch_default_and_common_backend_contract() -> None:
     frozen = load_frozen_detector_config(
         ROOT / "configs/production_detector.yaml", ROOT
