@@ -13,6 +13,7 @@ TemporalState = Literal[
     "suspected_violation",
     "confirmed_violation",
     "conflict",
+    "not_required",
 ]
 
 
@@ -30,6 +31,10 @@ class Incident:
     status: str
     close_reason: str | None
     evidence_summary: dict[str, object]
+    zone_ids_at_start: tuple[str, ...] | None
+    zone_ids_at_confirmation: tuple[str, ...] | None
+    last_zone_ids: tuple[str, ...] | None
+    zone_policy_required: bool | None
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)

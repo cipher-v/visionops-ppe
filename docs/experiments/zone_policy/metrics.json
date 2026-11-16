@@ -1,0 +1,69 @@
+{
+  "diagnostic_type": "deterministic synthetic correctness and microbenchmark",
+  "not_real_world_accuracy": true,
+  "scenario": {
+    "expected": {
+      "person_a_stable_entry_seconds": 1.4,
+      "person_b_stable_entry_seconds": 10.4,
+      "person_b_incident_started_seconds": 10.4,
+      "person_b_incident_opened_seconds": 11.9,
+      "person_b_incident_closed_seconds": 12.9,
+      "person_b_close_reason": "zone_exited",
+      "person_c_stable_entry": false
+    },
+    "actual": {
+      "person_a_stable_entry_seconds": 1.4,
+      "person_b_stable_entry_seconds": 10.4,
+      "person_b_incident_started_seconds": 10.4,
+      "person_b_incident_opened_seconds": 11.9,
+      "person_b_incident_closed_seconds": 12.9,
+      "person_b_close_reason": "zone_exited",
+      "person_c_stable_entry": false
+    },
+    "passed": true,
+    "zone_diagnostics": {
+      "person_observations_evaluated": 14,
+      "raw_zone_entries": 3,
+      "raw_zone_exits": 2,
+      "stable_zone_entries": 2,
+      "stable_zone_exits": 1,
+      "observations_inside_each_zone": {
+        "ppe_zone_1": 5
+      },
+      "equipment_required_observations": {
+        "helmet": 5,
+        "vest": 5
+      },
+      "violations_outside_required_zones_suppressed": 7,
+      "in_zone_suspected_violations": 2,
+      "in_zone_confirmed_incidents": 1,
+      "incidents_closed_by_zone_exit": 1
+    },
+    "temporal_summary": {
+      "known_tracks_at_end": 3,
+      "incidents_opened": 1,
+      "incidents_closed": 1,
+      "incidents_active": 0,
+      "cooldown_confirmations_suppressed": 0,
+      "close_reasons": {
+        "zone_exited": 1
+      },
+      "temporal_state_observations": {
+        "helmet:compliant": 1,
+        "helmet:confirmed_violation": 2,
+        "helmet:not_required": 9,
+        "helmet:suspected_violation": 2,
+        "vest:compliant": 5,
+        "vest:not_required": 9
+      }
+    }
+  },
+  "zone_engine_overhead": {
+    "observations": 5000,
+    "units": "milliseconds per person observation",
+    "mean": 0.00556272,
+    "p50": 0.0052,
+    "p95": 0.007,
+    "scope": "zone membership engine only; excludes detector, tracker, association, and rendering"
+  }
+}

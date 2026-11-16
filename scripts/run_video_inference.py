@@ -42,6 +42,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--temporal-compliance-config", type=Path, default=DEFAULT_TEMPORAL_CONFIG
     )
+    parser.add_argument(
+        "--zones",
+        type=Path,
+        default=None,
+        help="Optional normalized safety-zone configuration",
+    )
     parser.add_argument("--fallback-fps", type=float, default=30.0)
     parser.add_argument("--device", default=None)
     parser.add_argument(
@@ -79,6 +85,7 @@ def main() -> None:
                 else None
             ),
             real_video_validation=args.real_video_validation,
+            zones_config=args.zones,
         ),
     )
     print(json.dumps(metadata, indent=2))

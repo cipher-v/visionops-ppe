@@ -23,12 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 13B - bounded real-video tracking robustness comparison**
+**Checkpoint 14 - spatial safety zones and zone-aware PPE policy**
 
-Three locally supplied real videos were processed end to end with the frozen detector,
-tracked Person IDs, PPE association, temporal compliance, and structured event records.
-A predeclared comparison selected supported BoT-SORT without ReID as the production tracker
-because it prevented an observed identity transfer; ByteTrack remains preserved as the
-reproducible baseline. This is qualitative operational evidence, not a formally annotated
-tracking benchmark. Spatial zones, model export, APIs, and drift monitoring remain deferred.
+The frozen detector and production BoT-SORT pipeline now supports optional normalized
+polygon zones, timestamp-stabilized bottom-center membership, overlapping-zone requirement
+union, and zone-aware helmet/vest incidents. Zone-disabled behavior is unchanged. The
+included polygon is illustrative rather than an authoritative site policy; model export,
+APIs, and drift monitoring remain deferred.
 

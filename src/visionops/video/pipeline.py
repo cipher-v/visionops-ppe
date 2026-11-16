@@ -32,6 +32,9 @@ from visionops.video.config import FrozenDetectorConfig, verify_weights
 from visionops.video.policy import CandidateBox, apply_class_thresholds
 from visionops.video.schema import VideoDetection, normalized_box
 from visionops.video.source import AnnotatedVideoWriter, FramePacket, VideoReader
+from visionops.zones.config import ZoneConfig
+from visionops.zones.engine import ZoneEngine
+from visionops.zones.schema import ZoneMembershipRecord
 
 
 @dataclass(frozen=True)
@@ -52,6 +55,7 @@ class PipelineOptions:
     enable_temporal_compliance: bool = False
     temporal_compliance_config: Path | None = None
     real_video_validation: bool = False
+    zones_config: Path | None = None
 
     def __post_init__(self) -> None:
         if self.frame_stride < 1:
@@ -74,6 +78,12 @@ class PipelineOptions:
             )
         if self.enable_temporal_compliance and self.temporal_compliance_config is None:
             raise ValueError("Temporal compliance requires a temporal configuration")
+        if self.zones_config is not None and not self.enable_tracking:
+            raise ValueError("Zones require tracking to be enabled")
+        if self.zones_config is not None and not self.enable_ppe_association:
+            raise ValueError("Zones require PPE association to be enabled")
+        if self.zones_config is not None and not self.enable_temporal_compliance:
+            raise ValueError("Zones require temporal compliance to be enabled")
 
 
 def _summary(values: list[float]) -> dict[str, float | int | None]:
@@ -232,6 +242,8 @@ def render_ppe_associations(
 
 
 def _temporal_label(state: object) -> str:
+    if state.temporal_state == "not_required":
+        return "N/R"
     if state.temporal_state == "compliant":
         return "OK"
     if state.temporal_state == "suspected_violation":
@@ -274,6 +286,64 @@ def render_temporal_compliance(
             rendered,
             f"V: {_temporal_label(record.vest)}",
             (x1, y1 + 36),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 170, 0),
+            1,
+            cv2.LINE_AA,
+        )
+    return rendered
+
+
+def render_zone_policy(
+    frame: np.ndarray,
+    detections: list[VideoDetection],
+    tracks: tuple[PersonTrack, ...],
+    temporal_records: tuple[TemporalComplianceRecord, ...],
+    zone_records: tuple[ZoneMembershipRecord, ...],
+    config: ZoneConfig,
+) -> np.ndarray:
+    """Render illustrative normalized polygons and stabilized track membership."""
+    rendered = render_temporal_compliance(
+        frame,
+        detections,
+        tracks,
+        temporal_records,
+    )
+    height, width = rendered.shape[:2]
+    for zone in config.enabled_zones:
+        points = np.array(
+            [[round(x * width), round(y * height)] for x, y in zone.polygon],
+            dtype=np.int32,
+        )
+        cv2.polylines(rendered, [points], True, (180, 80, 255), 2, cv2.LINE_AA)
+        x, y = points[0]
+        cv2.putText(
+            rendered,
+            zone.name,
+            (int(x), max(18, int(y) - 6)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.55,
+            (180, 80, 255),
+            2,
+            cv2.LINE_AA,
+        )
+    names = {zone.id: zone.name for zone in config.enabled_zones}
+    membership_by_track = {record.track_id: record for record in zone_records}
+    for track in tracks:
+        membership = membership_by_track.get(track.track_id)
+        if membership is None:
+            continue
+        x1, y1, _, _ = (round(value) for value in track.bbox_xyxy)
+        label = (
+            ", ".join(names[zone_id] for zone_id in membership.stable_zone_ids)
+            if membership.stable_zone_ids
+            else "none"
+        )
+        cv2.putText(
+            rendered,
+            f"Zone: {label}",
+            (x1, y1 + 54),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
             (255, 170, 0),
@@ -334,6 +404,21 @@ def build_temporal_metadata(
     }
 
 
+def build_zone_metadata(
+    engine: ZoneEngine | None,
+    zone_latencies: list[float],
+) -> dict[str, object]:
+    if engine is None:
+        return {"enabled": False}
+    return {
+        "enabled": True,
+        "configuration": engine.config.to_dict(),
+        "diagnostics": engine.diagnostics.summary(),
+        "timing": _summary(zone_latencies),
+        "policy_semantics": "illustrative spatial policy applicability",
+    }
+
+
 def run_video_pipeline(
     config: FrozenDetectorConfig, options: PipelineOptions
 ) -> dict[str, object]:
@@ -348,6 +433,7 @@ def run_video_pipeline(
     associations_path = options.output_dir / "ppe_associations.jsonl"
     compliance_path = options.output_dir / "compliance_states.jsonl"
     incidents_path = options.output_dir / "incidents.jsonl"
+    zone_membership_path = options.output_dir / "zone_membership.jsonl"
 
     model_load_started = time.perf_counter()
     model = YOLO(str(config.weights_path))
@@ -366,6 +452,7 @@ def run_video_pipeline(
     tracking_latencies: list[float] = []
     association_latencies: list[float] = []
     temporal_latencies: list[float] = []
+    zone_latencies: list[float] = []
     frames_processed = 0
     frames_with_detections = 0
     detections_written = 0
@@ -396,6 +483,11 @@ def run_video_pipeline(
             TemporalComplianceConfig.from_yaml(options.temporal_compliance_config),
             run_id=f"run-{uuid.uuid4().hex}",
         )
+    zone_engine = (
+        ZoneEngine(ZoneConfig.from_yaml(options.zones_config))
+        if options.zones_config is not None
+        else None
+    )
 
     with ExitStack() as stack:
         reader = stack.enter_context(VideoReader(options.source))
@@ -441,6 +533,13 @@ def run_video_pipeline(
                 incidents_path.open("w", encoding="utf-8", newline="\n")
             )
             if options.enable_temporal_compliance
+            else None
+        )
+        zone_membership_file = (
+            stack.enter_context(
+                zone_membership_path.open("w", encoding="utf-8", newline="\n")
+            )
+            if zone_engine is not None
             else None
         )
 
@@ -529,6 +628,7 @@ def run_video_pipeline(
                 for record in association_records:
                     associations_file.write(json.dumps(record.to_dict()) + "\n")
             temporal_records: tuple[TemporalComplianceRecord, ...] = ()
+            zone_records: tuple[ZoneMembershipRecord, ...] = ()
             if temporal_engine is not None:
                 temporal_started = time.perf_counter()
                 if compliance_file is None or incidents_file is None:
@@ -540,6 +640,8 @@ def run_video_pipeline(
                     else set()
                 )
                 for track_id in sorted(expired_ids):
+                    if zone_engine is not None:
+                        zone_engine.expire_track(track_id)
                     for event in temporal_engine.expire_track(
                         track_id, packet.timestamp_seconds
                     ):
@@ -549,22 +651,77 @@ def run_video_pipeline(
                     set(temporal_engine.known_track_ids) - active_ids - expired_ids
                 ) & live_ids
                 for track_id in sorted(missing_ids):
+                    zone_ids: tuple[str, ...] = ()
+                    required_equipment: frozenset[str] | None = None
+                    if zone_engine is not None:
+                        zone_ids, required_equipment = zone_engine.stable_policy(
+                            track_id
+                        )
                     for event in temporal_engine.mark_missing(
-                        track_id, packet.timestamp_seconds
+                        track_id,
+                        packet.timestamp_seconds,
+                        required_equipment=required_equipment,
+                        zone_ids=zone_ids,
                     ):
                         incidents_file.write(json.dumps(event.to_dict()) + "\n")
                 produced_records = []
+                produced_zone_records = []
                 for association_record in association_records:
-                    update = temporal_engine.update(association_record)
+                    membership = None
+                    if zone_engine is not None:
+                        if zone_membership_file is None:
+                            raise RuntimeError("Zone output file was not initialized")
+                        zone_started = time.perf_counter()
+                        membership = zone_engine.update(
+                            frame_index=association_record.frame_index,
+                            timestamp_seconds=association_record.timestamp_seconds,
+                            source_id=association_record.source_id,
+                            track_id=association_record.track_id,
+                            person_bbox_normalized=(
+                                association_record.person_bbox_normalized
+                            ),
+                        )
+                        zone_latencies.append(time.perf_counter() - zone_started)
+                        produced_zone_records.append(membership)
+                        zone_membership_file.write(
+                            json.dumps(membership.to_dict()) + "\n"
+                        )
+                    update = temporal_engine.update(
+                        association_record,
+                        required_equipment=(
+                            membership.required_equipment
+                            if membership is not None
+                            else None
+                        ),
+                        zone_ids=(
+                            membership.stable_zone_ids if membership is not None else ()
+                        ),
+                    )
+                    if zone_engine is not None and membership is not None:
+                        zone_engine.diagnostics.observe_policy(
+                            association_record,
+                            membership,
+                            update,
+                        )
                     produced_records.append(update.record)
                     compliance_file.write(json.dumps(update.record.to_dict()) + "\n")
                     for event in update.events:
                         incidents_file.write(json.dumps(event.to_dict()) + "\n")
                 temporal_records = tuple(produced_records)
+                zone_records = tuple(produced_zone_records)
                 temporal_latencies.append(time.perf_counter() - temporal_started)
             if writer is not None:
                 rendered = (
-                    render_temporal_compliance(
+                    render_zone_policy(
+                        packet.image,
+                        detections,
+                        frame_tracks,
+                        temporal_records,
+                        zone_records,
+                        zone_engine.config,
+                    )
+                    if zone_engine is not None
+                    else render_temporal_compliance(
                         packet.image,
                         detections,
                         frame_tracks,
@@ -704,6 +861,7 @@ def run_video_pipeline(
             temporal_latencies,
             real_video_validation=options.real_video_validation,
         ),
+        "zones": build_zone_metadata(zone_engine, zone_latencies),
         "outputs": {
             "detections_jsonl": str(detections_path),
             "run_metadata_json": str(metadata_path),
@@ -716,6 +874,9 @@ def run_video_pipeline(
             ),
             "incidents_jsonl": (
                 str(incidents_path) if options.enable_temporal_compliance else None
+            ),
+            "zone_membership_jsonl": (
+                str(zone_membership_path) if zone_engine is not None else None
             ),
             "annotated_video": str(annotated_path) if effective_render else None,
         },

@@ -1,0 +1,17 @@
+version: 1
+membership:
+  anchor: bottom_center
+  enter_confirm_seconds: 0.35
+  exit_confirm_seconds: 0.35
+zones:
+  - id: ppe_zone_1
+    name: Illustrative Work Area
+    polygon:
+      - [0.10, 0.25]
+      - [0.90, 0.25]
+      - [0.90, 0.95]
+      - [0.10, 0.95]
+    required_equipment:
+      - helmet
+      - vest
+    enabled: true

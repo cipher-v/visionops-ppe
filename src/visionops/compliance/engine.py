@@ -40,6 +40,8 @@ class _EquipmentRuntime:
     incident_sequence: int = 0
     cooldown_suppressed: bool = False
     evidence_counts: Counter[str] = field(default_factory=Counter)
+    violation_zone_ids: tuple[str, ...] = ()
+    current_zone_ids: tuple[str, ...] = ()
 
 
 @dataclass
@@ -150,6 +152,7 @@ class TemporalComplianceEngine:
         track: _TrackRuntime,
         runtime: _EquipmentRuntime,
         timestamp: float,
+        zone_policy_enabled: bool,
     ) -> IncidentEvent:
         runtime.incident_sequence += 1
         incident = Incident(
@@ -172,6 +175,14 @@ class TemporalComplianceEngine:
             status="active",
             close_reason=None,
             evidence_summary=self._evidence_summary(runtime),
+            zone_ids_at_start=(
+                runtime.violation_zone_ids if zone_policy_enabled else None
+            ),
+            zone_ids_at_confirmation=(
+                runtime.current_zone_ids if zone_policy_enabled else None
+            ),
+            last_zone_ids=(runtime.current_zone_ids if zone_policy_enabled else None),
+            zone_policy_required=True if zone_policy_enabled else None,
         )
         runtime.active_incident = incident
         runtime.cooldown_suppressed = False
@@ -193,6 +204,8 @@ class TemporalComplianceEngine:
         incident.duration_seconds = max(0.0, timestamp - incident.started_at_seconds)
         incident.status = "closed"
         incident.close_reason = reason
+        if incident.zone_policy_required:
+            incident.last_zone_ids = runtime.current_zone_ids
         incident.evidence_summary = self._evidence_summary(runtime)
         runtime.active_incident = None
         runtime.cooldown_until = timestamp + self.config.incident_cooldown_seconds
@@ -228,6 +241,7 @@ class TemporalComplianceEngine:
         track: _TrackRuntime,
         runtime: _EquipmentRuntime,
         timestamp: float,
+        zone_policy_enabled: bool,
     ) -> list[IncidentEvent]:
         elapsed = timestamp - runtime.last_update_timestamp
         if runtime.last_evidence_state == "violation":
@@ -241,6 +255,7 @@ class TemporalComplianceEngine:
         ):
             runtime.violation_duration = 0.0
             runtime.violation_started_at = timestamp
+            runtime.violation_zone_ids = runtime.current_zone_ids
         runtime.present_duration = 0.0
         runtime.present_started_at = None
         runtime.unknown_started_at = None
@@ -248,6 +263,8 @@ class TemporalComplianceEngine:
         runtime.paused_evidence_state = None
 
         if runtime.active_incident is not None:
+            if runtime.active_incident.zone_policy_required:
+                runtime.active_incident.last_zone_ids = runtime.current_zone_ids
             runtime.temporal_state = "confirmed_violation"
             runtime.last_stable_state = "confirmed_violation"
             return []
@@ -263,7 +280,14 @@ class TemporalComplianceEngine:
                 self._suppressed_confirmations += 1
                 runtime.cooldown_suppressed = True
             return []
-        return [self._open_incident(track, runtime, timestamp)]
+        return [
+            self._open_incident(
+                track,
+                runtime,
+                timestamp,
+                zone_policy_enabled,
+            )
+        ]
 
     def _update_present(
         self,
@@ -352,10 +376,33 @@ class TemporalComplianceEngine:
         runtime: _EquipmentRuntime,
         evidence: EquipmentState,
         timestamp: float,
+        *,
+        required: bool = True,
+        zone_ids: tuple[str, ...] = (),
+        zone_policy_enabled: bool = False,
     ) -> tuple[EquipmentTemporalSnapshot, list[IncidentEvent]]:
         runtime.evidence_counts[evidence] += 1
-        if evidence == "violation":
-            events = self._update_violation(track, runtime, timestamp)
+        runtime.current_zone_ids = zone_ids
+        if not required:
+            event = self._close_incident(runtime, timestamp, "zone_exited")
+            events = [event] if event is not None else []
+            runtime.temporal_state = "not_required"
+            runtime.violation_duration = 0.0
+            runtime.present_duration = 0.0
+            runtime.violation_started_at = None
+            runtime.present_started_at = None
+            runtime.unknown_started_at = None
+            runtime.conflict_started_at = None
+            runtime.paused_evidence_state = None
+            runtime.violation_zone_ids = ()
+            runtime.last_stable_state = "not_required"
+        elif evidence == "violation":
+            events = self._update_violation(
+                track,
+                runtime,
+                timestamp,
+                zone_policy_enabled,
+            )
         elif evidence == "present":
             events = self._update_present(runtime, timestamp)
         elif evidence == "conflict":
@@ -366,7 +413,7 @@ class TemporalComplianceEngine:
         if evidence != "unknown":
             runtime.last_evidence_timestamp = timestamp
         runtime.last_update_timestamp = timestamp
-        runtime.last_evidence_state = evidence
+        runtime.last_evidence_state = evidence if required else "unknown"
         unknown_duration = (
             timestamp - runtime.unknown_started_at
             if runtime.unknown_started_at is not None
@@ -406,7 +453,13 @@ class TemporalComplianceEngine:
         )
         return snapshot, events
 
-    def update(self, record: PersonPPEFrame) -> TemporalUpdateResult:
+    def update(
+        self,
+        record: PersonPPEFrame,
+        *,
+        required_equipment: frozenset[str] | None = None,
+        zone_ids: tuple[str, ...] = (),
+    ) -> TemporalUpdateResult:
         self._validate_timestamp(record.timestamp_seconds)
         track = self._track(record)
         self._validate_track_time(track, record.timestamp_seconds)
@@ -417,11 +470,29 @@ class TemporalComplianceEngine:
             and record.frame_index <= track.last_frame_index
         ):
             raise ValueError("Per-track frame indices must increase strictly")
+        zone_policy_enabled = required_equipment is not None
+        required = (
+            frozenset({"helmet", "vest"})
+            if required_equipment is None
+            else required_equipment
+        )
         helmet, helmet_events = self._update_equipment(
-            track, track.helmet, record.helmet.state, record.timestamp_seconds
+            track,
+            track.helmet,
+            record.helmet.state,
+            record.timestamp_seconds,
+            required="helmet" in required,
+            zone_ids=zone_ids,
+            zone_policy_enabled=zone_policy_enabled,
         )
         vest, vest_events = self._update_equipment(
-            track, track.vest, record.vest.state, record.timestamp_seconds
+            track,
+            track.vest,
+            record.vest.state,
+            record.timestamp_seconds,
+            required="vest" in required,
+            zone_ids=zone_ids,
+            zone_policy_enabled=zone_policy_enabled,
         )
         track.last_timestamp = record.timestamp_seconds
         track.last_frame_index = record.frame_index
@@ -440,16 +511,41 @@ class TemporalComplianceEngine:
         )
 
     def mark_missing(
-        self, track_id: int, timestamp: float
+        self,
+        track_id: int,
+        timestamp: float,
+        *,
+        required_equipment: frozenset[str] | None = None,
+        zone_ids: tuple[str, ...] = (),
     ) -> tuple[IncidentEvent, ...]:
         track = self._tracks.get(track_id)
         if track is None:
             return ()
         self._validate_track_time(track, timestamp)
-        _, helmet_events = self._update_equipment(
-            track, track.helmet, "unknown", timestamp
+        zone_policy_enabled = required_equipment is not None
+        required = (
+            frozenset({"helmet", "vest"})
+            if required_equipment is None
+            else required_equipment
         )
-        _, vest_events = self._update_equipment(track, track.vest, "unknown", timestamp)
+        _, helmet_events = self._update_equipment(
+            track,
+            track.helmet,
+            "unknown",
+            timestamp,
+            required="helmet" in required,
+            zone_ids=zone_ids,
+            zone_policy_enabled=zone_policy_enabled,
+        )
+        _, vest_events = self._update_equipment(
+            track,
+            track.vest,
+            "unknown",
+            timestamp,
+            required="vest" in required,
+            zone_ids=zone_ids,
+            zone_policy_enabled=zone_policy_enabled,
+        )
         track.last_timestamp = timestamp
         return tuple((*helmet_events, *vest_events))
 
