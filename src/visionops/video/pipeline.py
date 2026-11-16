@@ -427,7 +427,10 @@ def build_zone_metadata(
 
 
 def run_video_pipeline(
-    config: FrozenDetectorConfig, options: PipelineOptions
+    config: FrozenDetectorConfig,
+    options: PipelineOptions,
+    detector: DetectorBackend | None = None,
+    warmup: bool = True,
 ) -> dict[str, object]:
     """Run bounded frame-by-frame inference and return persisted run metadata."""
     wall_started = time.perf_counter()
@@ -443,13 +446,18 @@ def run_video_pipeline(
     zone_membership_path = options.output_dir / "zone_membership.jsonl"
 
     model_load_started = time.perf_counter()
-    detector = DetectorBackend(
-        options.detector_backend,
-        config,
-        options.deployment_config,
-        repository_root=Path(__file__).resolve().parents[3],
-    )
-    model_load_seconds = time.perf_counter() - model_load_started
+    if detector is None:
+        detector = DetectorBackend(
+            options.detector_backend,
+            config,
+            options.deployment_config,
+            repository_root=Path(__file__).resolve().parents[3],
+        )
+        model_load_seconds = time.perf_counter() - model_load_started
+    else:
+        if detector.name != options.detector_backend:
+            raise ValueError("Provided detector does not match requested backend")
+        model_load_seconds = 0.0
     selected_device: str | int = (
         options.device
         if options.device is not None
@@ -556,23 +564,24 @@ def run_video_pipeline(
             else None
         )
 
-        warmup_frame = np.zeros(
-            (
-                source_metadata.original_height,
-                source_metadata.original_width,
-                3,
-            ),
-            dtype=np.uint8,
-        )
-        warmup_started = time.perf_counter()
-        detector.predict(
-            warmup_frame,
-            imgsz=config.imgsz,
-            confidence=config.inference_confidence_floor,
-            iou=config.nms_iou,
-            device=selected_device,
-        )
-        warmup_seconds = time.perf_counter() - warmup_started
+        if warmup:
+            warmup_frame = np.zeros(
+                (
+                    source_metadata.original_height,
+                    source_metadata.original_width,
+                    3,
+                ),
+                dtype=np.uint8,
+            )
+            warmup_started = time.perf_counter()
+            detector.predict(
+                warmup_frame,
+                imgsz=config.imgsz,
+                confidence=config.inference_confidence_floor,
+                iou=config.nms_iou,
+                device=selected_device,
+            )
+            warmup_seconds = time.perf_counter() - warmup_started
         processing_started = time.perf_counter()
         last_processed_timestamp = 0.0
 
@@ -849,7 +858,7 @@ def run_video_pipeline(
         },
         "timing": {
             "model_load_seconds": model_load_seconds,
-            "warmup_frames": 1,
+            "warmup_frames": int(warmup),
             "warmup_seconds": warmup_seconds,
             "processing_wall_clock_seconds": processing_seconds,
             "total_wall_clock_seconds": time.perf_counter() - wall_started,

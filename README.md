@@ -23,12 +23,11 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 16 - robustness stress testing and practical drift monitoring**
+**Checkpoint 17 - production serving API and Docker packaging**
 
-The frozen PyTorch detector has been evaluated under 24 deterministic stress conditions
-on each of two validation domains. A lightweight, five-second-window drift monitor now
-records input and detector-output shifts. Gaussian noise and motion blur are the principal
-robustness weaknesses; generic PSI alerts detect distribution change but correlate poorly
-with accuracy loss and over-alert on the limited real-video clips. No model or operating
-threshold was changed.
+The frozen PyTorch pipeline is exposed through FastAPI with liveness/readiness, safe
+configuration, stateless image inference, bounded asynchronous video jobs, incident
+retrieval and Prometheus metrics. A CPU-oriented Dockerfile is provided with externally
+mounted, hash-verified weights; Docker runtime validation remains pending because the
+local Docker Desktop Linux daemon was unavailable. Drift remains diagnostic-only.
 

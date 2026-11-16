@@ -1,0 +1,26 @@
+{
+  "checkpoint": 17,
+  "backend": "pytorch",
+  "smoke": {
+    "startup_seconds": 5.492063499987125,
+    "image_wall_latency_ms": 155.4541999939829,
+    "image_detector_latency_ms": 151.48920007050037,
+    "video_frames": 3,
+    "video_duration_seconds": 0.6,
+    "video_effective_fps": 12.517179827038147,
+    "video_incidents": 0,
+    "liveness_status": 200,
+    "readiness_status": 200,
+    "metrics_status": 200
+  },
+  "docker": {
+    "client_version": "29.3.1",
+    "daemon_available": false,
+    "build_performed": false,
+    "run_performed": false
+  },
+  "drift": {
+    "diagnostic_only": true,
+    "accuracy_failure_predictor": false
+  }
+}
