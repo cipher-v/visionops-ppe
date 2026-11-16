@@ -74,6 +74,32 @@ See [architecture.md](docs/architecture.md) for component and safety boundaries.
 
 The public demo clips provide qualitative integration evidence; they are not an annotated accuracy or formal MOT benchmark. See [experiment_summary.md](docs/experiment_summary.md) and [docs/experiments](docs/experiments).
 
+## Training and experimentation
+
+The final model was selected through controlled experiments rather than a single training run:
+
+- Established a YOLO26n baseline at 640px, then moved to 960px after improved small-PPE recall and mAP50-95.
+- Tested YOLO26s to determine whether additional model capacity improved generalization; it improved source-domain accuracy but did not improve external-domain performance enough to justify the added latency.
+- Evaluated the source-trained detector on RF100 and identified a substantial domain-shift gap.
+- Added target-domain training data and ran a matched-exposure control to separate the effect of data diversity from simply training on more samples.
+- Improved filtered RF100 validation mAP50-95 from **0.3349 to 0.4948** while retaining **0.6642** on Construction-PPE validation.
+- Calibrated class-specific operating thresholds across both validation domains, reaching **0.9020 / 0.9073 F1**.
+- Compared ByteTrack, BoT-SORT, and appearance-ReID variants on real video; selected BoT-SORT without ReID after targeted failure analysis.
+- Evaluated ONNX as a deployment backend, but retained PyTorch after parity and latency tests failed the production acceptance criteria.
+
+### Selected decision evidence
+
+| Decision | Measured evidence | Outcome |
+|---|---|---|
+| [640 → 960 resolution](docs/experiments/resolution_960/comparison.md) | mAP50-95 `0.5461 → 0.6012`; tiny-object recall `+0.150` | Selected 960px |
+| [YOLO26n vs YOLO26s](docs/experiments/external_generalization/comparison.md) | YOLO26s improved source accuracy, but external mAP50-95 was `0.3012` vs `0.3029` for YOLO26n with roughly 2× inference cost | Retained YOLO26n |
+| [Target-domain diversity](docs/experiments/data_diversity_exposure_control/comparison.md) | RF100 mAP50-95: source-only `0.3349` → exposure-matched `0.4722` → full mixed `0.4948` | Selected mixed-source training |
+| [Operating-point calibration](docs/experiments/final_model_selection/calibration.md) | Construction-PPE / RF100 F1: `0.9020 / 0.9073` | Froze class-specific thresholds |
+| [Tracker comparison](docs/experiments/tracker_robustness/comparison.md) | BoT-SORT avoided the primary transfer failure; appearance ReID showed no meaningful visual benefit | Selected BoT-SORT without ReID |
+| [Deployment backend](docs/experiments/deployment_optimization/decision.md) | ONNX failed strict output parity and was slower in the controlled benchmark | Retained PyTorch |
+
+Detailed protocols and results are available in [experiment_summary.md](docs/experiment_summary.md) and [docs/experiments](docs/experiments).
+
 ## Production pipeline
 
 Production classes are `helmet`, `vest`, `Person`, `no_helmet`, and `no_vest`. Temporal confirmation, clearing, cooldown, track expiry, and optional zone applicability produce auditable incident events. Track IDs are local technical identifiers, never worker identity. Production BoT-SORT keeps the reportable Person evidence threshold at `0.41`; lower-confidence Person candidates down to `0.11` support track continuity only, with sparse-optical-flow motion compensation and no appearance ReID.
