@@ -16,7 +16,7 @@
 | Robustness testing | Complete |
 | Drift telemetry | Complete; diagnostic-only |
 | FastAPI service | Complete; single-node reference |
-| Dockerfile | Complete; build/runtime unvalidated locally |
+| Dockerfile | Complete; CUDA 12.1 build and GPU runtime validated locally |
 | Human review queue | Complete; no automatic retraining |
 | Public demo media | Pending verified provenance/replacement |
 

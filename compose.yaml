@@ -1,0 +1,25 @@
+services:
+  visionops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    gpus: all
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?ADMIN_USERNAME must be set}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?ADMIN_PASSWORD_HASH must be set}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET must be set}
+      VISIONOPS_RUNTIME_DIR: /var/lib/visionops
+    volumes:
+      - visionops-data:/var/lib/visionops
+      - type: bind
+        source: ./runs/experiment_mixed5_yolo26n_960/weights/best.pt
+        target: /opt/visionops/runs/experiment_mixed5_yolo26n_960/weights/best.pt
+        read_only: true
+        bind:
+          create_host_path: false
+
+volumes:
+  visionops-data:

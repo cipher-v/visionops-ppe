@@ -104,7 +104,8 @@ curl.exe http://127.0.0.1:8000/health/ready
 Set `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `SESSION_SECRET` before starting
 the administrator interface. See
 [portfolio_deployment.md](docs/portfolio_deployment.md) for local and Nginx
-deployment preparation, and [demo.md](docs/demo.md) for pipeline artifacts.
+deployment preparation, [docker_deployment.md](docs/docker_deployment.md) for
+the GPU Docker workflow, and [demo.md](docs/demo.md) for pipeline artifacts.
 
 ## API
 
@@ -133,7 +134,7 @@ data/, runs/, results/  local ignored datasets, weights, media, and artifacts
 - Track fragmentation and duplicate tracks remain possible under overlap/occlusion.
 - Zones are normalized image-plane polygons, not calibrated world coordinates.
 - Drift does not prove failure; low drift does not prove correctness.
-- The local job queue is not distributed, and Docker runtime was not validated because the local Linux daemon was unavailable.
+- The local and Docker job queues are single-process and are not distributed.
 - Internal real-video provenance is unresolved; no questionable footage is embedded here.
 
 ## License, datasets, and media
