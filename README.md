@@ -23,12 +23,12 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 15 - deployment export, backend parity, and performance profiling**
+**Checkpoint 16 - robustness stress testing and practical drift monitoring**
 
-The frozen production pipeline now has a hash-verified detector-backend abstraction and
-stage-level performance instrumentation. ONNX FP32 was exported and rigorously evaluated,
-but it failed the predeclared detection and downstream behavioral parity gates and was
-slower in the controlled detector benchmark, so PyTorch remains production. TensorRT was
-not forced into an incompatible local runtime stack. APIs and drift monitoring remain
-deferred.
+The frozen PyTorch detector has been evaluated under 24 deterministic stress conditions
+on each of two validation domains. A lightweight, five-second-window drift monitor now
+records input and detector-output shifts. Gaussian noise and motion blur are the principal
+robustness weaknesses; generic PSI alerts detect distribution change but correlate poorly
+with accuracy loss and over-alert on the limited real-video clips. No model or operating
+threshold was changed.
 
