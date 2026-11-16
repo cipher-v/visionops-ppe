@@ -1,0 +1,40 @@
+{
+  "run_id": "cp18-real-v1",
+  "raw_candidates": 1137,
+  "post_temporal_dedup": 102,
+  "post_visual_dedup": 75,
+  "selected": 28,
+  "dedup_reduction_percent": 97.537,
+  "by_type": {
+    "incident_context": 6,
+    "frame_conflict": 5,
+    "detector_uncertainty": 10,
+    "association_uncertainty": 4,
+    "drift_telemetry": 3
+  },
+  "by_clip": {
+    "helmet_transition": 12,
+    "walking_multiworker": 12,
+    "compliant_multiworker": 4
+  },
+  "incident_associated_percent": 21.4286,
+  "drift_associated_percent": 10.7143,
+  "artifact_bytes": 20365826,
+  "human_fields_blank": true,
+  "drift_diagnostic_only": true,
+  "accuracy_failure_predictor": false,
+  "performance": {
+    "event_mean_ms": 0.00441,
+    "event_p50_ms": 0.0006,
+    "event_p95_ms": 0.0232,
+    "selection_total_ms": 4.4827,
+    "artifact_generation_ms": 33831.7463
+  },
+  "diagnostic": {
+    "raw": 8,
+    "post_temporal": 7,
+    "post_visual": 7,
+    "selected": 6,
+    "human_fields_blank": true
+  }
+}
