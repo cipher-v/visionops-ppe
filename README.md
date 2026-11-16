@@ -23,11 +23,12 @@ visionops-ppe/
 
 ## Current status
 
-**Checkpoint 13 - real-world video validation and demo evaluation**
+**Checkpoint 13B - bounded real-video tracking robustness comparison**
 
 Three locally supplied real videos were processed end to end with the frozen detector,
 tracked Person IDs, PPE association, temporal compliance, and structured event records.
-Annotated outputs and compact review artifacts support qualitative operational inspection;
-this is not a formally annotated tracking or compliance benchmark. Spatial zones, model
-export, APIs, and drift monitoring remain deferred.
+A predeclared comparison selected supported BoT-SORT without ReID as the production tracker
+because it prevented an observed identity transfer; ByteTrack remains preserved as the
+reproducible baseline. This is qualitative operational evidence, not a formally annotated
+tracking benchmark. Spatial zones, model export, APIs, and drift monitoring remain deferred.
 

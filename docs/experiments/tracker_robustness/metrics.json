@@ -1,0 +1,1246 @@
+{
+  "experiment": "bounded real-video tracking robustness comparison",
+  "formal_mot_ground_truth": false,
+  "public_demo_eligible": false,
+  "video_hashes": {
+    "compliant_multiworker.mp4": "B9183548A9EC8BFDDD2298BEA144476AA14C29DC7E67C7CE009A2821D0567EF5",
+    "helmet_transition.mp4": "423513545128921B90FCABED8A9207EEA96678A8F6CEFE6639DB959F97D92120",
+    "walking_multiworker.mp4": "DF2F645CAAD8D90EEE93AD1C5B012DE4394981E5EEABD92E37BFC16101EA2FA4"
+  },
+  "tracker_configs": {
+    "bytetrack": {
+      "path": "configs/bytetrack_person.yaml",
+      "sha256": "9E3EAB03889E86C3F5A3EFD74B9E7C3918EC95D497C07CB1E32E3A267ED6B42D"
+    },
+    "botsort": {
+      "path": "configs/botsort_person.yaml",
+      "sha256": "EF93D0E74C9E2018C4611EF247A58AB8ECEB365D9E9E7D65103CDD2F97F036B9"
+    },
+    "botsort_reid": {
+      "path": "configs/botsort_reid_person.yaml",
+      "sha256": "53E3D4925148171C6C46F7DEAFF78F186E03E83CE5148AC1499A752F2E9B01E3",
+      "model": "yolo26n-cls.pt",
+      "model_sha256": "0DD6F8DBC448870AC98A3CBB7156F923F7CE21FED3755D4019169FFFFD279E81"
+    }
+  },
+  "predeclared_windows": {
+    "helmet_duplicate": {
+      "clip": "helmet_transition",
+      "start": 104,
+      "end": 112,
+      "frames": [
+        104,
+        106,
+        108,
+        110,
+        112
+      ],
+      "fps": 25.0,
+      "crop": [
+        1400,
+        0,
+        3500,
+        2160
+      ],
+      "question": "Is the three-frame duplicate avoided while one primary ID remains?"
+    },
+    "walking_crossing": {
+      "clip": "walking_multiworker",
+      "start": 252,
+      "end": 300,
+      "frames": [
+        252,
+        268,
+        269,
+        284,
+        300
+      ],
+      "fps": 23.976023976023978,
+      "crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "question": "Do dark-clothed and red-vest workers retain distinct IDs?"
+    }
+  },
+  "review_findings": {
+    "bytetrack:helmet_duplicate": {
+      "observed_behavior": "Track 2 overlaps Track 1 at frame 106, replaces it for frames 108-109, and Track 1 returns at frame 110.",
+      "verdict": "duplicate_not_avoided"
+    },
+    "botsort:helmet_duplicate": {
+      "observed_behavior": "The same three-frame Track 2 duplicate occurs; primary Track 1 returns.",
+      "verdict": "duplicate_not_avoided"
+    },
+    "botsort_reid:helmet_duplicate": {
+      "observed_behavior": "ReID produces the same duplicate sequence as BoT-SORT without ReID.",
+      "verdict": "duplicate_not_avoided"
+    },
+    "bytetrack:walking_crossing": {
+      "observed_behavior": "Track 2 began on the dark-clothed worker but is on the red-vest worker in this window; Track 4 starts on the dark-clothed worker at frame 269.",
+      "verdict": "probable_id_switch"
+    },
+    "botsort:walking_crossing": {
+      "observed_behavior": "Track 1 remains on the red-vest worker. Track 4 starts on the dark-clothed worker at frame 269, so identity transfer is avoided but dark-worker fragmentation remains.",
+      "verdict": "partial_clear_improvement"
+    },
+    "botsort_reid:walking_crossing": {
+      "observed_behavior": "The identity behavior matches BoT-SORT without ReID; ReID adds no visible continuity benefit in the predeclared window.",
+      "verdict": "no_additional_improvement"
+    }
+  },
+  "final_selection": {
+    "tracker": "botsort",
+    "reid": false,
+    "production_config": "configs/production_tracker.yaml",
+    "production_tracker_changed": true,
+    "reason": "Prevents the observed walking identity transfer without stable-clip regression; ReID adds cost without additional continuity benefit."
+  },
+  "trackers": {
+    "bytetrack": {
+      "compliant_multiworker": {
+        "configuration": {
+          "tracker_type": "bytetrack",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false
+        },
+        "tracking": {
+          "unique_tracks_created": 2,
+          "track_observations": 630,
+          "mean_track_length_frames": 315.0,
+          "median_track_length_frames": 315.0,
+          "p95_track_length_frames": 315.0,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 2,
+          "frames_with_active_tracks": 315,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 0,
+          "recovered_transitions": 0,
+          "expired_tracks": 0,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1,
+            2
+          ],
+          "observations_per_track": {
+            "1": 315,
+            "2": 315
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 315,
+          "mean_ms": 1.0746323747471684,
+          "p50_ms": 0.9629998821765184,
+          "p95_ms": 1.6314300941303375
+        },
+        "pipeline": {
+          "effective_fps": 5.419576097265933,
+          "end_to_end_latency_ms": {
+            "count": 315,
+            "mean_ms": 152.91530887581524,
+            "p50_ms": 144.86810006201267,
+            "p95_ms": 203.0827298993245
+          }
+        },
+        "association": {
+          "total_person_observations": 630,
+          "ppe_detections_considered": 1260,
+          "ppe_detections_assigned": 1260,
+          "ppe_detections_unassigned": 0,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 0,
+          "mean_association_score": 0.8679429498980344,
+          "per_class_assignment_counts": {
+            "helmet": 630,
+            "vest": 630
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 630,
+              "violation": 0,
+              "conflict": 0,
+              "unknown": 0
+            },
+            "vest": {
+              "present": 630,
+              "violation": 0,
+              "conflict": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 1260
+        },
+        "incidents": []
+      },
+      "helmet_transition": {
+        "configuration": {
+          "tracker_type": "bytetrack",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false
+        },
+        "tracking": {
+          "unique_tracks_created": 2,
+          "track_observations": 298,
+          "mean_track_length_frames": 149.0,
+          "median_track_length_frames": 149.0,
+          "p95_track_length_frames": 280.4,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 1,
+          "frames_with_active_tracks": 297,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 3,
+          "recovered_transitions": 2,
+          "expired_tracks": 1,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1
+          ],
+          "observations_per_track": {
+            "1": 295,
+            "2": 3
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 297,
+          "mean_ms": 1.0416993223795485,
+          "p50_ms": 0.9469999931752682,
+          "p95_ms": 1.7416799906641245
+        },
+        "pipeline": {
+          "effective_fps": 5.406530380927447,
+          "end_to_end_latency_ms": {
+            "count": 297,
+            "mean_ms": 156.2198838399353,
+            "p50_ms": 144.72390012815595,
+            "p95_ms": 215.07097990252075
+          }
+        },
+        "association": {
+          "total_person_observations": 298,
+          "ppe_detections_considered": 621,
+          "ppe_detections_assigned": 617,
+          "ppe_detections_unassigned": 4,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 2,
+          "mean_association_score": 0.8922572438589038,
+          "per_class_assignment_counts": {
+            "helmet": 96,
+            "no_helmet": 212,
+            "no_vest": 309
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 96,
+              "violation": 201,
+              "conflict": 0,
+              "unknown": 1
+            },
+            "vest": {
+              "present": 0,
+              "violation": 297,
+              "conflict": 0,
+              "unknown": 1
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 96,
+          "confirmed_violation": 415,
+          "suspected_violation": 84,
+          "unknown": 1
+        },
+        "incidents": [
+          {
+            "event_type": "incident_opened",
+            "event_timestamp_seconds": 1.52,
+            "incident": {
+              "incident_id": "run-884936de311f44518a2d2a8da54fb991-track-1-vest-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "vest",
+              "type": "ppe_violation",
+              "started_at_seconds": 0.0,
+              "confirmed_at_seconds": 1.52,
+              "cleared_at_seconds": null,
+              "duration_seconds": null,
+              "status": "active",
+              "close_reason": null,
+              "evidence_summary": {
+                "observation_counts": {
+                  "violation": 39
+                },
+                "continuous_violation_duration": 1.52,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_opened",
+            "event_timestamp_seconds": 5.56,
+            "incident": {
+              "incident_id": "run-884936de311f44518a2d2a8da54fb991-track-1-helmet-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "helmet",
+              "type": "ppe_violation",
+              "started_at_seconds": 3.84,
+              "confirmed_at_seconds": 5.56,
+              "cleared_at_seconds": null,
+              "duration_seconds": null,
+              "status": "active",
+              "close_reason": null,
+              "evidence_summary": {
+                "observation_counts": {
+                  "present": 96,
+                  "unknown": 3,
+                  "violation": 41
+                },
+                "continuous_violation_duration": 1.5199999999999996,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_closed",
+            "event_timestamp_seconds": 11.84,
+            "incident": {
+              "incident_id": "run-884936de311f44518a2d2a8da54fb991-track-1-helmet-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "helmet",
+              "type": "ppe_violation",
+              "started_at_seconds": 3.84,
+              "confirmed_at_seconds": 5.56,
+              "cleared_at_seconds": 11.84,
+              "duration_seconds": 8.0,
+              "status": "closed",
+              "close_reason": "source_ended",
+              "evidence_summary": {
+                "observation_counts": {
+                  "present": 96,
+                  "unknown": 3,
+                  "violation": 198
+                },
+                "continuous_violation_duration": 7.8,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_closed",
+            "event_timestamp_seconds": 11.84,
+            "incident": {
+              "incident_id": "run-884936de311f44518a2d2a8da54fb991-track-1-vest-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "vest",
+              "type": "ppe_violation",
+              "started_at_seconds": 0.0,
+              "confirmed_at_seconds": 1.52,
+              "cleared_at_seconds": 11.84,
+              "duration_seconds": 11.84,
+              "status": "closed",
+              "close_reason": "source_ended",
+              "evidence_summary": {
+                "observation_counts": {
+                  "unknown": 2,
+                  "violation": 295
+                },
+                "continuous_violation_duration": 11.719999999999999,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          }
+        ]
+      },
+      "walking_multiworker": {
+        "configuration": {
+          "tracker_type": "bytetrack",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false
+        },
+        "tracking": {
+          "unique_tracks_created": 4,
+          "track_observations": 998,
+          "mean_track_length_frames": 249.5,
+          "median_track_length_frames": 208.0,
+          "p95_track_length_frames": 502.69999999999993,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 4,
+          "frames_with_active_tracks": 577,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 25,
+          "recovered_transitions": 23,
+          "expired_tracks": 2,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            2,
+            4
+          ],
+          "observations_per_track": {
+            "1": 153,
+            "2": 545,
+            "3": 37,
+            "4": 263
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 577,
+          "mean_ms": 1.1421149012275957,
+          "p50_ms": 1.0504999663680792,
+          "p95_ms": 1.5894999727606771
+        },
+        "pipeline": {
+          "effective_fps": 11.600841914715454,
+          "end_to_end_latency_ms": {
+            "count": 577,
+            "mean_ms": 79.82247764490015,
+            "p50_ms": 78.21599999442697,
+            "p95_ms": 93.22840007953346
+          }
+        },
+        "association": {
+          "total_person_observations": 998,
+          "ppe_detections_considered": 1891,
+          "ppe_detections_assigned": 1766,
+          "ppe_detections_unassigned": 125,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 4,
+          "mean_association_score": 0.8498078642838571,
+          "per_class_assignment_counts": {
+            "helmet": 711,
+            "no_helmet": 75,
+            "no_vest": 1,
+            "vest": 979
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 686,
+              "violation": 50,
+              "conflict": 25,
+              "unknown": 237
+            },
+            "vest": {
+              "present": 977,
+              "violation": 0,
+              "conflict": 1,
+              "unknown": 20
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 1691,
+          "conflict": 36,
+          "suspected_violation": 89,
+          "unknown": 180
+        },
+        "incidents": []
+      }
+    },
+    "botsort": {
+      "compliant_multiworker": {
+        "configuration": {
+          "tracker_type": "botsort",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false,
+          "gmc_method": "sparseOptFlow",
+          "proximity_thresh": 0.5,
+          "appearance_thresh": 0.8,
+          "with_reid": false,
+          "model": "auto"
+        },
+        "tracking": {
+          "unique_tracks_created": 2,
+          "track_observations": 630,
+          "mean_track_length_frames": 315.0,
+          "median_track_length_frames": 315.0,
+          "p95_track_length_frames": 315.0,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 2,
+          "frames_with_active_tracks": 315,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 0,
+          "recovered_transitions": 0,
+          "expired_tracks": 0,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1,
+            2
+          ],
+          "observations_per_track": {
+            "1": 315,
+            "2": 315
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 315,
+          "mean_ms": 51.36611587737524,
+          "p50_ms": 48.77650015987456,
+          "p95_ms": 62.7338501624763
+        },
+        "pipeline": {
+          "effective_fps": 5.956371620076914,
+          "end_to_end_latency_ms": {
+            "count": 315,
+            "mean_ms": 151.45755810219617,
+            "p50_ms": 146.58800000324845,
+            "p95_ms": 191.05719001963737
+          }
+        },
+        "association": {
+          "total_person_observations": 630,
+          "ppe_detections_considered": 1260,
+          "ppe_detections_assigned": 1260,
+          "ppe_detections_unassigned": 0,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 0,
+          "mean_association_score": 0.8678912726435253,
+          "per_class_assignment_counts": {
+            "helmet": 630,
+            "vest": 630
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 630,
+              "violation": 0,
+              "conflict": 0,
+              "unknown": 0
+            },
+            "vest": {
+              "present": 630,
+              "violation": 0,
+              "conflict": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 1260
+        },
+        "incidents": []
+      },
+      "helmet_transition": {
+        "configuration": {
+          "tracker_type": "botsort",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false,
+          "gmc_method": "sparseOptFlow",
+          "proximity_thresh": 0.5,
+          "appearance_thresh": 0.8,
+          "with_reid": false,
+          "model": "auto"
+        },
+        "tracking": {
+          "unique_tracks_created": 2,
+          "track_observations": 298,
+          "mean_track_length_frames": 149.0,
+          "median_track_length_frames": 149.0,
+          "p95_track_length_frames": 280.4,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 1,
+          "frames_with_active_tracks": 297,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 2,
+          "recovered_transitions": 2,
+          "expired_tracks": 0,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1
+          ],
+          "observations_per_track": {
+            "1": 295,
+            "2": 3
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 297,
+          "mean_ms": 61.51993569027419,
+          "p50_ms": 59.79910003952682,
+          "p95_ms": 74.38902002759278
+        },
+        "pipeline": {
+          "effective_fps": 5.220737400364481,
+          "end_to_end_latency_ms": {
+            "count": 297,
+            "mean_ms": 171.75863704311752,
+            "p50_ms": 164.17860006913543,
+            "p95_ms": 219.594020023942
+          }
+        },
+        "association": {
+          "total_person_observations": 298,
+          "ppe_detections_considered": 621,
+          "ppe_detections_assigned": 617,
+          "ppe_detections_unassigned": 4,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 2,
+          "mean_association_score": 0.893941750774795,
+          "per_class_assignment_counts": {
+            "helmet": 96,
+            "no_helmet": 212,
+            "no_vest": 309
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 96,
+              "violation": 201,
+              "conflict": 0,
+              "unknown": 1
+            },
+            "vest": {
+              "present": 0,
+              "violation": 297,
+              "conflict": 0,
+              "unknown": 1
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 96,
+          "confirmed_violation": 415,
+          "suspected_violation": 84,
+          "unknown": 1
+        },
+        "incidents": [
+          {
+            "event_type": "incident_opened",
+            "event_timestamp_seconds": 1.52,
+            "incident": {
+              "incident_id": "run-f0bcd6330d234fbeb32720483a76057e-track-1-vest-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "vest",
+              "type": "ppe_violation",
+              "started_at_seconds": 0.0,
+              "confirmed_at_seconds": 1.52,
+              "cleared_at_seconds": null,
+              "duration_seconds": null,
+              "status": "active",
+              "close_reason": null,
+              "evidence_summary": {
+                "observation_counts": {
+                  "violation": 39
+                },
+                "continuous_violation_duration": 1.52,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_opened",
+            "event_timestamp_seconds": 5.56,
+            "incident": {
+              "incident_id": "run-f0bcd6330d234fbeb32720483a76057e-track-1-helmet-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "helmet",
+              "type": "ppe_violation",
+              "started_at_seconds": 3.84,
+              "confirmed_at_seconds": 5.56,
+              "cleared_at_seconds": null,
+              "duration_seconds": null,
+              "status": "active",
+              "close_reason": null,
+              "evidence_summary": {
+                "observation_counts": {
+                  "present": 96,
+                  "unknown": 3,
+                  "violation": 41
+                },
+                "continuous_violation_duration": 1.5199999999999996,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_closed",
+            "event_timestamp_seconds": 11.84,
+            "incident": {
+              "incident_id": "run-f0bcd6330d234fbeb32720483a76057e-track-1-helmet-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "helmet",
+              "type": "ppe_violation",
+              "started_at_seconds": 3.84,
+              "confirmed_at_seconds": 5.56,
+              "cleared_at_seconds": 11.84,
+              "duration_seconds": 8.0,
+              "status": "closed",
+              "close_reason": "source_ended",
+              "evidence_summary": {
+                "observation_counts": {
+                  "present": 96,
+                  "unknown": 3,
+                  "violation": 198
+                },
+                "continuous_violation_duration": 7.8,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_closed",
+            "event_timestamp_seconds": 11.84,
+            "incident": {
+              "incident_id": "run-f0bcd6330d234fbeb32720483a76057e-track-1-vest-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "vest",
+              "type": "ppe_violation",
+              "started_at_seconds": 0.0,
+              "confirmed_at_seconds": 1.52,
+              "cleared_at_seconds": 11.84,
+              "duration_seconds": 11.84,
+              "status": "closed",
+              "close_reason": "source_ended",
+              "evidence_summary": {
+                "observation_counts": {
+                  "unknown": 2,
+                  "violation": 295
+                },
+                "continuous_violation_duration": 11.719999999999999,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          }
+        ]
+      },
+      "walking_multiworker": {
+        "configuration": {
+          "tracker_type": "botsort",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false,
+          "gmc_method": "sparseOptFlow",
+          "proximity_thresh": 0.5,
+          "appearance_thresh": 0.8,
+          "with_reid": false,
+          "model": "auto"
+        },
+        "tracking": {
+          "unique_tracks_created": 4,
+          "track_observations": 998,
+          "mean_track_length_frames": 249.5,
+          "median_track_length_frames": 193.5,
+          "p95_track_length_frames": 527.3499999999999,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 4,
+          "frames_with_active_tracks": 577,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 26,
+          "recovered_transitions": 24,
+          "expired_tracks": 2,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1,
+            4
+          ],
+          "observations_per_track": {
+            "1": 574,
+            "2": 124,
+            "3": 37,
+            "4": 263
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 577,
+          "mean_ms": 20.385972438041165,
+          "p50_ms": 18.076600041240454,
+          "p95_ms": 35.701359948143335
+        },
+        "pipeline": {
+          "effective_fps": 13.957435607528902,
+          "end_to_end_latency_ms": {
+            "count": 577,
+            "mean_ms": 66.03066204438564,
+            "p50_ms": 58.74580005183816,
+            "p95_ms": 104.70618009567256
+          }
+        },
+        "association": {
+          "total_person_observations": 998,
+          "ppe_detections_considered": 1891,
+          "ppe_detections_assigned": 1764,
+          "ppe_detections_unassigned": 127,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 4,
+          "mean_association_score": 0.850505721529848,
+          "per_class_assignment_counts": {
+            "helmet": 711,
+            "no_helmet": 75,
+            "no_vest": 1,
+            "vest": 977
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 686,
+              "violation": 50,
+              "conflict": 25,
+              "unknown": 237
+            },
+            "vest": {
+              "present": 975,
+              "violation": 0,
+              "conflict": 1,
+              "unknown": 22
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 1691,
+          "conflict": 36,
+          "suspected_violation": 89,
+          "unknown": 180
+        },
+        "incidents": []
+      }
+    },
+    "botsort_reid": {
+      "compliant_multiworker": {
+        "configuration": {
+          "tracker_type": "botsort",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false,
+          "gmc_method": "sparseOptFlow",
+          "proximity_thresh": 0.5,
+          "appearance_thresh": 0.8,
+          "with_reid": true,
+          "model": "yolo26n-cls.pt"
+        },
+        "tracking": {
+          "unique_tracks_created": 2,
+          "track_observations": 630,
+          "mean_track_length_frames": 315.0,
+          "median_track_length_frames": 315.0,
+          "p95_track_length_frames": 315.0,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 2,
+          "frames_with_active_tracks": 315,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 0,
+          "recovered_transitions": 0,
+          "expired_tracks": 0,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1,
+            2
+          ],
+          "observations_per_track": {
+            "1": 315,
+            "2": 315
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 315,
+          "mean_ms": 93.64660730186318,
+          "p50_ms": 83.82760011591017,
+          "p95_ms": 152.08228004630655
+        },
+        "pipeline": {
+          "effective_fps": 4.134359398733429,
+          "end_to_end_latency_ms": {
+            "count": 315,
+            "mean_ms": 216.01940508015335,
+            "p50_ms": 201.7138998489827,
+            "p95_ms": 331.42117001116276
+          }
+        },
+        "association": {
+          "total_person_observations": 630,
+          "ppe_detections_considered": 1260,
+          "ppe_detections_assigned": 1260,
+          "ppe_detections_unassigned": 0,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 0,
+          "mean_association_score": 0.8678912726435253,
+          "per_class_assignment_counts": {
+            "helmet": 630,
+            "vest": 630
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 630,
+              "violation": 0,
+              "conflict": 0,
+              "unknown": 0
+            },
+            "vest": {
+              "present": 630,
+              "violation": 0,
+              "conflict": 0,
+              "unknown": 0
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 1260
+        },
+        "incidents": []
+      },
+      "helmet_transition": {
+        "configuration": {
+          "tracker_type": "botsort",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false,
+          "gmc_method": "sparseOptFlow",
+          "proximity_thresh": 0.5,
+          "appearance_thresh": 0.8,
+          "with_reid": true,
+          "model": "yolo26n-cls.pt"
+        },
+        "tracking": {
+          "unique_tracks_created": 2,
+          "track_observations": 298,
+          "mean_track_length_frames": 149.0,
+          "median_track_length_frames": 149.0,
+          "p95_track_length_frames": 280.4,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 1,
+          "frames_with_active_tracks": 297,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 2,
+          "recovered_transitions": 2,
+          "expired_tracks": 0,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1
+          ],
+          "observations_per_track": {
+            "1": 295,
+            "2": 3
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 297,
+          "mean_ms": 80.44496362774888,
+          "p50_ms": 77.0435999147594,
+          "p95_ms": 115.19017997197803
+        },
+        "pipeline": {
+          "effective_fps": 5.021663218408106,
+          "end_to_end_latency_ms": {
+            "count": 297,
+            "mean_ms": 181.69706868108125,
+            "p50_ms": 172.58020001463592,
+            "p95_ms": 232.84061988815662
+          }
+        },
+        "association": {
+          "total_person_observations": 298,
+          "ppe_detections_considered": 621,
+          "ppe_detections_assigned": 617,
+          "ppe_detections_unassigned": 4,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 2,
+          "mean_association_score": 0.893941750774795,
+          "per_class_assignment_counts": {
+            "helmet": 96,
+            "no_helmet": 212,
+            "no_vest": 309
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 96,
+              "violation": 201,
+              "conflict": 0,
+              "unknown": 1
+            },
+            "vest": {
+              "present": 0,
+              "violation": 297,
+              "conflict": 0,
+              "unknown": 1
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 96,
+          "confirmed_violation": 415,
+          "suspected_violation": 84,
+          "unknown": 1
+        },
+        "incidents": [
+          {
+            "event_type": "incident_opened",
+            "event_timestamp_seconds": 1.52,
+            "incident": {
+              "incident_id": "run-999c3499db7141fa99071d15d3adcb9e-track-1-vest-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "vest",
+              "type": "ppe_violation",
+              "started_at_seconds": 0.0,
+              "confirmed_at_seconds": 1.52,
+              "cleared_at_seconds": null,
+              "duration_seconds": null,
+              "status": "active",
+              "close_reason": null,
+              "evidence_summary": {
+                "observation_counts": {
+                  "violation": 39
+                },
+                "continuous_violation_duration": 1.52,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_opened",
+            "event_timestamp_seconds": 5.56,
+            "incident": {
+              "incident_id": "run-999c3499db7141fa99071d15d3adcb9e-track-1-helmet-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "helmet",
+              "type": "ppe_violation",
+              "started_at_seconds": 3.84,
+              "confirmed_at_seconds": 5.56,
+              "cleared_at_seconds": null,
+              "duration_seconds": null,
+              "status": "active",
+              "close_reason": null,
+              "evidence_summary": {
+                "observation_counts": {
+                  "present": 96,
+                  "unknown": 3,
+                  "violation": 41
+                },
+                "continuous_violation_duration": 1.5199999999999996,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_closed",
+            "event_timestamp_seconds": 11.84,
+            "incident": {
+              "incident_id": "run-999c3499db7141fa99071d15d3adcb9e-track-1-helmet-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "helmet",
+              "type": "ppe_violation",
+              "started_at_seconds": 3.84,
+              "confirmed_at_seconds": 5.56,
+              "cleared_at_seconds": 11.84,
+              "duration_seconds": 8.0,
+              "status": "closed",
+              "close_reason": "source_ended",
+              "evidence_summary": {
+                "observation_counts": {
+                  "present": 96,
+                  "unknown": 3,
+                  "violation": 198
+                },
+                "continuous_violation_duration": 7.8,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          },
+          {
+            "event_type": "incident_closed",
+            "event_timestamp_seconds": 11.84,
+            "incident": {
+              "incident_id": "run-999c3499db7141fa99071d15d3adcb9e-track-1-vest-0001",
+              "source_id": "E:\\visionops-ppe\\data\\demo_videos\\helmet_transition.mp4",
+              "track_id": 1,
+              "equipment": "vest",
+              "type": "ppe_violation",
+              "started_at_seconds": 0.0,
+              "confirmed_at_seconds": 1.52,
+              "cleared_at_seconds": 11.84,
+              "duration_seconds": 11.84,
+              "status": "closed",
+              "close_reason": "source_ended",
+              "evidence_summary": {
+                "observation_counts": {
+                  "unknown": 2,
+                  "violation": 295
+                },
+                "continuous_violation_duration": 11.719999999999999,
+                "continuous_present_duration": 0.0,
+                "last_stable_state": "confirmed_violation"
+              }
+            }
+          }
+        ]
+      },
+      "walking_multiworker": {
+        "configuration": {
+          "tracker_type": "botsort",
+          "track_high_thresh": 0.25,
+          "track_low_thresh": 0.1,
+          "new_track_thresh": 0.25,
+          "track_buffer": 30,
+          "match_thresh": 0.8,
+          "fuse_score": true,
+          "appearance_reid": false,
+          "gmc_method": "sparseOptFlow",
+          "proximity_thresh": 0.5,
+          "appearance_thresh": 0.8,
+          "with_reid": true,
+          "model": "yolo26n-cls.pt"
+        },
+        "tracking": {
+          "unique_tracks_created": 4,
+          "track_observations": 998,
+          "mean_track_length_frames": 249.5,
+          "median_track_length_frames": 192.0,
+          "p95_track_length_frames": 529.8999999999999,
+          "singleton_tracks": 0,
+          "tracks_lasting_at_least_one_second": 4,
+          "frames_with_active_tracks": 577,
+          "maximum_simultaneous_active_tracks": 2,
+          "lost_transitions": 22,
+          "recovered_transitions": 21,
+          "expired_tracks": 1,
+          "rejected_person_detections": 0,
+          "live_track_ids_at_end": [
+            1,
+            4
+          ],
+          "observations_per_track": {
+            "1": 577,
+            "2": 121,
+            "3": 37,
+            "4": 263
+          }
+        },
+        "tracking_timing_ms": {
+          "count": 577,
+          "mean_ms": 26.526459617430483,
+          "p50_ms": 25.20200004801154,
+          "p95_ms": 34.161019930616014
+        },
+        "pipeline": {
+          "effective_fps": 15.439099412765783,
+          "end_to_end_latency_ms": {
+            "count": 577,
+            "mean_ms": 61.0549530333983,
+            "p50_ms": 58.83920006453991,
+            "p95_ms": 76.1214001569897
+          }
+        },
+        "association": {
+          "total_person_observations": 998,
+          "ppe_detections_considered": 1891,
+          "ppe_detections_assigned": 1764,
+          "ppe_detections_unassigned": 127,
+          "malformed_ppe_detections": 0,
+          "ambiguous_candidate_count": 4,
+          "mean_association_score": 0.8504819913546108,
+          "per_class_assignment_counts": {
+            "helmet": 711,
+            "no_helmet": 75,
+            "no_vest": 1,
+            "vest": 977
+          },
+          "frame_level_equipment_states": {
+            "helmet": {
+              "present": 686,
+              "violation": 50,
+              "conflict": 25,
+              "unknown": 237
+            },
+            "vest": {
+              "present": 975,
+              "violation": 0,
+              "conflict": 1,
+              "unknown": 22
+            }
+          }
+        },
+        "temporal_state_counts": {
+          "compliant": 1690,
+          "conflict": 36,
+          "suspected_violation": 89,
+          "unknown": 181
+        },
+        "incidents": []
+      }
+    }
+  },
+  "review_artifacts": {
+    "helmet_duplicate": {
+      "bytetrack": {
+        "sheet": "results/tracker_robustness/review_artifacts/sheets/helmet_duplicate_bytetrack.jpg",
+        "clip": "results/tracker_robustness/review_artifacts/clips/helmet_duplicate_bytetrack.mp4"
+      },
+      "botsort": {
+        "sheet": "results/tracker_robustness/review_artifacts/sheets/helmet_duplicate_botsort.jpg",
+        "clip": "results/tracker_robustness/review_artifacts/clips/helmet_duplicate_botsort.mp4"
+      },
+      "botsort_reid": {
+        "sheet": "results/tracker_robustness/review_artifacts/sheets/helmet_duplicate_botsort_reid.jpg",
+        "clip": "results/tracker_robustness/review_artifacts/clips/helmet_duplicate_botsort_reid.mp4"
+      }
+    },
+    "walking_crossing": {
+      "bytetrack": {
+        "sheet": "results/tracker_robustness/review_artifacts/sheets/walking_crossing_bytetrack.jpg",
+        "clip": "results/tracker_robustness/review_artifacts/clips/walking_crossing_bytetrack.mp4"
+      },
+      "botsort": {
+        "sheet": "results/tracker_robustness/review_artifacts/sheets/walking_crossing_botsort.jpg",
+        "clip": "results/tracker_robustness/review_artifacts/clips/walking_crossing_botsort.mp4"
+      },
+      "botsort_reid": {
+        "sheet": "results/tracker_robustness/review_artifacts/sheets/walking_crossing_botsort_reid.jpg",
+        "clip": "results/tracker_robustness/review_artifacts/clips/walking_crossing_botsort_reid.mp4"
+      }
+    }
+  }
+}

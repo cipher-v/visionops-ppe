@@ -30,7 +30,7 @@ class PersonTrack:
 
 @dataclass(frozen=True)
 class TrackerEvents:
-    """Lifecycle transitions reliably derived from ByteTrack state."""
+    """Lifecycle transitions derived from the selected tracker state."""
 
     created_ids: tuple[int, ...] = ()
     lost_ids: tuple[int, ...] = ()

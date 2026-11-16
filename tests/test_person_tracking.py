@@ -57,6 +57,35 @@ def test_tracker_initialization_and_configuration() -> None:
     assert metadata["person_confidence_threshold"] == 0.41
 
 
+def test_botsort_configuration_and_frame_requirement() -> None:
+    settings = TrackerSettings.from_yaml(ROOT / "configs/botsort_person.yaml")
+    tracker = PersonByteTracker(settings)
+    metadata = tracker.metadata()
+    assert metadata["name"] == "Ultralytics BoT-SORT"
+    assert metadata["appearance_reid"] is False
+    with pytest.raises(ValueError, match="current image frame"):
+        _update(tracker, 0, [_detection(0, 10)])
+
+
+def test_botsort_auto_reid_is_rejected_without_native_features() -> None:
+    settings = TrackerSettings(
+        tracker_type="botsort",
+        gmc_method="sparseOptFlow",
+        with_reid=True,
+        model="auto",
+    )
+    with pytest.raises(ValueError, match="external model"):
+        settings.validate()
+
+
+def test_production_tracker_selects_supported_botsort_without_reid() -> None:
+    production = TrackerSettings.from_yaml(ROOT / "configs/production_tracker.yaml")
+    candidate = TrackerSettings.from_yaml(ROOT / "configs/botsort_person.yaml")
+    assert production == candidate
+    assert production.tracker_type == "botsort"
+    assert production.with_reid is False
+
+
 def test_person_only_and_frozen_threshold_filtering() -> None:
     tracker = _tracker()
     result = _update(

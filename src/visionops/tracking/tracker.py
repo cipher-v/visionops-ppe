@@ -1,4 +1,4 @@
-"""Repository adapter for Ultralytics' supported ByteTrack implementation."""
+"""Person-only adapter for supported Ultralytics ByteTrack and BoT-SORT."""
 
 from __future__ import annotations
 
@@ -7,10 +7,12 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import torch
 import ultralytics
 import yaml
 from ultralytics.engine.results import Boxes
+from ultralytics.trackers.bot_sort import BOTSORT
 from ultralytics.trackers.byte_tracker import BYTETracker
 
 from visionops.tracking.schema import PersonTrack, TrackerEvents, TrackerFrameResult
@@ -22,12 +24,12 @@ FROZEN_PERSON_THRESHOLD = 0.41
 
 
 class TrackerInitializationError(RuntimeError):
-    """Raised when the supported ByteTrack adapter cannot initialize."""
+    """Raised when a supported Ultralytics tracker cannot initialize."""
 
 
 @dataclass(frozen=True)
 class TrackerSettings:
-    """Immutable repository-owned ByteTrack configuration."""
+    """Immutable repository-owned Person tracker configuration."""
 
     tracker_type: str = "bytetrack"
     track_high_thresh: float = 0.25
@@ -37,6 +39,11 @@ class TrackerSettings:
     match_thresh: float = 0.80
     fuse_score: bool = True
     appearance_reid: bool = False
+    gmc_method: str | None = None
+    proximity_thresh: float = 0.50
+    appearance_thresh: float = 0.80
+    with_reid: bool = False
+    model: str = "auto"
 
     @classmethod
     def from_yaml(cls, path: Path) -> TrackerSettings:
@@ -54,8 +61,8 @@ class TrackerSettings:
         return settings
 
     def validate(self) -> None:
-        if self.tracker_type != "bytetrack":
-            raise ValueError("Only the frozen ByteTrack adapter is supported")
+        if self.tracker_type not in {"bytetrack", "botsort"}:
+            raise ValueError("Tracker type must be 'bytetrack' or 'botsort'")
         thresholds = (
             self.track_low_thresh,
             self.track_high_thresh,
@@ -69,14 +76,33 @@ class TrackerSettings:
         if self.track_buffer < 0:
             raise ValueError("Track buffer cannot be negative")
         if self.appearance_reid:
-            raise ValueError("Appearance/ReID is intentionally disabled")
+            raise ValueError("Use the official 'with_reid' setting")
+        if self.tracker_type == "bytetrack" and self.with_reid:
+            raise ValueError("ByteTrack does not support appearance ReID")
+        if self.tracker_type == "botsort":
+            if self.gmc_method not in {
+                "sparseOptFlow",
+                "orb",
+                "sift",
+                "ecc",
+                "none",
+            }:
+                raise ValueError("BoT-SORT requires a supported GMC method")
+            if not 0 <= self.proximity_thresh <= 1:
+                raise ValueError("BoT-SORT proximity threshold must be normalized")
+            if not 0 <= self.appearance_thresh <= 1:
+                raise ValueError("BoT-SORT appearance threshold must be normalized")
+            if self.with_reid and self.model == "auto":
+                raise ValueError(
+                    "This adapter requires an external model for BoT-SORT ReID"
+                )
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
 
 class PersonByteTracker:
-    """Feed only frozen-threshold Person detections into Ultralytics ByteTrack."""
+    """Feed only frozen-threshold Person detections into one supported tracker."""
 
     def __init__(self, settings: TrackerSettings) -> None:
         settings.validate()
@@ -88,11 +114,20 @@ class PersonByteTracker:
                 track_buffer=settings.track_buffer,
                 match_thresh=settings.match_thresh,
                 fuse_score=settings.fuse_score,
+                gmc_method=settings.gmc_method,
+                proximity_thresh=settings.proximity_thresh,
+                appearance_thresh=settings.appearance_thresh,
+                with_reid=settings.with_reid,
+                model=settings.model,
+                device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
             )
-            self._tracker = BYTETracker(args=args)
+            tracker_class = (
+                BYTETracker if settings.tracker_type == "bytetrack" else BOTSORT
+            )
+            self._tracker = tracker_class(args=args)
         except Exception as error:
             raise TrackerInitializationError(
-                f"Unable to initialize Ultralytics ByteTrack: {error}"
+                f"Unable to initialize Ultralytics {settings.tracker_type}: {error}"
             ) from error
         self.settings = settings
         self._seen_ids: set[int] = set()
@@ -103,7 +138,11 @@ class PersonByteTracker:
 
     @property
     def name(self) -> str:
-        return "Ultralytics ByteTrack"
+        return (
+            "Ultralytics ByteTrack"
+            if self.settings.tracker_type == "bytetrack"
+            else "Ultralytics BoT-SORT"
+        )
 
     @property
     def version(self) -> str:
@@ -117,11 +156,17 @@ class PersonByteTracker:
         return tuple(sorted((active | lost) - self._expired_ids))
 
     def metadata(self) -> dict[str, object]:
+        implementation = (
+            "ultralytics.trackers.byte_tracker.BYTETracker"
+            if self.settings.tracker_type == "bytetrack"
+            else "ultralytics.trackers.bot_sort.BOTSORT"
+        )
         return {
             "name": self.name,
             "ultralytics_version": self.version,
-            "implementation": "ultralytics.trackers.byte_tracker.BYTETracker",
-            "appearance_reid": False,
+            "implementation": implementation,
+            "appearance_reid": self.settings.with_reid,
+            "reid_model": self.settings.model if self.settings.with_reid else None,
             "configuration": self.settings.to_dict(),
             "person_class_id": PERSON_CLASS_ID,
             "person_confidence_threshold": FROZEN_PERSON_THRESHOLD,
@@ -159,6 +204,7 @@ class PersonByteTracker:
         detections: list[VideoDetection],
         frame_shape: tuple[int, int],
         source_id: str,
+        frame: np.ndarray | None = None,
     ) -> TrackerFrameResult:
         """Update one processed frame without accepting PPE or weak Person boxes."""
         self._validate_frame(frame_index, timestamp_seconds)
@@ -190,7 +236,9 @@ class PersonByteTracker:
         if not len(accepted):
             data = torch.empty((0, 6), dtype=torch.float32)
         boxes = Boxes(data, (height, width)).cpu().numpy()
-        rows = self._tracker.update(boxes, img=None)
+        if self.settings.tracker_type == "botsort" and frame is None:
+            raise ValueError("BoT-SORT requires the current image frame")
+        rows = self._tracker.update(boxes, img=frame)
 
         current_lost = {int(track.track_id) for track in self._tracker.lost_stracks}
         current_removed = {
@@ -210,7 +258,7 @@ class PersonByteTracker:
             class_id = int(class_id_value)
             detection_index = int(index_value)
             if class_id != PERSON_CLASS_ID or not 0 <= detection_index < len(accepted):
-                raise RuntimeError("ByteTrack returned an invalid Person association")
+                raise RuntimeError("Tracker returned an invalid Person association")
             matched_indices.add(detection_index)
             state = (
                 "new"

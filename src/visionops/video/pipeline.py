@@ -506,6 +506,7 @@ def run_video_pipeline(
                     detections,
                     packet.image.shape[:2],
                     source_metadata.source_id,
+                    frame=packet.image,
                 )
                 tracking_latencies.append(time.perf_counter() - tracking_started)
                 tracking_diagnostics.update(tracking_result)

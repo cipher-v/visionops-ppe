@@ -23,6 +23,7 @@ datasets/
 *.csv
 *.parquet
 !docs/experiments/real_video_validation/review_manifest.csv
+!docs/experiments/tracker_robustness/review_manifest.csv
 
 # Track provenance only; keep demo video media ignored.
 !data/
