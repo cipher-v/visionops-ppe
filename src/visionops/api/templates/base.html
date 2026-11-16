@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="VisionOps PPE construction safety monitoring demo">
+    <title>{% block title %}VisionOps PPE{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/app.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="VisionOps PPE home">
+        <span class="brand-mark">VO</span>
+        <span>VisionOps PPE</span>
+      </a>
+      {% block header_actions %}{% endblock %}
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+    <footer>
+      <span>VisionOps PPE</span>
+      <span>Computer vision for construction safety review</span>
+    </footer>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

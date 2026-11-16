@@ -28,6 +28,7 @@ dev = [
 ]
 service = [
     "fastapi==0.115.12",
+    "jinja2==3.1.6",
     "prometheus-client==0.21.1",
     "python-multipart==0.0.20",
     "uvicorn==0.34.2",
@@ -40,10 +41,17 @@ deployment = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"visionops.api" = ["templates/*.html", "static/*.css", "static/*.js"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra -p no:cacheprovider"
 pythonpath = [".", "src"]
+markers = [
+    "integration: CPU integration test using repository-owned synthetic fixtures",
+    "gpu_model: requires local verified model weights and a supported GPU runtime",
+]
 
 [tool.ruff]
 target-version = "py311"

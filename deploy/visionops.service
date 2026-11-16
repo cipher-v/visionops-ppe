@@ -1,0 +1,18 @@
+[Unit]
+Description=VisionOps PPE portfolio service
+After=network.target
+
+[Service]
+Type=simple
+User=visionops
+Group=visionops
+WorkingDirectory=/opt/visionops-ppe
+EnvironmentFile=/etc/visionops-ppe.env
+ExecStart=/opt/visionops-ppe/.venv/bin/uvicorn visionops.api.app:app --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=on-failure
+RestartSec=5
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}VisionOps PPE — Safety video intelligence{% endblock %}
+{% block content %}
+  <section class="hero">
+    <div class="eyebrow">PORTFOLIO DEMO · VIDEO SAFETY INTELLIGENCE</div>
+    <h1>Make PPE compliance<br><span>visible over time.</span></h1>
+    <p class="hero-copy">VisionOps PPE turns construction video into tracked, temporal helmet and vest compliance evidence that a safety reviewer can inspect.</p>
+    <div class="pipeline" aria-label="Processing pipeline">
+      <span>Detect</span><i>→</i><span>Track</span><i>→</i><span>Associate PPE</span><i>→</i><span>Confirm over time</span>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <div class="section-heading">
+      <div>
+        <div class="eyebrow">PUBLISHED RUNS</div>
+        <h2>Processed video demos</h2>
+      </div>
+      <p>Only reviewed, completed runs published by the administrator appear here.</p>
+    </div>
+    {% if videos %}
+      <div class="video-grid">
+        {% for video in videos %}
+          <article class="video-card">
+            <div class="video-poster">
+              <video preload="metadata" muted aria-label="Preview of {{ video.title }}">
+                <source src="{{ video.video_url }}" type="video/mp4">
+              </video>
+              <span class="status-pill">Published</span>
+            </div>
+            <div class="card-body">
+              <h3>{{ video.title }}</h3>
+              <dl class="card-meta">
+                <div><dt>Duration</dt><dd>{% if video.summary.duration_seconds is not none %}{{ "%.1f"|format(video.summary.duration_seconds) }}s{% else %}—{% endif %}</dd></div>
+                <div><dt>Processed</dt><dd>{{ video.summary.processed_at[:10] }}</dd></div>
+                <div><dt>Incidents</dt><dd>{{ video.incident_count }}</dd></div>
+              </dl>
+              <a class="button primary" href="{{ video.watch_url }}">View demo <span>↗</span></a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-icon">◫</span>
+        <h3>No published demos yet</h3>
+        <p>Completed videos will appear here after administrator review and publication.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

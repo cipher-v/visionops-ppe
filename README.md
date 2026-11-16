@@ -1,33 +1,141 @@
 # VisionOps PPE
 
-VisionOps PPE is a production-oriented computer vision project intended to detect personal protective equipment (PPE) compliance and support reliable operational monitoring.
+VisionOps PPE is a production-oriented computer-vision prototype for detecting construction PPE evidence and converting video observations into track-aware, temporally validated incidents. It goes beyond a detector demo with controlled domain experiments, calibrated thresholds, tracking, explicit uncertainty, monitoring, human review, an API, and reproducible packaging.
 
-## Planned ML lifecycle
+> This is a safety-assistance prototype, not a certified safety system. Human oversight and deployment-specific validation are required.
 
-The planned lifecycle covers data preparation and validation, model training and evaluation, inference and tracking, service delivery, observability, and drift detection. These capabilities are intentionally deferred until later checkpoints.
+## What it does
+
+Images or video pass through a frozen PyTorch YOLO26n detector at 960 pixels. Class-specific thresholds filter detections; BoT-SORT tracks people; deterministic geometry associates PPE with each anonymous, run-local track; temporal rules distinguish unknown, conflict, suspected, confirmed, and cleared states; optional normalized-image zones control where equipment rules apply. Missing evidence means `unknown`, not a violation.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[Image / Video / CCTV] --> B[YOLO26n @ 960<br/>PyTorch]
+    B --> C[Class-specific<br/>confidence policy]
+    C --> D[BoT-SORT<br/>Person tracking]
+    D --> E[Person-to-PPE<br/>geometric association]
+    E --> F[Temporal compliance<br/>engine]
+    F --> G[Optional normalized<br/>spatial zones]
+    G --> H[Structured incidents]
+    C -. aggregate telemetry .-> I[Drift monitoring<br/>diagnostic only]
+    D -. uncertain observations .-> J[Human review queue<br/>human-in-the-loop only]
+    E -.-> J
+    F -.-> J
+    I -. candidates, not verdicts .-> J
+    B --> K[FastAPI service]
+    H --> K
+    K --> L[Prometheus-compatible<br/>metrics]
+```
+
+See [architecture.md](docs/architecture.md) for component and safety boundaries.
+
+## Why this project is different
+
+- Controlled 640→960 resolution and YOLO26n→YOLO26s capacity experiments.
+- Leakage-audited RF100 evaluation and explicit domain-shift error decomposition.
+- Mixed-source adaptation plus a matched-exposure control separating diversity from volume.
+- Frozen, class-specific threshold calibration across source and target validation domains.
+- Real-video tracking, per-person PPE association, temporal persistence, and zone-aware incidents.
+- Bounded BoT-SORT/ReID comparison prompted by an observed identity-transfer failure.
+- Strict ONNX behavioral parity testing, robustness stress tests, and honest negative results.
+- PSI drift telemetry validated as shift detection—not an accuracy-failure predictor.
+- Deduplicated human review queue with no automatic labeling or retraining.
+- Hash-verified FastAPI runtime, Prometheus metrics, upload controls, and Docker packaging.
+
+## Key results
+
+| Result | Value | Interpretation |
+|---|---:|---|
+| Final detector, Construction-PPE mAP50-95 | **0.6642** | Five-class source validation |
+| Final detector, filtered RF100 mAP50-95 | **0.4948** | Held-out target-domain validation for the mixed model |
+| RF100 mAP50-95: source-only A → exposure-matched D → full mixed C | 0.3349 → 0.4722 → **0.4948** | Diversity drove most of the gain |
+| Calibrated operational F1, Construction-PPE / RF100 | **0.9020 / 0.9073** | Frozen class-specific policy |
+| Review queue | 1,137 raw → **28** | Timestamp, perceptual, and budget deduplication |
+
+The three internal videos validate integration and expose failures qualitatively; they are not an annotated accuracy or formal MOT benchmark. See [experiment_summary.md](docs/experiment_summary.md) and [docs/experiments](docs/experiments).
+
+## Production pipeline
+
+Production classes are `helmet`, `vest`, `Person`, `no_helmet`, and `no_vest`. Temporal confirmation, clearing, cooldown, track expiry, and optional zone applicability produce auditable incident events. Track IDs are local technical identifiers, never worker identity.
+
+## Deployment, robustness, and monitoring
+
+PyTorch is the production backend. ONNX FP32 was rejected because it failed strict final-detection/downstream parity and was slower in the controlled detector benchmark. TensorRT was not forced into an incompatible stack and is not claimed as validated.
+
+Gaussian noise and motion blur were the largest synthetic weaknesses. Simple PSI signals detected distribution changes but correlated poorly with measured accuracy loss and over-alerted on limited real footage; drift is therefore diagnostic-only.
+
+## Human review
+
+Uncertain detections, association ambiguity, conflicts, unknown states, incidents, tracking events, and drift windows can nominate candidates. A transparent score plus temporal and perceptual-hash deduplication reduces review load. Human fields remain blank until review, and export never changes training manifests or launches retraining.
+
+## Quickstart
+
+Python 3.11 or 3.12 is required. The frozen weight is intentionally ignored by Git and must be placed at `runs/experiment_mixed5_yolo26n_960/weights/best.pt`; startup verifies SHA-256 `BF99E872A9B57A7C33A4EBF06F0620F9EB8A215AEC29DDE2A90CA1F72F9581F4`.
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev,service]"
+pytest
+ruff check .
+ruff format --check .
+```
+
+Run the full video pipeline:
+
+```powershell
+python scripts\run_video_inference.py --source demo.mp4 `
+  --output-dir results\demo --enable-tracking `
+  --enable-ppe-association --enable-temporal-compliance `
+  --zones configs\zones\example_zones.yaml --render
+```
+
+Start the API:
+
+```powershell
+python scripts\hash_admin_password.py
+uvicorn visionops.api.app:app --host 127.0.0.1 --port 8000
+curl.exe http://127.0.0.1:8000/health/ready
+```
+
+Set `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `SESSION_SECRET` before starting
+the administrator interface. See
+[portfolio_deployment.md](docs/portfolio_deployment.md) for local and Nginx
+deployment preparation, and [demo.md](docs/demo.md) for pipeline artifacts.
+
+## API
+
+Public routes are `/` and `/watch/{video_id}`; they expose only completed videos
+explicitly published by the administrator. Private routes begin at `/admin` and
+`/api/admin/videos`. Existing `/v1` job/config endpoints and `/metrics` remain
+available to an authenticated administrator. Long videos use the existing
+bounded single-node job queue.
 
 ## Repository structure
 
 ```text
-visionops-ppe/
-├── src/visionops/  # Installable Python package
-├── configs/        # Version-controlled configuration
-├── scripts/        # Project automation and entry-point scripts
-├── tests/          # Automated tests
-├── results/        # Local generated results (ignored by Git)
-├── docs/           # Project documentation
-├── pyproject.toml  # Package, tooling, and dependency configuration
-├── .gitignore      # Files excluded from version control
-└── README.md       # Project overview and setup guidance
+configs/                frozen production and experiment configuration
+docs/                   cards, decisions, guides, and experiment lineage
+scripts/                audits, experiments, diagnostics, demo, and export entrypoints
+src/visionops/          pipeline, tracking, association, compliance, API, monitoring
+tests/                  deterministic unit and CPU integration tests
+data/, runs/, results/  local ignored datasets, weights, media, and artifacts
 ```
 
-## Current status
+## Limitations
 
-**Checkpoint 17 - production serving API and Docker packaging**
+- No sealed deployment-representative test set or formal real-world accuracy study exists.
+- RF100 validation became target-domain development evidence for the mixed model; its small test split was used earlier for model-family diagnosis and is not pristine final evidence.
+- Sparse RF100 `no_helmet` labels limit confidence in that class.
+- Track fragmentation and duplicate tracks remain possible under overlap/occlusion.
+- Zones are normalized image-plane polygons, not calibrated world coordinates.
+- Drift does not prove failure; low drift does not prove correctness.
+- The local job queue is not distributed, and Docker runtime was not validated because the local Linux daemon was unavailable.
+- Internal real-video provenance is unresolved; no questionable footage is embedded here.
 
-The frozen PyTorch pipeline is exposed through FastAPI with liveness/readiness, safe
-configuration, stateless image inference, bounded asynchronous video jobs, incident
-retrieval and Prometheus metrics. A CPU-oriented Dockerfile is provided with externally
-mounted, hash-verified weights; Docker runtime validation remains pending because the
-local Docker Desktop Linux daemon was unavailable. Drift remains diagnostic-only.
+## License, datasets, and media
 
+No repository code license has been chosen and there is no `LICENSE` file. Construction-PPE and RF100 Construction Safety v2 are CC BY 4.0 and require separate attribution; datasets are not redistributed. Ultralytics, PyTorch, OpenCV, and other dependencies retain their upstream licenses. Internal validation videos and derived frames remain ignored and are not approved as public demo media. See [dataset_card.md](docs/dataset_card.md) and [project_status.md](docs/project_status.md).

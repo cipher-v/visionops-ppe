@@ -31,6 +31,11 @@ from visionops.tracking.tracker import PersonByteTracker, TrackerSettings
 from visionops.video.backend import DetectorBackend
 from visionops.video.config import FrozenDetectorConfig, verify_weights
 from visionops.video.policy import CandidateBox, apply_class_thresholds
+from visionops.video.rendering import (
+    output_dimensions,
+    render_demo_overlay,
+    scale_for_output,
+)
 from visionops.video.schema import VideoDetection, normalized_box
 from visionops.video.source import AnnotatedVideoWriter, FramePacket, VideoReader
 from visionops.zones.config import ZoneConfig
@@ -59,6 +64,8 @@ class PipelineOptions:
     zones_config: Path | None = None
     detector_backend: str = "pytorch"
     deployment_config: Path | None = None
+    overlay_mode: str = "demo"
+    render_width: int | None = None
 
     def __post_init__(self) -> None:
         if self.frame_stride < 1:
@@ -91,6 +98,10 @@ class PipelineOptions:
             raise ValueError(f"Unsupported detector backend: {self.detector_backend}")
         if self.detector_backend != "pytorch" and self.deployment_config is None:
             raise ValueError("Non-PyTorch backends require deployment configuration")
+        if self.overlay_mode not in {"demo", "debug"}:
+            raise ValueError("Overlay mode must be 'demo' or 'debug'")
+        if self.render_width is not None and self.render_width < 2:
+            raise ValueError("Render width must be at least 2 pixels")
 
 
 def _summary(values: list[float]) -> dict[str, float | int | None]:
@@ -516,14 +527,19 @@ def run_video_pipeline(
             raise RuntimeError("Opened reader did not expose source metadata")
         source_metadata = reader.metadata
         output_fps = source_metadata.reported_fps or options.fallback_fps
+        render_size = output_dimensions(
+            source_metadata.original_width,
+            source_metadata.original_height,
+            options.render_width,
+        )
         writer = None
         effective_render = options.render or options.enable_tracking
         if effective_render:
             writer = stack.enter_context(
                 AnnotatedVideoWriter(
                     annotated_path,
-                    source_metadata.original_width,
-                    source_metadata.original_height,
+                    render_size[0],
+                    render_size[1],
                     output_fps,
                 )
             )
@@ -595,7 +611,7 @@ def run_video_pipeline(
             if packet.frame_index % options.frame_stride != 0:
                 frames_skipped_by_stride += 1
                 if writer is not None:
-                    writer.write(packet.image)
+                    writer.write(scale_for_output(packet.image, render_size))
                 continue
 
             frame_started = time.perf_counter()
@@ -744,41 +760,58 @@ def run_video_pipeline(
                 profiler.record("temporal_compliance", temporal_latencies[-1])
             if writer is not None:
                 render_started = time.perf_counter()
-                rendered = (
-                    render_zone_policy(
+                if options.overlay_mode == "demo" and tracker is not None:
+                    rendered = render_demo_overlay(
                         packet.image,
-                        detections,
                         frame_tracks,
                         temporal_records,
-                        zone_records,
-                        zone_engine.config,
-                    )
-                    if zone_engine is not None
-                    else render_temporal_compliance(
-                        packet.image,
-                        detections,
-                        frame_tracks,
-                        temporal_records,
-                    )
-                    if temporal_engine is not None
-                    else render_ppe_associations(
-                        packet.image,
-                        detections,
-                        frame_tracks,
                         association_records,
+                        zone_records,
+                        (
+                            {
+                                zone.id: zone.name
+                                for zone in zone_engine.config.enabled_zones
+                            }
+                            if zone_engine is not None
+                            else None
+                        ),
                     )
-                    if associator is not None
-                    else render_tracked_detections(
-                        packet.image, detections, frame_tracks
+                else:
+                    rendered = (
+                        render_zone_policy(
+                            packet.image,
+                            detections,
+                            frame_tracks,
+                            temporal_records,
+                            zone_records,
+                            zone_engine.config,
+                        )
+                        if zone_engine is not None
+                        else render_temporal_compliance(
+                            packet.image,
+                            detections,
+                            frame_tracks,
+                            temporal_records,
+                        )
+                        if temporal_engine is not None
+                        else render_ppe_associations(
+                            packet.image,
+                            detections,
+                            frame_tracks,
+                            association_records,
+                        )
+                        if associator is not None
+                        else render_tracked_detections(
+                            packet.image, detections, frame_tracks
+                        )
+                        if tracker is not None
+                        else render_detections(packet.image, detections)
                     )
-                    if tracker is not None
-                    else render_detections(packet.image, detections)
-                )
                 profiler.record(
                     "overlay_rendering", time.perf_counter() - render_started
                 )
                 encode_started = time.perf_counter()
-                writer.write(rendered)
+                writer.write(scale_for_output(rendered, render_size))
                 profiler.record(
                     "video_encode_write", time.perf_counter() - encode_started
                 )
@@ -855,6 +888,9 @@ def run_video_pipeline(
             "output_fps": output_fps,
             "fallback_fps_used": source_metadata.reported_fps is None,
             "annotated_video_written": effective_render,
+            "overlay_mode": options.overlay_mode if effective_render else None,
+            "render_width": render_size[0] if effective_render else None,
+            "render_height": render_size[1] if effective_render else None,
         },
         "timing": {
             "model_load_seconds": model_load_seconds,

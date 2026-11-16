@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import logging
 import time
-import uuid
 from collections.abc import Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -13,13 +12,15 @@ from typing import Any
 
 import cv2
 import numpy as np
-from fastapi import FastAPI, File, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
+from visionops.api.auth import WebSettings
 from visionops.api.errors import ServiceError
 from visionops.api.health import readiness
 from visionops.api.metrics import ServiceMetrics
+from visionops.api.portfolio import PortfolioService, install_portfolio_routes
 from visionops.api.runtime import ProductionRuntime, ServiceSettings
 from visionops.api.schemas import (
     ImageInferenceResponse,
@@ -51,12 +52,18 @@ def create_app(
         [ServiceSettings, ServiceMetrics], Any
     ] = ProductionRuntime,
     settings: ServiceSettings | None = None,
+    web_settings: WebSettings | None = None,
 ) -> FastAPI:
     service_metrics = ServiceMetrics()
     effective_settings = settings or ServiceSettings.from_environment(ROOT)
+    effective_web_settings = web_settings or WebSettings.from_environment(
+        effective_settings.runtime_dir
+    )
+    portfolio = PortfolioService(effective_settings, effective_web_settings)
 
     @asynccontextmanager
     async def lifespan(application: FastAPI):
+        portfolio.initialize()
         application.state.runtime = runtime_factory(effective_settings, service_metrics)
         _log("runtime_startup", status="ready", backend="pytorch")
         try:
@@ -64,8 +71,16 @@ def create_app(
         finally:
             application.state.runtime.close()
 
-    application = FastAPI(title="VisionOps PPE", version="1.0", lifespan=lifespan)
+    application = FastAPI(
+        title="VisionOps PPE",
+        version="1.0",
+        lifespan=lifespan,
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None,
+    )
     application.state.metrics = service_metrics
+    application.state.portfolio = portfolio
 
     @application.exception_handler(ServiceError)
     async def service_error_handler(
@@ -118,7 +133,9 @@ def create_app(
         return readiness(request.app.state.runtime)
 
     @application.get("/v1/config")
-    def safe_config(request: Request) -> dict[str, object]:
+    def safe_config(
+        request: Request, _admin: str = Depends(portfolio.require_admin)
+    ) -> dict[str, object]:
         runtime = request.app.state.runtime
         config = runtime.config
         return {
@@ -140,7 +157,9 @@ def create_app(
 
     @application.post("/v1/infer/image", response_model=ImageInferenceResponse)
     async def infer_image(
-        request: Request, file: UploadFile = File(...)
+        request: Request,
+        _admin: str = Depends(portfolio.require_admin),
+        file: UploadFile = File(...),
     ) -> dict[str, object]:
         suffix = Path(file.filename or "").suffix.lower()
         if suffix not in {".jpg", ".jpeg", ".png", ".bmp", ".webp"}:
@@ -158,31 +177,11 @@ def create_app(
     )
     async def submit_video(
         request: Request,
+        _admin: str = Depends(portfolio.require_admin),
         file: UploadFile = File(...),
         zone_config: UploadFile | None = File(default=None),
     ) -> dict[str, object]:
-        suffix = Path(file.filename or "").suffix.lower()
-        if suffix not in {".mp4", ".avi", ".mov", ".mkv"}:
-            raise ServiceError(
-                415, "unsupported_video_type", "Unsupported video extension"
-            )
-        content = await _read_limited(file, effective_settings.max_video_bytes)
-        incoming = effective_settings.runtime_dir / "incoming"
-        incoming.mkdir(parents=True, exist_ok=True)
-        token = uuid.uuid4().hex
-        input_path = incoming / f"{token}{suffix}"
-        input_path.write_bytes(content)
-        capture = cv2.VideoCapture(str(input_path))
-        valid = capture.isOpened() and capture.get(cv2.CAP_PROP_FRAME_COUNT) > 0
-        capture.release()
-        if not valid:
-            input_path.unlink(missing_ok=True)
-            raise ServiceError(422, "invalid_video", "Video could not be decoded")
-        zone_path = None
-        if zone_config is not None:
-            zone_content = await _read_limited(zone_config, 1024 * 1024)
-            zone_path = request.app.state.runtime.validate_zone(zone_content, incoming)
-        job = request.app.state.runtime.submit_video(input_path, zone_path)
+        job = await portfolio.submit_video(request, file, zone_config=zone_config)
         return {
             "job_id": job.job_id,
             "status": job.status,
@@ -191,7 +190,11 @@ def create_app(
         }
 
     @application.get("/v1/jobs/{job_id}", response_model=JobStatusResponse)
-    def job_status(job_id: str, request: Request) -> dict[str, object]:
+    def job_status(
+        job_id: str,
+        request: Request,
+        _admin: str = Depends(portfolio.require_admin),
+    ) -> dict[str, object]:
         job = request.app.state.runtime.get_job(job_id)
         return {
             "job_id": job.job_id,
@@ -201,14 +204,22 @@ def create_app(
         }
 
     @application.get("/v1/jobs/{job_id}/result", response_model=VideoResultResponse)
-    def job_result(job_id: str, request: Request) -> dict[str, object]:
+    def job_result(
+        job_id: str,
+        request: Request,
+        _admin: str = Depends(portfolio.require_admin),
+    ) -> dict[str, object]:
         job = request.app.state.runtime.get_job(job_id)
         if job.status != "completed" or job.result is None:
             raise ServiceError(409, "job_not_complete", "Video job result is not ready")
         return {"job_id": job.job_id, "summary": job.result}
 
     @application.get("/v1/jobs/{job_id}/incidents")
-    def job_incidents(job_id: str, request: Request) -> dict[str, object]:
+    def job_incidents(
+        job_id: str,
+        request: Request,
+        _admin: str = Depends(portfolio.require_admin),
+    ) -> dict[str, object]:
         job = request.app.state.runtime.get_job(job_id)
         if job.status != "completed":
             raise ServiceError(409, "job_not_complete", "Video job result is not ready")
@@ -219,11 +230,12 @@ def create_app(
         }
 
     @application.get("/metrics")
-    def metrics() -> Response:
+    def metrics(_admin: str = Depends(portfolio.require_admin)) -> Response:
         return Response(
             generate_latest(service_metrics.registry), media_type=CONTENT_TYPE_LATEST
         )
 
+    install_portfolio_routes(application, portfolio)
     return application
 
 

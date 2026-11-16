@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin — VisionOps PPE{% endblock %}
+{% block header_actions %}
+  <div class="header-actions"><a class="text-link" href="/">Public site</a><form method="post" action="/admin/logout"><button class="text-button" type="submit">Sign out</button></form></div>
+{% endblock %}
+{% block content %}
+  <section class="admin-shell">
+    <div class="admin-heading">
+      <div><div class="eyebrow">PRIVATE WORKSPACE</div><h1>Video processing</h1></div>
+      <p>Upload a source, review the annotated result, then publish it to the portfolio.</p>
+    </div>
+    <form id="upload-form" class="upload-panel">
+      <label class="title-field">Optional title<input name="title" maxlength="120" placeholder="e.g. Helmet transition demonstration"></label>
+      <label id="drop-zone" class="drop-zone">
+        <input id="video-file" name="file" type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska" required>
+        <span class="upload-icon">↑</span>
+        <strong>Drop a video here</strong>
+        <span>or choose MP4, MOV, AVI, or MKV</span>
+        <em id="file-name">No file selected</em>
+      </label>
+      <button class="button primary" type="submit">Submit for processing</button>
+      <span id="upload-message" role="status"></span>
+      <ol id="upload-stages" class="upload-stages" hidden aria-live="polite">
+        <li data-upload-stage="uploading">Uploading...</li>
+        <li data-upload-stage="uploaded">Upload complete</li>
+        <li data-upload-stage="queued">Queued</li>
+        <li data-upload-stage="processing">Processing video...</li>
+        <li data-upload-stage="completed">Completed</li>
+      </ol>
+    </form>
+    <div class="jobs-heading"><h2>Processing jobs</h2><span id="refresh-state">Live status</span></div>
+    <div id="job-list" class="job-list"></div>
+  </section>
+  <script id="initial-videos" type="application/json">{{ videos|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', path='/sync-player.js') }}" defer></script><script src="{{ url_for('static', path='/admin.js') }}" defer></script>{% endblock %}

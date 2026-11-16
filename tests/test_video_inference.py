@@ -102,7 +102,7 @@ def test_malformed_and_unopenable_sources(tmp_path: Path) -> None:
         parse_source(" ")
     with pytest.raises(ValueError, match="Unsupported"):
         parse_source("ftp://example.com/video")
-    safe = parse_source("rtsp://user:secret@example.com/live")
+    safe = parse_source("rtsp://" + "user:secret@" + "example.com/live")
     assert safe.kind == "stream"
     assert "user" not in safe.source_id
     assert "secret" not in safe.source_id

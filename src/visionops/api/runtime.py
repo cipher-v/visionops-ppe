@@ -17,6 +17,11 @@ import numpy as np
 import torch
 
 from visionops.api.errors import ServiceError
+from visionops.api.media import (
+    FFmpegTools,
+    finalize_browser_media,
+    resolve_ffmpeg_tools,
+)
 from visionops.api.metrics import ServiceMetrics
 from visionops.association.config import AssociationConfig
 from visionops.compliance.config import TemporalComplianceConfig
@@ -64,6 +69,9 @@ class VideoJob:
     input_path: Path
     output_dir: Path
     zone_path: Path | None = None
+    presentation_source_path: Path | None = None
+    presentation_original_path: Path | None = None
+    presentation_annotated_path: Path | None = None
     status: str = "queued"
     progress: float = 0.0
     error: str | None = None
@@ -93,6 +101,7 @@ class ProductionRuntime:
             DriftReference.load(drift_path) if drift_path.is_file() else None
         )
         self.detector = DetectorBackend("pytorch", self.config)
+        self.ffmpeg_tools: FFmpegTools = resolve_ffmpeg_tools()
         self.gpu_lock = threading.BoundedSemaphore(settings.image_concurrency)
         self.jobs_lock = threading.Lock()
         self.jobs: dict[str, VideoJob] = {}
@@ -172,7 +181,12 @@ class ProductionRuntime:
             ) from error
         return path
 
-    def submit_video(self, input_path: Path, zone_path: Path | None) -> VideoJob:
+    def submit_video(
+        self,
+        input_path: Path,
+        zone_path: Path | None,
+        presentation_path: Path | None = None,
+    ) -> VideoJob:
         job_id = uuid.uuid4().hex
         output_dir = self.settings.runtime_dir / "jobs" / job_id
         output_dir.mkdir(parents=True)
@@ -182,7 +196,21 @@ class ProductionRuntime:
             target_zone = output_dir / "zones.yaml"
             zone_path.replace(target_zone)
             zone_path = target_zone
-        job = VideoJob(job_id, destination, output_dir, zone_path)
+        presentation_source = None
+        if presentation_path is not None:
+            presentation_dir = output_dir / "presentation"
+            presentation_dir.mkdir(parents=True, exist_ok=True)
+            presentation_source = (
+                presentation_dir / f"source{presentation_path.suffix.lower()}"
+            )
+            presentation_path.replace(presentation_source)
+        job = VideoJob(
+            job_id,
+            destination,
+            output_dir,
+            zone_path,
+            presentation_source_path=presentation_source,
+        )
         with self.jobs_lock:
             self.jobs[job_id] = job
         self.metrics.jobs_submitted.inc()
@@ -201,7 +229,8 @@ class ProductionRuntime:
                     PipelineOptions(
                         source=str(job.input_path),
                         output_dir=job.output_dir / "artifacts",
-                        render=False,
+                        render=True,
+                        overlay_mode="demo",
                         device=self.device,
                         enable_tracking=True,
                         tracker_config=self.settings.root
@@ -217,6 +246,21 @@ class ProductionRuntime:
                     detector=self.detector,
                     warmup=False,
                 )
+            if job.presentation_source_path is None:
+                raise RuntimeError("Original presentation source is unavailable")
+            presentation_dir = job.output_dir / "presentation"
+            job.presentation_original_path = presentation_dir / "original.mp4"
+            job.presentation_annotated_path = presentation_dir / "annotated.mp4"
+            finalize_browser_media(
+                job.presentation_source_path,
+                job.presentation_original_path,
+                self.ffmpeg_tools,
+            )
+            finalize_browser_media(
+                job.output_dir / "artifacts/annotated.mp4",
+                job.presentation_annotated_path,
+                self.ffmpeg_tools,
+            )
             incidents_path = job.output_dir / "artifacts/incidents.jsonl"
             job.incidents = (
                 [
@@ -269,7 +313,10 @@ class ProductionRuntime:
                     {"event": "video_job", "status": "failed", "job_type": "video"}
                 )
             )
-            job.status, job.error = "failed", "Video pipeline failed"
+            job.status, job.error = (
+                "failed",
+                "Video processing or presentation finalization failed",
+            )
             self.metrics.jobs_completed.labels(status="failed").inc()
         finally:
             self.metrics.active_jobs.dec()

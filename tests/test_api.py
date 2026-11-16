@@ -10,7 +10,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from visionops.api.app import create_app
+from visionops.api.auth import WebSettings, hash_password
 from visionops.api.runtime import ProductionRuntime, ServiceSettings, VideoJob
+
+pytestmark = pytest.mark.integration
 
 
 class FakeRuntime:
@@ -49,7 +52,14 @@ class FakeRuntime:
     def validate_zone(self, _content: bytes, _directory: Path) -> Path:
         return _directory / "zone.yaml"
 
-    def submit_video(self, input_path: Path, zone_path: Path | None) -> VideoJob:
+    def submit_video(
+        self,
+        input_path: Path,
+        zone_path: Path | None,
+        presentation_path: Path | None = None,
+    ) -> VideoJob:
+        if presentation_path is not None:
+            presentation_path.unlink(missing_ok=True)
         job = VideoJob(
             "job123",
             input_path,
@@ -79,7 +89,18 @@ def client(tmp_path: Path) -> TestClient:
     settings = ServiceSettings(
         tmp_path, tmp_path / "runtime", max_image_bytes=2048, max_video_bytes=100_000
     )
-    with TestClient(create_app(FakeRuntime, settings)) as test_client:
+    web_settings = WebSettings(
+        tmp_path / "runtime/portfolio.sqlite3",
+        "admin",
+        hash_password("test-password", salt=b"0123456789abcdef"),
+        "test-session-secret-with-at-least-32-characters",
+    )
+    with TestClient(create_app(FakeRuntime, settings, web_settings)) as test_client:
+        response = test_client.post(
+            "/admin/login",
+            data={"username": "admin", "password": "test-password"},
+        )
+        assert response.status_code == 200
         yield test_client
 
 

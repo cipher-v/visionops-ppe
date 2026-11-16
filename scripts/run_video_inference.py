@@ -36,6 +36,18 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--frame-stride", type=int, default=1)
     parser.add_argument("--render", action="store_true")
+    parser.add_argument(
+        "--overlay-mode",
+        choices=("demo", "debug"),
+        default="demo",
+        help="Readable Person-centric demo overlay or detailed diagnostic overlay",
+    )
+    parser.add_argument(
+        "--render-width",
+        type=int,
+        default=None,
+        help="Optional annotated-output width; source inference geometry is unchanged",
+    )
     parser.add_argument("--enable-tracking", action="store_true")
     parser.add_argument("--enable-ppe-association", action="store_true")
     parser.add_argument("--enable-temporal-compliance", action="store_true")
@@ -97,6 +109,8 @@ def main() -> None:
             zones_config=args.zones,
             detector_backend=args.detector_backend,
             deployment_config=args.deployment_config,
+            overlay_mode=args.overlay_mode,
+            render_width=args.render_width,
         ),
     )
     print(json.dumps(metadata, indent=2))
