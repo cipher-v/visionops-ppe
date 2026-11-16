@@ -5,7 +5,12 @@ import pytest
 from visionops.tracking.metrics import TrackingDiagnostics
 from visionops.tracking.schema import PersonTrack
 from visionops.tracking.tracker import PersonByteTracker, TrackerSettings
-from visionops.video.pipeline import PipelineOptions, build_tracking_metadata
+from visionops.video.pipeline import (
+    PipelineOptions,
+    _tracking_person_candidates,
+    build_tracking_metadata,
+)
+from visionops.video.policy import CandidateBox, apply_class_thresholds
 from visionops.video.schema import VideoDetection
 
 ROOT = Path(__file__).parents[1]
@@ -36,7 +41,14 @@ def _detection(
 
 
 def _tracker(buffer: int = 3) -> PersonByteTracker:
-    return PersonByteTracker(TrackerSettings(track_buffer=buffer))
+    return PersonByteTracker(
+        TrackerSettings(
+            track_high_thresh=0.41,
+            track_low_thresh=0.11,
+            new_track_thresh=0.41,
+            track_buffer=buffer,
+        )
+    )
 
 
 def _update(
@@ -80,26 +92,75 @@ def test_botsort_auto_reid_is_rejected_without_native_features() -> None:
 
 def test_production_tracker_selects_supported_botsort_without_reid() -> None:
     production = TrackerSettings.from_yaml(ROOT / "configs/production_tracker.yaml")
-    candidate = TrackerSettings.from_yaml(ROOT / "configs/botsort_person.yaml")
-    assert production == candidate
+    metadata = PersonByteTracker(production).metadata()
     assert production.tracker_type == "botsort"
+    assert production.track_high_thresh == 0.41
+    assert production.track_low_thresh == 0.11
+    assert production.new_track_thresh == 0.41
+    assert production.track_buffer == 60
+    assert production.match_thresh == 0.90
+    assert production.gmc_method == "sparseOptFlow"
     assert production.with_reid is False
+    assert metadata["person_confidence_threshold"] == 0.41
+    assert metadata["tracking_confidence_floor"] == 0.11
 
 
-def test_person_only_and_frozen_threshold_filtering() -> None:
+def test_reportable_and_tracking_person_paths_remain_distinct() -> None:
+    candidates = [
+        CandidateBox(0, 0.90, (0, 0, 10, 10)),
+        CandidateBox(2, 0.20, (10, 10, 30, 80)),
+        CandidateBox(2, 0.50, (40, 10, 60, 80)),
+    ]
+    classes = {0: "helmet", 1: "vest", 2: "Person", 3: "no_helmet", 4: "no_vest"}
+    thresholds = {
+        "helmet": 0.32,
+        "vest": 0.19,
+        "Person": 0.41,
+        "no_helmet": 0.27,
+        "no_vest": 0.11,
+    }
+
+    reportable = apply_class_thresholds(candidates, classes, thresholds)
+    tracking = _tracking_person_candidates(candidates, 0.11)
+
+    assert [(item.class_id, item.confidence) for item in reportable] == [
+        (0, 0.90),
+        (2, 0.50),
+    ]
+    assert [item.confidence for item in tracking] == [0.20, 0.50]
+
+
+def test_person_only_and_tracking_floor_filtering() -> None:
     tracker = _tracker()
     result = _update(
         tracker,
         0,
         [
             _detection(0, 10, class_id=0),
-            _detection(0, 60, confidence=0.4099),
+            _detection(0, 60, confidence=0.1099),
             _detection(0, 110, confidence=0.41),
         ],
     )
     assert len(result.tracks) == 1
     assert result.tracks[0].class_name == "Person"
     assert result.rejected_person_detections == 1
+
+
+def test_low_confidence_person_cannot_initialize_track() -> None:
+    tracker = _tracker()
+    result = _update(tracker, 0, [_detection(0, 30, confidence=0.20)])
+    assert not result.tracks
+    assert not result.events.created_ids
+
+
+def test_strong_person_initializes_and_low_confidence_preserves_track() -> None:
+    tracker = _tracker()
+    strong = _update(tracker, 0, [_detection(0, 30, confidence=0.80)])
+    track_id = strong.tracks[0].track_id
+
+    supported = _update(tracker, 1, [_detection(1, 31, confidence=0.20)])
+    assert [track.track_id for track in supported.tracks] == [track_id]
+    assert not supported.events.created_ids
 
 
 def test_smooth_trajectory_retains_one_track_id() -> None:

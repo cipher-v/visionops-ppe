@@ -27,7 +27,11 @@ from visionops.compliance.schema import TemporalComplianceRecord
 from visionops.deployment.profiler import StageProfiler
 from visionops.tracking.metrics import TrackingDiagnostics
 from visionops.tracking.schema import PersonTrack
-from visionops.tracking.tracker import PersonByteTracker, TrackerSettings
+from visionops.tracking.tracker import (
+    PERSON_CLASS_ID,
+    PersonByteTracker,
+    TrackerSettings,
+)
 from visionops.video.backend import DetectorBackend
 from visionops.video.config import FrozenDetectorConfig, verify_weights
 from visionops.video.policy import CandidateBox, apply_class_thresholds
@@ -171,6 +175,18 @@ def _structured_detections(
             )
         )
     return detections
+
+
+def _tracking_person_candidates(
+    candidates: list[CandidateBox], confidence_floor: float
+) -> list[CandidateBox]:
+    """Select Person support boxes without changing reportable detections."""
+    return [
+        candidate
+        for candidate in candidates
+        if candidate.class_id == PERSON_CLASS_ID
+        and candidate.confidence >= confidence_floor
+    ]
 
 
 def render_detections(
@@ -625,8 +641,10 @@ def run_video_pipeline(
                 device=selected_device,
             )
             detector_latencies.append(time.perf_counter() - detector_started)
+            raw_candidates = _candidates(result)
+
             candidates = apply_class_thresholds(
-                _candidates(result), config.classes, config.confidence_thresholds
+                raw_candidates, config.classes, config.confidence_thresholds
             )
             detections = _structured_detections(
                 packet, candidates, config, source_metadata.source_id
@@ -637,10 +655,20 @@ def run_video_pipeline(
             tracking_result = None
             if tracker is not None and tracking_diagnostics is not None:
                 tracking_started = time.perf_counter()
+                tracking_candidates = _tracking_person_candidates(
+                    raw_candidates, tracker.settings.track_low_thresh
+                )
+
+                tracking_detections = _structured_detections(
+                    packet,
+                    tracking_candidates,
+                    config,
+                    source_metadata.source_id,
+                )
                 tracking_result = tracker.update(
                     packet.frame_index,
                     packet.timestamp_seconds,
-                    detections,
+                    tracking_detections,
                     packet.image.shape[:2],
                     source_metadata.source_id,
                     frame=packet.image,

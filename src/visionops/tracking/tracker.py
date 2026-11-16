@@ -102,7 +102,7 @@ class TrackerSettings:
 
 
 class PersonByteTracker:
-    """Feed only frozen-threshold Person detections into one supported tracker."""
+    """Feed Person detections down to the configured tracking confidence floor."""
 
     def __init__(self, settings: TrackerSettings) -> None:
         settings.validate()
@@ -170,6 +170,7 @@ class PersonByteTracker:
             "configuration": self.settings.to_dict(),
             "person_class_id": PERSON_CLASS_ID,
             "person_confidence_threshold": FROZEN_PERSON_THRESHOLD,
+            "tracking_confidence_floor": self.settings.track_low_thresh,
             "track_ids_local_to_run": True,
         }
 
@@ -206,7 +207,7 @@ class PersonByteTracker:
         source_id: str,
         frame: np.ndarray | None = None,
     ) -> TrackerFrameResult:
-        """Update one processed frame without accepting PPE or weak Person boxes."""
+        """Update one frame using valid Person boxes at the tracking floor."""
         self._validate_frame(frame_index, timestamp_seconds)
         height, width = frame_shape
         if height <= 0 or width <= 0:
@@ -221,7 +222,7 @@ class PersonByteTracker:
         accepted = [
             detection
             for detection in person_detections
-            if detection.confidence >= FROZEN_PERSON_THRESHOLD
+            if detection.confidence >= self.settings.track_low_thresh
             and math.isfinite(detection.confidence)
             and self._valid_box(detection)
         ]

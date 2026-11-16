@@ -1,10 +1,10 @@
-# Selected in Checkpoint 13B after bounded real-video continuity comparison.
+# Selected after the final bounded crowded-video continuity review.
 tracker_type: botsort
-track_high_thresh: 0.25
-track_low_thresh: 0.10
-new_track_thresh: 0.25
-track_buffer: 30
-match_thresh: 0.80
+track_high_thresh: 0.41
+track_low_thresh: 0.11
+new_track_thresh: 0.41
+track_buffer: 60
+match_thresh: 0.90
 fuse_score: true
 appearance_reid: false
 gmc_method: sparseOptFlow
