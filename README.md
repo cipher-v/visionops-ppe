@@ -10,6 +10,8 @@ Images or video pass through a frozen PyTorch YOLO26n detector at 960 pixels. Cl
 
 ## Demo
 
+**YouTube demos:** [Watch the VisionOps PPE demo playlist](https://www.youtube.com/playlist?list=PLOi5iik86yrY)
+
 Two short side-by-side demonstrations show the production pipeline on real video.
 
 ### Multi-worker tracking
@@ -51,10 +53,6 @@ See [architecture.md](docs/architecture.md) for component and safety boundaries.
 
 ## Why this project is different
 
-- Controlled 640→960 resolution and YOLO26n→YOLO26s capacity experiments.
-- Leakage-audited RF100 evaluation and explicit domain-shift error decomposition.
-- Mixed-source adaptation plus a matched-exposure control separating diversity from volume.
-- Frozen, class-specific threshold calibration across source and target validation domains.
 - Real-video tracking, per-person PPE association, temporal persistence, and zone-aware incidents.
 - Bounded BoT-SORT/ReID comparison prompted by an observed identity-transfer failure.
 - Strict ONNX behavioral parity testing, robustness stress tests, and honest negative results.
@@ -92,7 +90,7 @@ The final model was selected through controlled experiments rather than a single
 | Decision | Measured evidence | Outcome |
 |---|---|---|
 | [640 → 960 resolution](docs/experiments/resolution_960/comparison.md) | mAP50-95 `0.5461 → 0.6012`; tiny-object recall `+0.150` | Selected 960px |
-| [YOLO26n vs YOLO26s](docs/experiments/external_generalization/comparison.md) | YOLO26s improved source accuracy, but external mAP50-95 was `0.3012` vs `0.3029` for YOLO26n with roughly 2× inference cost | Retained YOLO26n |
+| [YOLO26n vs YOLO26s](docs/experiments/model_capacity_960/comparison.md) + [external evaluation](docs/experiments/external_generalization/comparison.md) | YOLO26s improved source accuracy, but external mAP50-95 was `0.3012` vs `0.3029` for YOLO26n with roughly 2× inference cost | Retained YOLO26n |
 | [Target-domain diversity](docs/experiments/data_diversity_exposure_control/comparison.md) | RF100 mAP50-95: source-only `0.3349` → exposure-matched `0.4722` → full mixed `0.4948` | Selected mixed-source training |
 | [Operating-point calibration](docs/experiments/final_model_selection/calibration.md) | Construction-PPE / RF100 F1: `0.9020 / 0.9073` | Froze class-specific thresholds |
 | [Tracker comparison](docs/experiments/tracker_robustness/comparison.md) | BoT-SORT avoided the primary transfer failure; appearance ReID showed no meaningful visual benefit | Selected BoT-SORT without ReID |
